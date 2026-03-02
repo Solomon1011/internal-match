@@ -1,17 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Internal Match - Login</title>
-    <link rel="stylesheet" href="style.css">
+  <title>Internal Match</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg">
 
 <div class="card">
-    <h1>💘 Internal Match</h1>
-    <input type="text" id="username" placeholder="Enter your name">
-    <button onclick="login()">Enter</button>
+  <h1>💘 Internal Match</h1>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="signUp()">Sign Up</button>
+  <button onclick="login()">Login</button>
+
+  <hr>
+
+  <button onclick="googleLogin()">Login with Google</button>
 </div>
 
-<script src="script.js"></script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  // 🔴 PASTE YOUR FIREBASE CONFIG HERE
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Sign Up
+window.signUp = async function() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("Account Created!");
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Login
+window.login = async function() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Google Login
+window.googleLogin = async function() {
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+</script>
 </body>
 </html>
