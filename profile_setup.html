@@ -3,17 +3,22 @@
 <head>
   <title>Complete Your Profile</title>
   <style>
-    body { background-color:#1a1a1a; color:#f5d061; font-family: Arial; padding:20px; }
+    body { background-color:#1a1a1a; color:#f5d061; font-family: Arial, sans-serif; padding:20px; }
+    h2 { text-align:center; }
     input, select, button { display:block; margin:10px 0; padding:8px; width:80%; border-radius:5px; border:1px solid #f5d061; background:#111; color:#f5d061; }
+    img { display:block; margin:10px 0; width:120px; height:120px; border-radius:50%; object-fit:cover; border:2px solid #f5d061; }
   </style>
 </head>
 <body>
 
 <h2>Complete Your Profile</h2>
 
+<!-- Profile Picture Preview -->
+<img id="profile-pic-display" src="" alt="Profile Picture">
+
+<input type="file" id="profile-pic" accept="image/*">
 <input type="text" id="username" placeholder="Username">
 <input type="number" id="age" placeholder="Age">
-<input type="date" id="dob" placeholder="Date of Birth">
 <input type="text" id="location" placeholder="Location">
 
 <select id="gender">
@@ -25,14 +30,11 @@
 
 <select id="interest">
   <option value="">What are you interested in?</option>
-  <option value="Hangout 🩵">Hangout 🩵</option>
-  <option value="Friends 💚">Friends 💚</option>
-  <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-  <option value="Marriage 💘">Marriage 💘</option>
+  <option value="Hangout">Hangout 🩵</option>
+  <option value="Friends">Friends 💚</option>
+  <option value="Serious Relationship">Serious Relationship 💖</option>
+  <option value="Marriage">Marriage 💘</option>
 </select>
-
-<label>Profile Picture:</label>
-<input type="file" id="profile-pic">
 
 <button onclick="saveProfile()">Save Profile</button>
 
@@ -57,45 +59,77 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
+// Redirect if not logged in
 auth.onAuthStateChanged(user=>{
   if(!user) window.location.href="index.html";
+  else loadProfile(user.uid);
 });
 
+// Load existing profile (if any)
+function loadProfile(uid){
+  db.collection("users").doc(uid).get().then(doc=>{
+    if(doc.exists){
+      const data = doc.data();
+      document.getElementById("username").value = data.username || '';
+      document.getElementById("age").value = data.age || '';
+      document.getElementById("location").value = data.location || '';
+      document.getElementById("gender").value = data.gender || '';
+      document.getElementById("interest").value = data.interest || '';
+      if(data.profilePic) document.getElementById("profile-pic-display").src = data.profilePic;
+    }
+  });
+}
+
+// Preview selected profile picture
+document.getElementById("profile-pic").addEventListener("change", function(){
+  const file = this.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = e => document.getElementById("profile-pic-display").src = e.target.result;
+    reader.readAsDataURL(file);
+  }
+});
+
+// Save profile
 function saveProfile(){
+  const user = auth.currentUser;
   const username = document.getElementById("username").value.trim();
   const age = document.getElementById("age").value;
-  const dob = document.getElementById("dob").value;
   const location = document.getElementById("location").value.trim();
   const gender = document.getElementById("gender").value;
   const interest = document.getElementById("interest").value;
-  const profilePic = document.getElementById("profile-pic").files[0];
+  const profilePicFile = document.getElementById("profile-pic").files[0];
 
-  if(!username || !age || !dob || !location || !gender || !interest || !profilePic){
-    return alert("Please fill all fields and select a profile picture!");
+  if(!username || !age || !location || !gender || !interest){
+    return alert("Please fill all fields!");
   }
 
-  const user = auth.currentUser;
+  const userRef = db.collection("users").doc(user.uid);
 
-  // Upload profile picture to Firebase Storage
-  const storageRef = storage.ref().child(`profile-pictures/${user.uid}`);
-  storageRef.put(profilePic).then(snapshot=>{
-    snapshot.ref.getDownloadURL().then(url=>{
-      // Save user profile in Firestore
-      db.collection("users").doc(user.uid).update({
-        username: username,
-        age: parseInt(age),
-        dob: dob,
-        location: location,
-        gender: gender,
-        interest: interest,
-        profilePic: url
-      }).then(()=>{
-        alert("Profile saved!");
-        window.location.href = "dashboard.html";
-      }).catch(err=>alert(err.message));
+  if(profilePicFile){
+    // Upload profile picture
+    const storageRef = storage.ref(`profile-pictures/${user.uid}`);
+    storageRef.put(profilePicFile).then(snapshot=>{
+      snapshot.ref.getDownloadURL().then(url=>{
+        userRef.set({
+          username, age: parseInt(age), location, gender, interest, profilePic: url, coins: 10, premium: false
+        }, {merge:true}).then(()=>{
+          alert("Profile saved!");
+          window.location.href="dashboard.html";
+        });
+      });
     });
-  });
+  } else {
+    // Save without updating picture
+    userRef.set({
+      username, age: parseInt(age), location, gender, interest
+    }, {merge:true}).then(()=>{
+      alert("Profile saved!");
+      window.location.href="dashboard.html";
+    });
+  }
 }
 </script>
+
 </body>
 </html>
