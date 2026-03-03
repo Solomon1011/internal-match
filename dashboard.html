@@ -147,24 +147,24 @@ function showProfile(){
       <p>${p.gender} | ${p.location}</p>
       <p>Interest: ${p.interest}</p>
       <div class="actions">
-        <button class="action-btn" onclick="swipe('like')">💖 Like</button>
-        <button class="action-btn" onclick="swipe('ignore')">❌ Ignore</button>
-        <button class="action-btn" onclick="messageCurrent()">💬 Message</button>
+        <button class="action-btn" onclick="swipe('like', ${currentIndex})">💖 Like</button>
+        <button class="action-btn" onclick="swipe('ignore', ${currentIndex})">❌ Ignore</button>
+        <button class="action-btn" onclick="messageCurrent(${currentIndex})">💬 Message</button>
       </div>
     </div>
   `;
 }
 
-function swipe(action){
-  const p = filteredProfiles[currentIndex];
+function swipe(action, index){
+  const p = filteredProfiles[index];
   if(action==="like") { addChat(p); autoReply(p); }
   if(action==="ignore") { p.ignored = true; }
   currentIndex++;
   showProfile();
 }
 
-function messageCurrent(){
-  const p = filteredProfiles[currentIndex];
+function messageCurrent(index){
+  const p = filteredProfiles[index];
   if(p) addChat(p);
 }
 
@@ -177,6 +177,7 @@ function addChat(profile){
     profile.addedToChat=true;
     profile.messages.push({from:profile.name,text:"Hi there! 💖 Let's chat romantically!"});
   }
+  showTab('chats');
   openChat(profile);
 }
 
