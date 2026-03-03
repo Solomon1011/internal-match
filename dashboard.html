@@ -3,53 +3,123 @@
 <head>
   <title>Internal Match Dashboard</title>
   <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #f5d061;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    /* Tab bar fixed at bottom */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #111;
+      border-top: 1px solid #f5d061;
+      padding: 10px 0;
+    }
+
+    .tab-bar button {
+      background: none;
+      border: none;
+      color: #f5d061;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .tab-content {
+      margin-bottom: 80px; /* To avoid overlap with bottom tab */
+    }
+
+    #swipe-container {
+      margin-bottom: 10px;
+    }
+
+    #chat-box {
+      border: 1px solid #f5d061;
+      padding: 10px;
+      height: 200px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #f5d061;
+      color: #1a1a1a;
+      border: none;
+      padding: 8px 12px;
+      margin: 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    input[type=text] {
+      padding: 6px;
+      width: 70%;
+      margin-right: 5px;
+      border-radius: 4px;
+      border: 1px solid #f5d061;
+      background-color: #111;
+      color: #f5d061;
+    }
+  </style>
 </head>
-<body style="background-color:#1a1a1a; color:#f5d061; font-family:Arial,sans-serif; padding:20px;">
+<body>
 
-<h2 style="text-align:center;">💘 Internal Match Dashboard</h2>
+<h2>💘 Internal Match Dashboard</h2>
 
-<!-- Tabs -->
-<div style="display:flex; justify-content:space-around; margin-bottom:20px;">
-  <button onclick="showTab('profile')">My Profile</button>
-  <button onclick="showTab('people')">People Profiles</button>
-  <button onclick="showTab('liked')">Who Likes Me</button>
+<div class="tab-content">
+  <!-- Profile Tab -->
+  <div id="profile-tab" style="display:none;">
+    <h3>My Profile</h3>
+    <p>Email: <span id="user-email"></span></p>
+    <p>Coins: <span id="coins">Loading...</span></p>
+    <p>Premium: <span id="premium-status">No</span></p>
+    <button onclick="buyPremium()">Buy Premium</button>
+    <button onclick="useCoin()">Use 1 Coin</button>
+    <br><br>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- People Profiles Tab -->
+  <div id="people-tab" style="display:none;">
+    <h3>People Profiles</h3>
+    <div id="swipe-container">Loading profiles...</div>
+    <button onclick="swipe('like')">Like</button>
+    <button onclick="swipe('dislike')">Dislike</button>
+  </div>
+
+  <!-- Who Likes Me Tab -->
+  <div id="liked-tab" style="display:none;">
+    <h3>Who Likes Me</h3>
+    <div id="liked-container">Loading...</div>
+  </div>
+
+  <!-- Chat Tab -->
+  <div id="chats-tab" style="display:none;">
+    <h3>Chat with Your Matches</h3>
+    <div id="chat-users" style="margin-bottom:10px;"></div>
+    <div id="chat-box"></div>
+    <input type="text" id="message-input" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Bottom Tab Bar -->
+<div class="tab-bar">
+  <button onclick="showTab('profile')">Profile</button>
+  <button onclick="showTab('people')">People</button>
+  <button onclick="showTab('liked')">Likes</button>
   <button onclick="showTab('chats')">Chats</button>
-  <button onclick="logout()">Logout</button>
-</div>
-
-<!-- Tab Contents -->
-
-<!-- Profile Tab -->
-<div id="profile-tab" style="display:none;">
-  <h3>My Profile</h3>
-  <p>Email: <span id="user-email"></span></p>
-  <p>Coins: <span id="coins">Loading...</span></p>
-  <p>Premium: <span id="premium-status">No</span></p>
-  <button onclick="buyPremium()">Buy Premium</button>
-  <button onclick="useCoin()">Use 1 Coin</button>
-</div>
-
-<!-- People Profiles Tab -->
-<div id="people-tab" style="display:none;">
-  <h3>People Profiles</h3>
-  <div id="swipe-container" style="margin-bottom:10px;">Loading profiles...</div>
-  <button onclick="swipe('like')">Like</button>
-  <button onclick="swipe('dislike')">Dislike</button>
-</div>
-
-<!-- Who Likes You Tab -->
-<div id="liked-tab" style="display:none;">
-  <h3>Who Likes Me</h3>
-  <div id="liked-container">Loading...</div>
-</div>
-
-<!-- Chat Tab -->
-<div id="chats-tab" style="display:none;">
-  <h3>Chat with Your Matches</h3>
-  <div id="chat-users" style="margin-bottom:10px;"></div>
-  <div id="chat-box" style="border:1px solid #f5d061; padding:10px; height:200px; overflow-y:scroll; margin-bottom:10px;"></div>
-  <input type="text" id="message-input" placeholder="Type a message">
-  <button onclick="sendMessage()">Send</button>
 </div>
 
 <!-- Firebase scripts -->
@@ -58,6 +128,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
   authDomain: "internal-match.firebaseapp.com",
@@ -71,20 +142,16 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ===== Tab switching =====
+// Tab switching
 function showTab(tab){
   document.getElementById('profile-tab').style.display='none';
   document.getElementById('people-tab').style.display='none';
   document.getElementById('liked-tab').style.display='none';
   document.getElementById('chats-tab').style.display='none';
-
-  if(tab==='profile') document.getElementById('profile-tab').style.display='block';
-  if(tab==='people') document.getElementById('people-tab').style.display='block';
-  if(tab==='liked') document.getElementById('liked-tab').style.display='block';
-  if(tab==='chats') document.getElementById('chats-tab').style.display='block';
+  document.getElementById(tab+'-tab').style.display='block';
 }
 
-// ===== Auth & Dashboard Load =====
+// Auth state
 auth.onAuthStateChanged(user => {
   if(!user){
     window.location.href = "index.html";
@@ -97,7 +164,7 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// ===== Load User Profile =====
+// Load user profile
 function loadUserProfile(uid){
   db.collection("users").doc(uid).get().then(doc=>{
     if(doc.exists){
@@ -113,7 +180,7 @@ function loadUserProfile(uid){
   });
 }
 
-// ===== Coins =====
+// Coins
 function useCoin(){
   const user = auth.currentUser;
   const userRef = db.collection("users").doc(user.uid);
@@ -128,7 +195,7 @@ function useCoin(){
   });
 }
 
-// ===== Paystack Premium =====
+// Buy Premium
 function buyPremium(){
   const user = auth.currentUser;
   const userRef = db.collection("users").doc(user.uid);
@@ -149,20 +216,18 @@ function buyPremium(){
   handler.openIframe();
 }
 
-// ===== Logout =====
+// Logout
 function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
 
-// ===== Swipe System =====
+// Swipe System
 let currentProfileIndex=0;
 let profiles=[];
-
 function loadProfiles(uid){
   db.collection("users").get().then(snapshot=>{
     profiles=snapshot.docs.filter(doc=>doc.id!==uid).map(doc=>({id:doc.id,...doc.data()}));
     showProfile();
   });
 }
-
 function showProfile(){
   const container=document.getElementById("swipe-container");
   if(currentProfileIndex>=profiles.length){
@@ -172,7 +237,6 @@ function showProfile(){
   const profile=profiles[currentProfileIndex];
   container.innerHTML=`<h3>${profile.email}</h3>`;
 }
-
 function swipe(type){
   const user=auth.currentUser;
   const profile=profiles[currentProfileIndex];
@@ -191,7 +255,7 @@ function swipe(type){
   showProfile();
 }
 
-// ===== Who Likes Me =====
+// Who Likes Me
 function loadWhoLikedMe(){
   const user=auth.currentUser;
   db.collection('likes').where('to','==',user.uid).where('type','==','like').get()
@@ -209,15 +273,13 @@ function loadWhoLikedMe(){
   });
 }
 
-// ===== Chat System =====
+// Chat System
 let currentChatId=null;
-
 function loadMatches(){
   const user=auth.currentUser;
   db.collection("matches").where("user1","==",user.uid).get().then(showMatchUsers);
   db.collection("matches").where("user2","==",user.uid).get().then(showMatchUsers);
 }
-
 function showMatchUsers(snapshot){
   const chatUsersDiv=document.getElementById("chat-users");
   snapshot.forEach(doc=>{
@@ -230,7 +292,6 @@ function showMatchUsers(snapshot){
     chatUsersDiv.appendChild(btn);
   });
 }
-
 function openChat(chatId,matchUid){
   currentChatId=chatId;
   const chatBox=document.getElementById("chat-box");
@@ -252,10 +313,9 @@ function openChat(chatId,matchUid){
       div.innerText=(msg.from===auth.currentUser.uid?"Me: ":"Them: ")+msg.text;
       chatBox.appendChild(div);
     });
-    chatBox.scrollTop=chatBox.scrollHeight;
+    chatBox.scrollTop = chatBox.scrollHeight;
   });
 }
-
 function sendMessage(){
   if(!currentChatId) return alert("Select a match first!");
   const input=document.getElementById("message-input");
@@ -269,7 +329,6 @@ function sendMessage(){
       timestamp: firebase.firestore.Timestamp.now()
     })
   });
-
   input.value="";
 }
 </script>
