@@ -2,12 +2,8 @@
 <html>
 <head>
   <title>Internal Match Dashboard</title>
-
-  <!-- STOP ZOOMING -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
   <script src="https://js.paystack.co/v1/inline.js"></script>
-
   <style>
     body { 
       background-color:#1a1a1a; 
@@ -16,9 +12,7 @@
       margin:0; 
       padding:20px; 
     }
-
     h2{text-align:center;}
-
     .tab-bar { 
       position:fixed; 
       bottom:0; 
@@ -29,7 +23,6 @@
       border-top:1px solid #f5d061; 
       padding:10px 0; 
     }
-
     .tab-bar button { 
       background:none; 
       border:none; 
@@ -39,86 +32,32 @@
       display:flex; 
       flex-direction:column; 
       align-items:center; 
-      flex:1;
     }
-
-    .tab-bar img{
-      width:24px; 
-      height:24px; 
-      margin-bottom:3px;
-    }
-
-    /* CENTER CONTENT */
-    .tab-content{
-      margin-bottom:100px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-    }
-
-    #profile-tab,
-    #people-tab,
-    #liked-tab,
-    #chats-tab{
-      width:100%;
-      max-width:400px;
-    }
-
-    #swipe-container, 
-    #liked-container, 
-    #chat-box { 
-      margin-bottom:10px; 
-    }
-
-    #chat-box{
-      border:1px solid #f5d061; 
-      padding:10px; 
-      height:200px; 
-      overflow-y:scroll;
-      text-align:left;
-    }
-
-    button{
-      background:#f5d061; 
-      color:#1a1a1a; 
-      border:none; 
-      padding:8px 12px; 
-      margin:2px; 
-      border-radius:4px; 
-      cursor:pointer;
-    }
-
-    input[type=text]{
-      padding:6px; 
-      width:70%; 
-      margin-right:5px; 
-      border-radius:4px; 
-      border:1px solid #f5d061; 
-      background:#111; 
-      color:#f5d061;
-    }
-
-    img.profile-small{
-      width:40px; 
-      height:40px; 
-      border-radius:50%; 
-      margin-right:5px; 
-      vertical-align:middle;
+    .tab-bar img{width:24px; height:24px; margin-bottom:3px;}
+    .tab-content{margin-bottom:100px; display:flex; flex-direction:column; align-items:center;}
+    #swipe-container, #liked-container, #chat-box { margin-bottom:10px; width:100%; max-width:400px; text-align:center; }
+    #chat-box{border:1px solid #f5d061; padding:10px; height:200px; overflow-y:scroll;}
+    button{background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; margin:2px; border-radius:4px; cursor:pointer;}
+    input[type=text]{padding:6px; width:70%; margin-right:5px; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061;}
+    img.profile-small{width:40px; height:40px; border-radius:50%; margin-right:5px; vertical-align:middle;}
+    /* Center all tab content */
+    #profile-tab, #people-tab, #liked-tab, #chats-tab {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
   </style>
 </head>
-
 <body>
 
 <h2>💘 Internal Match Dashboard</h2>
 
 <div class="tab-content">
-
   <!-- Profile Tab -->
-  <div id="profile-tab" style="display:none;">
+  <div id="profile-tab">
     <h3>My Profile</h3>
-    <img id="user-profile-pic" src="" alt="Profile" 
-    style="width:120px; height:120px; border-radius:50%; border:2px solid #f5d061;"><br>
+    <img id="user-profile-pic" src="" alt="Profile" style="width:120px; height:120px; border-radius:50%; border:2px solid #f5d061;"><br>
     <p>Email: <span id="user-email"></span></p>
     <p>Username: <span id="user-username"></span></p>
     <p>Age: <span id="user-age"></span></p>
@@ -135,7 +74,7 @@
   </div>
 
   <!-- People Profiles Tab -->
-  <div id="people-tab" style="display:none;">
+  <div id="people-tab">
     <h3>People Profiles</h3>
     <div id="swipe-container">Loading profiles...</div>
     <button onclick="swipe('like')">Like</button>
@@ -143,38 +82,91 @@
   </div>
 
   <!-- Who Likes Me Tab -->
-  <div id="liked-tab" style="display:none;">
+  <div id="liked-tab">
     <h3>Who Likes Me</h3>
     <div id="liked-container">Loading...</div>
   </div>
 
   <!-- Chat Tab -->
-  <div id="chats-tab" style="display:none;">
+  <div id="chats-tab">
     <h3>Chats</h3>
     <div id="chat-users" style="margin-bottom:10px;"></div>
     <div id="chat-box"></div>
     <input type="text" id="message-input" placeholder="Type a message">
     <button onclick="sendMessage()">Send</button>
   </div>
-
 </div>
 
 <!-- Bottom Tab Bar -->
 <div class="tab-bar">
   <button onclick="showTab('profile')">
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="">
     Profile
   </button>
   <button onclick="showTab('people')">
-    <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">
     People
   </button>
   <button onclick="showTab('liked')">
-    <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" alt="">
     Likes
   </button>
   <button onclick="showTab('chats')">
-    <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" alt="">
     Chats
   </button>
 </div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<script>
+// Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+  authDomain: "internal-match.firebaseapp.com",
+  projectId: "internal-match",
+  storageBucket: "internal-match.appspot.com",
+  messagingSenderId: "129707008837",
+  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// Tab switching with centered content
+function showTab(tab){
+  document.getElementById('profile-tab').style.display='none';
+  document.getElementById('people-tab').style.display='none';
+  document.getElementById('liked-tab').style.display='none';
+  document.getElementById('chats-tab').style.display='none';
+
+  const selectedTab = document.getElementById(tab+'-tab');
+  selectedTab.style.display='flex';
+  selectedTab.style.flexDirection='column';
+  selectedTab.style.alignItems='center';
+}
+
+// Auth
+let currentUser=null;
+auth.onAuthStateChanged(user=>{
+  if(!user) return window.location.href="index.html";
+  currentUser=user;
+  loadProfile();
+  loadProfiles();
+  loadWhoLikedMe();
+  loadMatches();
+  showTab('profile');
+});
+
+// Keep all your original JavaScript below this line exactly as it was
+// ... (insert all your original functions: loadProfile, editProfile, logout, useCoin, buyPremium, loadProfiles, swipe, loadWhoLikedMe, loadMatches, openChat, sendMessage)
+// Copy everything from your old dashboard.html script after this point
+</script>
+
+</body>
+</html>
