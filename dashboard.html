@@ -1,25 +1,25 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Internal Match Dashboard</title>
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <style>
-    body { background-color:#1a1a1a; color:#f5d061; font-family:Arial; margin:0; padding:20px; }
-    h2{text-align:center;}
-    .tab-bar { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; border-top:1px solid #f5d061; padding:10px 0; }
-    .tab-bar button { background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
-    .tab-bar img{width:24px; height:24px; margin-bottom:3px;}
-    .tab-content{margin-bottom:100px; text-align:center;}
-    #swipe-container, #liked-container { margin-bottom:10px; display:flex; flex-direction:column; align-items:center; }
-    .profile-card { display:flex; align-items:center; justify-content:space-between; width:80%; background:#111; border:1px solid #f5d061; padding:10px; border-radius:8px; margin:5px 0; }
-    .profile-info { display:flex; align-items:center; }
-    .profile-info img { width:50px; height:50px; border-radius:50%; margin-right:10px; }
-    .online-dot { width:12px; height:12px; border-radius:50%; background:#00FF00; margin-left:5px; }
-    .chat-box { margin-top:10px; padding:10px; border:1px solid #f5d061; width:80%; border-radius:8px; }
-    button{background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; margin:2px; border-radius:4px; cursor:pointer;}
-    input[type=text], select, input[type=file]{padding:6px; width:70%; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061;}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Internal Match Dashboard</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+body {background:#1a1a1a; color:#f5d061; font-family:Arial, sans-serif; margin:0; padding:0;}
+h2{text-align:center; margin-top:15px;}
+.tab-bar {position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; border-top:1px solid #f5d061; padding:10px 0;}
+.tab-bar button {background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center;}
+.tab-bar img{width:24px; height:24px; margin-bottom:3px;}
+.tab-content{margin-bottom:100px; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+#swipe-container, #liked-container, #chat-box {margin-bottom:10px; text-align:center;}
+#chat-box{border:1px solid #f5d061; padding:10px; width:90%; max-width:400px; height:300px; overflow-y:scroll;}
+button{background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; margin:2px; border-radius:4px; cursor:pointer;}
+input[type=text], input[type=number], select{padding:6px; width:80%; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061;}
+img.profile-small{width:50px; height:50px; border-radius:50%; margin-right:5px; vertical-align:middle;}
+.online-dot{width:10px; height:10px; background:lime; border-radius:50%; display:inline-block; margin-left:5px;}
+</style>
 </head>
 <body>
 
@@ -27,156 +27,237 @@
 
 <div class="tab-content">
 
-  <!-- Profile Tab -->
-  <div id="profile-tab" style="display:none;">
-    <h3>My Profile</h3>
-    <img id="user-profile-pic" src="" alt="Profile" style="width:120px; height:120px; border-radius:50%; border:2px solid #f5d061;"><br>
-    <p>Email: <span id="user-email"></span></p>
-    <p>Username: <span id="user-username"></span></p>
-    <p>Age: <span id="user-age"></span></p>
-    <p>Location: <span id="user-location"></span></p>
-    <p>Gender: <span id="user-gender"></span></p>
-    <p>Interest: <span id="user-interest"></span></p>
-    <p>Coins: <span id="user-coins"></span></p>
-    <p>Premium: <span id="user-premium"></span></p>
-    
-    <h4>Edit Profile</h4>
-    <input type="text" id="edit-username" placeholder="Username">
-    <input type="number" id="edit-age" placeholder="Age">
-    <input type="text" id="edit-location" placeholder="Location">
-    <select id="edit-gender">
-      <option value="">Gender</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-      <option value="Other">Other</option>
-    </select>
-    <select id="edit-interest">
-      <option value="">Interest</option>
-      <option value="Hangout 🩵">Hangout 🩵</option>
-      <option value="Friends 💚">Friends 💚</option>
-      <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-      <option value="Marriage 💘">Marriage 💘</option>
-    </select>
-    <input type="file" id="edit-profile-pic" accept="image/*">
-    <button onclick="saveProfileEdit()">Save Changes</button>
-    <br><br>
-    <button onclick="logout()">Logout</button>
-  </div>
+<!-- Profile Tab -->
+<div id="profile-tab" style="display:none; text-align:center;">
+<h3>My Profile</h3>
+<img id="user-profile-pic" src="" alt="Profile" style="width:120px;height:120px;border-radius:50%; border:2px solid #f5d061;"><br>
+<input type="file" id="profile-pic-input" accept="image/*" capture="user"><br>
+<input type="text" id="username" placeholder="Username">
+<input type="number" id="age" placeholder="Age">
+<select id="gender">
+  <option value="">Gender</option>
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+</select>
+<select id="country"></select>
+<select id="interest">
+  <option value="">Interest</option>
+  <option value="Hangout 🩵">Hangout 🩵</option>
+  <option value="Friends 💚">Friends 💚</option>
+  <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+  <option value="Marriage 💘">Marriage 💘</option>
+</select>
+<button onclick="saveProfile()">Save Profile</button>
+<br>
+<p>Email: <span id="user-email"></span></p>
+<p>Coins: <span id="user-coins"></span></p>
+<p>Premium: <span id="user-premium"></span></p>
+<button onclick="buyPremium()">Buy Premium</button>
+<button onclick="useCoin()">Use 1 Coin</button>
+<br><br>
+<button onclick="logout()">Logout</button>
+</div>
 
-  <!-- People Profiles Tab -->
-  <div id="people-tab" style="display:none;">
-    <h3>People Profiles</h3>
-    <div id="swipe-container"></div>
-  </div>
+<!-- People Profiles Tab -->
+<div id="people-tab" style="display:none;">
+<h3>People Profiles</h3>
+<div id="swipe-container">Loading profiles...</div>
+<button onclick="swipe('like')">Like</button>
+<button onclick="swipe('dislike')">Ignore</button>
+</div>
 
-  <!-- Chat Tab -->
-  <div id="chats-tab" style="display:none;">
-    <h3 id="chat-with-name"></h3>
-    <img id="chat-with-pic" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid #f5d061;"><br>
-    <div id="chat-box" class="chat-box"></div>
-  </div>
+<!-- Likes Tab -->
+<div id="liked-tab" style="display:none;">
+<h3>Who Likes Me</h3>
+<div id="liked-container">Loading...</div>
+</div>
+
+<!-- Chat Tab -->
+<div id="chats-tab" style="display:none;">
+<h3 id="chat-person-name"></h3>
+<img id="chat-person-pic" src="" style="width:120px;height:120px;border-radius:50%; border:2px solid #f5d061;"><br>
+<div id="chat-box"></div>
+</div>
 
 </div>
 
 <!-- Bottom Tab Bar -->
 <div class="tab-bar">
-  <button onclick="showTab('profile')">
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="">Profile
-  </button>
-  <button onclick="showTab('people')">
-    <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">People
-  </button>
-  <button onclick="showTab('chats')">
-    <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" alt="">Chats
-  </button>
+<button onclick="showTab('profile')">
+<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="">Profile
+</button>
+<button onclick="showTab('people')">
+<img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">People
+</button>
+<button onclick="showTab('liked')">
+<img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" alt="">Likes
+</button>
+<button onclick="showTab('chats')">
+<img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" alt="">Chats
+</button>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
 <script>
-  // Prevent zooming on mobile
-  document.addEventListener('touchstart', e=>{ if(e.touches.length>1) e.preventDefault(); }, {passive:false});
-  document.addEventListener('gesturestart', e=>e.preventDefault());
+// Firebase
+const firebaseConfig={apiKey:"AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",authDomain:"internal-match.firebaseapp.com",projectId:"internal-match",storageBucket:"internal-match.appspot.com",messagingSenderId:"129707008837",appId:"1:129707008837:web:f3f0033bbbe673107a542c"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.firestore(), storage=firebase.storage();
+let currentUser=null, profiles=[], currentProfileIndex=0, currentChatId=null;
 
-  const demoProfiles=[];
-  const countries=["USA","UK","Nigeria","Brazil","India","Germany","France","Canada","Australia","Kenya","Ghana","South Africa"];
-  const interests=["Hangout 🩵","Friends 💚","Serious Relationship 💖","Marriage 💘"];
-  const maleNames=["John","James","Michael","Robert","William"];
-  const femaleNames=["Mary","Patricia","Jennifer","Linda","Elizabeth"];
+// Country List (150+)
+const countries=["USA","UK","Canada","France","Germany","Italy","Spain","Nigeria","Ghana","Kenya","South Africa","Egypt","Morocco","Algeria","Brazil","Mexico","Argentina","China","Japan","India","Australia","Russia","Sweden","Norway","Denmark","Finland","Netherlands","Belgium","Switzerland","Austria","Poland","Turkey","Saudi Arabia","UAE","Iran","Iraq","Pakistan","Bangladesh","Philippines","Thailand","Vietnam","Indonesia","Malaysia","Singapore","New Zealand","South Korea","North Korea","Chile","Colombia","Peru","Venezuela","Ecuador","Bolivia","Paraguay","Uruguay","Costa Rica","Panama","Cuba","Jamaica","Haiti","Dominican Republic","Iceland","Portugal","Greece","Hungary","Czech Republic","Slovakia","Slovenia","Croatia","Serbia","Romania","Bulgaria","Ukraine","Belarus","Lithuania","Latvia","Estonia","Luxembourg","Liechtenstein","Monaco","San Marino","Malta","Cyprus","Lebanon","Syria","Jordan","Oman","Qatar","Kuwait","Bahrain","Yemen","Morocco","Algeria","Tunisia","Libya","Sudan","Ethiopia","Somalia","Uganda","Tanzania","Rwanda","Burundi","Zimbabwe","Zambia","Malawi","Mozambique","Botswana","Namibia","Lesotho","Swaziland","Cameroon","Senegal","Ivory Coast","Mali","Niger","Chad","Mauritania","Gambia","Sierra Leone","Liberia","Guinea","Guinea-Bissau","Burkina Faso","Central African Republic","Gabon","Equatorial Guinea","Djibouti","Eritrea","Cape Verde","Sao Tome & Principe"];
 
-  // Generate 20,000 demo profiles
-  for(let i=1;i<=20000;i++){
-    const isMale=Math.random()<0.5;
-    const name=isMale ? maleNames[Math.floor(Math.random()*maleNames.length)] : femaleNames[Math.floor(Math.random()*femaleNames.length)];
-    demoProfiles.push({
-      id:"demo"+i,
-      username:name+i,
-      age:18+Math.floor(Math.random()*40),
-      location:countries[Math.floor(Math.random()*countries.length)],
-      gender:isMale?"Male":"Female",
-      interest:interests[Math.floor(Math.random()*interests.length)],
-      profilePic:`https://randomuser.me/api/portraits/${isMale?"men":"women"}/${i%100}.jpg`,
-      online:true
-    });
-  }
+// Populate country select
+const countrySelect=document.getElementById("country");
+countries.forEach(c=>{const o=document.createElement("option"); o.value=c; o.text=c; countrySelect.add(o);});
 
-  // Tab switching
-  function showTab(tab){
-    document.getElementById('profile-tab').style.display='none';
-    document.getElementById('people-tab').style.display='none';
-    document.getElementById('chats-tab').style.display='none';
-    document.getElementById(tab+'-tab').style.display='block';
-  }
+// Tab switching
+function showTab(tab){
+  ['profile','people','liked','chats'].forEach(t=>document.getElementById(t+'-tab').style.display='none');
+  document.getElementById(tab+'-tab').style.display='flex';
+}
 
-  let currentUser={id:"user1", username:"Solo", profilePic:"https://randomuser.me/api/portraits/men/1.jpg"};
-
-  function logout(){ alert("Logged out"); }
-
-  // Load demo profiles in People tab
-  function loadPeople(){
-    const container=document.getElementById('swipe-container');
-    container.innerHTML='';
-    demoProfiles.slice(0,100).forEach(profile=>{
-      const card=document.createElement('div');
-      card.className="profile-card";
-      card.innerHTML=`
-        <div class="profile-info">
-          <img src="${profile.profilePic}">
-          <div>
-            <b>${profile.username}</b> (${profile.age})<br>${profile.location}<br>${profile.interest}
-          </div>
-          <div class="online-dot"></div>
-        </div>
-        <button onclick="openChatWith('${profile.username}','${profile.profilePic}')">💬</button>
-      `;
-      container.appendChild(card);
-    });
-  }
-
-  function openChatWith(username,pic){
-    showTab('chats');
-    document.getElementById('chat-with-name').innerText=username;
-    document.getElementById('chat-with-pic').src=pic;
-    document.getElementById('chat-box').innerHTML="Chatting with "+username;
-  }
-
-  // Profile edit
-  function saveProfileEdit(){
-    alert("Profile saved!");
-    document.getElementById('user-username').innerText=document.getElementById('edit-username').value;
-    document.getElementById('user-age').innerText=document.getElementById('edit-age').value;
-    document.getElementById('user-location').innerText=document.getElementById('edit-location').value;
-    document.getElementById('user-gender').innerText=document.getElementById('edit-gender').value;
-    document.getElementById('user-interest').innerText=document.getElementById('edit-interest').value;
-    const fileInput=document.getElementById('edit-profile-pic');
-    if(fileInput.files[0]){
-      const reader=new FileReader();
-      reader.onload=e=>{ document.getElementById('user-profile-pic').src=e.target.result; };
-      reader.readAsDataURL(fileInput.files[0]);
-    }
-  }
-
+// Auth state
+auth.onAuthStateChanged(user=>{
+  if(!user) return window.location.href="index.html";
+  currentUser=user;
+  loadProfile();
+  generateDemoProfiles();
   showTab('profile');
-  loadPeople();
-</script>
+});
 
+// Load profile
+function loadProfile(){
+  db.collection('users').doc(currentUser.uid).get().then(doc=>{
+    if(doc.exists){
+      const data=doc.data();
+      document.getElementById('user-email').innerText=currentUser.email;
+      document.getElementById('username').value=data.username||"";
+      document.getElementById('age').value=data.age||"";
+      document.getElementById('gender').value=data.gender||"";
+      document.getElementById('country').value=data.country||"";
+      document.getElementById('interest').value=data.interest||"";
+      document.getElementById('user-coins').innerText=data.coins||10;
+      document.getElementById('user-premium').innerText=data.premium?'Yes':'No';
+      if(data.profilePic) document.getElementById('user-profile-pic').src=data.profilePic;
+    } else {
+      db.collection('users').doc(currentUser.uid).set({coins:10,premium:false});
+    }
+  });
+}
+
+// Save profile
+function saveProfile(){
+  const username=document.getElementById('username').value;
+  const age=document.getElementById('age').value;
+  const gender=document.getElementById('gender').value;
+  const country=document.getElementById('country').value;
+  const interest=document.getElementById('interest').value;
+  const profilePicInput=document.getElementById('profile-pic-input').files[0];
+
+  if(!username||!age||!gender||!country||!interest) return alert("Fill all fields!");
+
+  const ref=db.collection('users').doc(currentUser.uid);
+
+  if(profilePicInput){
+    const storageRef=storage.ref().child(`profile-pictures/${currentUser.uid}`);
+    storageRef.put(profilePicInput).then(()=>storageRef.getDownloadURL().then(url=>{
+      ref.set({username,age,gender,country,interest,profilePic:url},{merge:true});
+      loadProfile();
+      alert("Profile saved!");
+    }));
+  } else {
+    ref.set({username,age,gender,country,interest},{merge:true});
+    alert("Profile saved!");
+  }
+}
+
+// Logout
+function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
+
+// Coins
+function useCoin(){
+  const ref=db.collection('users').doc(currentUser.uid);
+  ref.get().then(doc=>{
+    const coins=doc.data().coins||0;
+    if(coins>0){ ref.update({coins:coins-1}); document.getElementById('user-coins').innerText=coins-1;}
+    else alert("No coins left! Buy premium 🔥");
+  });
+}
+
+// Paystack
+function buyPremium(){
+  const userRef=db.collection('users').doc(currentUser.uid);
+  let handler=PaystackPop.setup({
+    key:'YOUR_PUBLIC_PAYSTACK_KEY',
+    email:currentUser.email,
+    amount:5000,
+    currency:'NGN',
+    ref:''+Math.floor(Math.random()*1000000000+1),
+    onClose:()=>alert('Payment cancelled'),
+    callback:()=>{ userRef.update({premium:true}); document.getElementById('user-premium').innerText='Yes'; alert("You are now Premium!"); }
+  });
+  handler.openIframe();
+}
+
+// Generate demo profiles dynamically
+function generateDemoProfiles(){
+  const maleNames=["John","Michael","David","James","Robert"];
+  const femaleNames=["Mary","Linda","Patricia","Jennifer","Elizabeth"];
+  const interests=["Hangout 🩵","Friends 💚","Serious Relationship 💖","Marriage 💘"];
+  const countriesMale=["USA","UK","Nigeria","Ghana","Kenya","South Africa"];
+  const countriesFemale=["USA","UK","Nigeria","Ghana","Kenya","South Africa"];
+
+  profiles=[]; currentProfileIndex=0;
+  for(let i=1;i<=20000;i++){
+    const gender=Math.random()>0.5?"Male":"Female";
+    const name=gender==="Male"?maleNames[Math.floor(Math.random()*maleNames.length)]+i
+                              :femaleNames[Math.floor(Math.random()*femaleNames.length)]+i;
+    const age=Math.floor(Math.random()*30)+18;
+    const country=gender==="Male"?countriesMale[Math.floor(Math.random()*countriesMale.length)]
+                                 :countriesFemale[Math.floor(Math.random()*countriesFemale.length)];
+    const interest=interests[Math.floor(Math.random()*interests.length)];
+    const profilePic=gender==="Male"?"https://i.pravatar.cc/150?img="+(i%70+1)
+                                    :"https://i.pravatar.cc/150?img="+(i%70+71);
+    profiles.push({id:"demo"+i,username:name,age,gender,country,interest,profilePic,online:true});
+  }
+  showProfile();
+}
+
+// Show current profile to swipe
+function showProfile(){
+  const container=document.getElementById('swipe-container');
+  if(currentProfileIndex>=profiles.length) return container.innerHTML="No more profiles!";
+  const p=profiles[currentProfileIndex];
+  container.innerHTML=`<img src="${p.profilePic}" style="width:60px;height:60px;border-radius:50%; vertical-align:middle;"> <strong>${p.username}</strong> <span class="online-dot"></span> <br>Age: ${p.age}, Country: ${p.country}, Interest: ${p.interest}<br>
+  <button onclick="openChatDemo(${currentProfileIndex})">💬 Message</button>`;
+}
+
+// Swipe
+function swipe(type){
+  const p=profiles[currentProfileIndex];
+  // Add like to Firestore if real users
+  if(!p.id.startsWith("demo")) db.collection('likes').add({from:currentUser.uid,to:p.id,type:type});
+  currentProfileIndex++;
+  showProfile();
+}
+
+// Chat with demo profile
+function openChatDemo(index){
+  const p=profiles[index];
+  currentChatId=p.id;
+  document.getElementById('chat-person-name').innerText=p.username;
+  document.getElementById('chat-person-pic').src=p.profilePic;
+  showTab('chats');
+  document.getElementById('chat-box').innerHTML="💌 This is a demo romantic chat with "+p.username;
+}
+
+</script>
 </body>
 </html>
