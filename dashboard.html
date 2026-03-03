@@ -25,6 +25,8 @@ h2{text-align:center; margin-top:20px;}
 #chat-users img { width:24px; height:24px; cursor:pointer; }
 input[type=text], input[type=number], select { padding:6px; width:80%; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061; }
 button.save-btn { width:80%; margin-top:10px; }
+.filter-panel { display:flex; flex-direction:column; align-items:center; margin-bottom:10px; width:100%; }
+.filter-panel select { margin:5px; width:80%; }
 </style>
 </head>
 <body>
@@ -51,6 +53,20 @@ button.save-btn { width:80%; margin-top:10px; }
 
   <!-- People Profiles -->
   <div id="people-tab" style="display:none;">
+    <div class="filter-panel">
+      <select id="filter-gender">
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <select id="filter-location">
+        <option value="">All Locations</option>
+      </select>
+      <select id="filter-interest">
+        <option value="">All Interests</option>
+      </select>
+      <button class="save-btn" onclick="applyFilters()">🔍 Apply Filters</button>
+    </div>
     <div id="swipe-container">Loading profiles...</div>
     <div id="chat-users"></div>
   </div>
@@ -87,7 +103,7 @@ function showTab(tab){
 }
 showTab('profile');
 
-// Demo profiles generation 4000+
+// Demo profiles 4000+
 const malePics = Array.from({length:2000}, (_,i)=>`https://randomuser.me/api/portraits/men/${i%100}.jpg`);
 const femalePics = Array.from({length:2000}, (_,i)=>`https://randomuser.me/api/portraits/women/${i%100}.jpg`);
 const maleNames = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
@@ -98,30 +114,19 @@ const romanticMessages = ["Hey you 😘, I was hoping to meet you today!","You h
 
 const demoProfiles = [];
 for(let i=0;i<2000;i++){
-  demoProfiles.push({
-    name: maleNames[Math.floor(Math.random()*maleNames.length)],
-    age:20+Math.floor(Math.random()*15),
-    gender:"Male",
-    location:locations[Math.floor(Math.random()*locations.length)],
-    interest:interests[Math.floor(Math.random()*interests.length)],
-    pic: malePics[i],
-    messages: [],
-    addedToChat:false
-  });
-  demoProfiles.push({
-    name: femaleNames[Math.floor(Math.random()*femaleNames.length)],
-    age:20+Math.floor(Math.random()*15),
-    gender:"Female",
-    location:locations[Math.floor(Math.random()*locations.length)],
-    interest:interests[Math.floor(Math.random()*interests.length)],
-    pic: femalePics[i],
-    messages: [],
-    addedToChat:false
-  });
+  demoProfiles.push({name: maleNames[Math.floor(Math.random()*maleNames.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:locations[Math.floor(Math.random()*locations.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic: malePics[i], messages: [], addedToChat:false, ignored:false});
+  demoProfiles.push({name: femaleNames[Math.floor(Math.random()*femaleNames.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:locations[Math.floor(Math.random()*locations.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic: femalePics[i], messages: [], addedToChat:false, ignored:false});
 }
+
+// Fill filter options
+const locationSelect = document.getElementById('filter-location');
+const interestSelect = document.getElementById('filter-interest');
+locations.forEach(l=>locationSelect.innerHTML+=`<option value="${l}">${l}</option>`);
+interests.forEach(i=>interestSelect.innerHTML+=`<option value="${i}">${i}</option>`);
 
 // Swipe system
 let currentIndex = 0;
+let filteredProfiles = demoProfiles.slice();
 const swipeContainer = document.getElementById('swipe-container');
 const chatUsersDiv = document.getElementById('chat-users');
 const chatBox = document.getElementById('chat-box');
@@ -129,11 +134,9 @@ const chatProfilePic = document.getElementById('chat-profile-pic');
 const chatName = document.getElementById('chat-name');
 
 function showProfile(){
-  if(currentIndex >= demoProfiles.length){
-    swipeContainer.innerHTML="No more profiles!";
-    return;
-  }
-  const p = demoProfiles[currentIndex];
+  while(currentIndex < filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
+  if(currentIndex >= filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
+  const p = filteredProfiles[currentIndex];
   swipeContainer.innerHTML=`
     <div class="card">
       <img src="${p.pic}">
@@ -150,14 +153,15 @@ function showProfile(){
 }
 
 function swipe(action){
-  const p = demoProfiles[currentIndex];
+  const p = filteredProfiles[currentIndex];
   if(action==="like") { addChat(p); autoReply(p); }
+  if(action==="ignore") { p.ignored = true; }
   currentIndex++;
   showProfile();
 }
 
 function messageCurrent(){
-  const p = demoProfiles[currentIndex];
+  const p = filteredProfiles[currentIndex];
   if(p) addChat(p);
 }
 
@@ -197,7 +201,7 @@ function autoReply(profile){
   }, 1000 + Math.random()*2000);
 }
 
-// User profile editing
+// Profile edit
 function saveProfile(){
   const userProfile = {
     name: document.getElementById('edit-username').value || "DemoUser",
@@ -207,13 +211,22 @@ function saveProfile(){
     interest: document.getElementById('edit-interest').value || "Serious Relationship 💖",
     pic: document.getElementById('edit-pic').value || "https://randomuser.me/api/portraits/lego/1.jpg"
   };
-  document.getElementById('user-username').innerText = userProfile.name;
-  document.getElementById('user-age').innerText = userProfile.age;
-  document.getElementById('user-location').innerText = userProfile.location;
-  document.getElementById('user-gender').innerText = userProfile.gender;
-  document.getElementById('user-interest').innerText = userProfile.interest;
-  document.getElementById('user-profile-pic').src = userProfile.pic;
   alert("Profile updated!");
+}
+
+// Filters
+function applyFilters(){
+  const gender = document.getElementById('filter-gender').value;
+  const location = document.getElementById('filter-location').value;
+  const interest = document.getElementById('filter-interest').value;
+  filteredProfiles = demoProfiles.filter(p=>{
+    return !p.ignored &&
+           (!gender || p.gender===gender) &&
+           (!location || p.location===location) &&
+           (!interest || p.interest===interest);
+  });
+  currentIndex = 0;
+  showProfile();
 }
 
 // Initial
