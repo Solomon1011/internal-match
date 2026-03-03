@@ -1,224 +1,305 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Internal Match Dashboard</title>
+<title>SoloLove Dating</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body { background:#1a1a1a; color:#f5d061; font-family:Arial; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; }
-h2{text-align:center; margin-top:20px;}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:white;
+}
 
-.tab-content { flex:1; width:100%; max-width:400px; padding:20px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; }
+header{
+  background:#000;
+  padding:15px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  color:#f5d061;
+}
 
-.tab-bar { position:fixed; bottom:0; width:100%; max-width:400px; display:flex; justify-content:space-around; background:#111; border-top:1px solid #f5d061; padding:10px 0; }
+input, select{
+  width:90%;
+  padding:10px;
+  margin:5px;
+  border-radius:8px;
+  border:none;
+}
 
-.tab-bar button { background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center; flex:1; }
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  background:#f5d061;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-.tab-bar img { width:28px; height:28px; margin-bottom:3px; }
+.nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  background:#000;
+}
 
-.card { background:#222; border:1px solid #f5d061; border-radius:12px; padding:15px; margin:10px 0; width:100%; max-width:350px; display:flex; flex-direction:column; align-items:center; }
+.nav button{
+  flex:1;
+  background:#000;
+  color:#f5d061;
+  border:none;
+}
 
-.card img { width:150px; height:150px; border-radius:50%; margin-bottom:10px; }
+.card{
+  background:#222;
+  margin:15px;
+  padding:15px;
+  border-radius:15px;
+  border:1px solid #f5d061;
+}
 
-.card h3 { margin:5px 0; font-size:20px; font-weight:bold; }
+.online{
+  color:#00ff00;
+  font-size:12px;
+}
 
-.action-btn { background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; }
+.profile-box{
+  background:#222;
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+  margin:20px;
+  border:1px solid #f5d061;
+}
 
-input[type=text], input[type=number], select { padding:6px; width:90%; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061; }
+.profile-box img{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #f5d061;
+}
 
-button.save-btn { width:90%; margin-top:10px; }
+.chat-list{
+  padding:10px;
+}
 
-.chat-item { display:flex; align-items:center; background:#222; padding:8px; margin:5px 0; border-radius:6px; cursor:pointer; width:100%; max-width:350px; }
+.chat-item{
+  padding:15px;
+  border-bottom:1px solid #333;
+  cursor:pointer;
+}
 
-.chat-item img { width:40px; height:40px; border-radius:50%; margin-right:10px; }
+.message-box{
+  position:fixed;
+  bottom:50px;
+  width:100%;
+  display:flex;
+}
 
-#chat-box { border:1px solid #f5d061; padding:10px; height:200px; overflow-y:auto; margin-bottom:10px; text-align:left; width:100%; max-width:350px; }
+.message-box input{
+  flex:1;
+  margin:0;
+  border-radius:0;
+}
 
-.message-input { display:flex; width:100%; max-width:350px; }
-
-.message-input input { flex:1; }
-
+.message-box button{
+  border-radius:0;
+}
 </style>
 </head>
 
 <body>
 
-<h2>💘 Internal Match Dashboard</h2>
+<header>SoloLove 💛</header>
 
-<div class="tab-content">
-
-<!-- PROFILE -->
-<div id="profile-tab">
-<h3>My Profile</h3>
-
-<img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg"
-style="width:120px;height:120px;border-radius:50%;object-fit:cover;"><br><br>
-
-<input type="file" accept="image/*" capture="environment" onchange="previewImage(event)">
-
-<input type="text" id="edit-username" placeholder="Username">
-<input type="number" id="edit-age" placeholder="Age">
-<input type="text" id="edit-location" placeholder="Location">
-
-<select id="edit-gender">
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-</select>
-
-<input type="text" id="edit-interest" placeholder="Interest">
-
-<button class="save-btn" onclick="saveProfile()">💾 Save Profile</button>
+<!-- LOGIN -->
+<div id="login">
+<center>
+<h3>Login</h3>
+<input id="loginEmail" placeholder="Email"><br>
+<input id="loginPass" type="password" placeholder="Password"><br>
+<button onclick="login()">Login</button>
+<p onclick="showSignup()">Create account</p>
+</center>
 </div>
 
-<!-- PEOPLE -->
-<div id="people-tab" style="display:none;">
-<div id="swipe-container"></div>
+<!-- SIGNUP -->
+<div id="signup" style="display:none;">
+<center>
+<h3>Sign Up</h3>
+<input id="signEmail" placeholder="Email"><br>
+<input id="signPass" type="password" placeholder="Password"><br>
+<button onclick="signup()">Sign Up</button>
+<p onclick="showLogin()">Already have account</p>
+</center>
 </div>
 
-<!-- CHATS -->
-<div id="chats-tab" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-<div id="chat-list" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
+<!-- APP -->
+<div id="app" style="display:none;">
 
-<div id="chat-window" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
-<div style="display:flex; align-items:center; width:100%; max-width:350px;">
-<img id="chat-profile-pic" style="width:50px;height:50px;border-radius:50%;margin-right:10px;">
-<span id="chat-name" style="font-weight:bold;font-size:18px;"></span>
+<!-- DISCOVER -->
+<div id="discover">
+
+<div class="card">
+<img src="https://randomuser.me/api/portraits/women/44.jpg" width="100%">
+<h3>Emily, 23</h3>
+<p>USA</p>
+<p>Music, Travel</p>
+<p class="online">● Online</p>
+<button onclick="startChat('Emily')">Message</button>
 </div>
 
-<div id="chat-box"></div>
+<div class="card">
+<img src="https://randomuser.me/api/portraits/men/32.jpg" width="100%">
+<h3>Daniel, 27</h3>
+<p>UK</p>
+<p>Football, Movies</p>
+<p class="online">● Online</p>
+<button onclick="startChat('Daniel')">Message</button>
+</div>
 
-<div class="message-input">
-<input type="text" id="chat-input" placeholder="Type message...">
+</div>
+
+<!-- CHAT -->
+<div id="chat" style="display:none;">
+<div class="chat-list" id="chatList"></div>
+<div id="chatMessages" style="padding:15px;margin-bottom:80px;"></div>
+
+<div class="message-box">
+<input id="messageInput" placeholder="Type message">
 <button onclick="sendMessage()">Send</button>
 </div>
 </div>
+
+<!-- PROFILE -->
+<div id="profile" style="display:none;">
+
+<div class="profile-box">
+<div style="position:relative;">
+<img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg">
+
+<label for="photoUpload"
+style="position:absolute;bottom:0;right:0;
+background:#f5d061;color:#000;
+padding:8px;border-radius:50%;cursor:pointer;">
+📷
+</label>
+
+<input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
+</div>
+
+<br>
+<input id="username" placeholder="Username"><br>
+<input id="age" placeholder="Age"><br>
+<input id="country" placeholder="Country"><br>
+<input id="interest" placeholder="Interest"><br>
+<button onclick="saveProfile()">Save</button>
 </div>
 
 </div>
 
-<div class="tab-bar">
+<div class="nav">
+<button onclick="showTab('discover')">Discover</button>
+<button onclick="showTab('chat')">Chat</button>
 <button onclick="showTab('profile')">Profile</button>
-<button onclick="showTab('people')">People</button>
-<button onclick="showTab('chats')">Chats</button>
+</div>
+
 </div>
 
 <script>
 
-// TAB SWITCH
+let currentChatUser = "";
+let chats = {};
+
+function showSignup(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("signup").style.display="block";
+}
+
+function showLogin(){
+  document.getElementById("signup").style.display="none";
+  document.getElementById("login").style.display="block";
+}
+
+function signup(){
+  document.getElementById("signup").style.display="none";
+  document.getElementById("app").style.display="block";
+}
+
+function login(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+}
+
 function showTab(tab){
-document.getElementById('profile-tab').style.display='none';
-document.getElementById('people-tab').style.display='none';
-document.getElementById('chats-tab').style.display='none';
-document.getElementById(tab+'-tab').style.display='block';
+  document.getElementById("discover").style.display="none";
+  document.getElementById("chat").style.display="none";
+  document.getElementById("profile").style.display="none";
+
+  document.getElementById(tab).style.display="block";
 }
 
-// PROFILE IMAGE UPLOAD
-function previewImage(event){
-const file = event.target.files[0];
-if(file){
-const reader = new FileReader();
-reader.onload = function(){
-document.getElementById('user-profile-pic').src = reader.result;
-}
-reader.readAsDataURL(file);
-}
+function startChat(name){
+  currentChatUser = name;
+  showTab('chat');
+  updateChatList();
 }
 
-function saveProfile(){
-alert("Profile updated!");
+function updateChatList(){
+  let list = document.getElementById("chatList");
+  list.innerHTML="";
+  for(let user in chats){
+    list.innerHTML += `<div class="chat-item" onclick="openChat('${user}')">${user}</div>`;
+  }
 }
 
-// DEMO PROFILES
-const demoProfiles = [];
-for(let i=0;i<50;i++){
-demoProfiles.push({
-name:"User "+(i+1),
-age:20+Math.floor(Math.random()*10),
-pic:`https://randomuser.me/api/portraits/${i%2==0?'men':'women'}/${i}.jpg`,
-messages:[],
-addedToChat:false
-});
-}
-
-let currentIndex = 0;
-const swipeContainer = document.getElementById("swipe-container");
-
-function showProfile(){
-if(currentIndex>=demoProfiles.length){
-swipeContainer.innerHTML="No more profiles";
-return;
-}
-const p = demoProfiles[currentIndex];
-
-swipeContainer.innerHTML=`
-<div class="card">
-<img src="${p.pic}">
-<h3>${p.name}, ${p.age}</h3>
-<button class="action-btn" onclick="messageCurrent()">💬 Message</button>
-</div>
-`;
-}
-showProfile();
-
-// CHAT SYSTEM
-const chatListDiv = document.getElementById("chat-list");
-const chatWindow = document.getElementById("chat-window");
-const chatBox = document.getElementById("chat-box");
-const chatInput = document.getElementById("chat-input");
-
-let activeChat = null;
-
-function messageCurrent(){
-const p = demoProfiles[currentIndex];
-if(p){
-addChat(p);
-showTab('chats');
-}
-}
-
-function addChat(profile){
-if(!profile.addedToChat){
-profile.addedToChat=true;
-profile.messages.push({from:profile.name,text:"Hi 💖"});
-}
-renderChatList();
-openChat(profile);
-}
-
-function renderChatList(){
-chatListDiv.innerHTML="";
-demoProfiles.filter(p=>p.addedToChat).forEach(profile=>{
-const div=document.createElement("div");
-div.className="chat-item";
-div.innerHTML=`<img src="${profile.pic}"><span>${profile.name}</span>`;
-div.onclick=()=>openChat(profile);
-chatListDiv.appendChild(div);
-});
-}
-
-function openChat(profile){
-activeChat=profile;
-chatWindow.style.display="flex";
-document.getElementById("chat-name").innerText=profile.name;
-document.getElementById("chat-profile-pic").src=profile.pic;
-
-chatBox.innerHTML="";
-profile.messages.forEach(m=>{
-const msg=document.createElement("div");
-msg.innerText=m.from+": "+m.text;
-chatBox.appendChild(msg);
-});
+function openChat(user){
+  currentChatUser = user;
+  displayMessages();
 }
 
 function sendMessage(){
-if(!activeChat) return;
-const text=chatInput.value;
-if(!text) return;
-activeChat.messages.push({from:"You",text:text});
-chatInput.value="";
-openChat(activeChat);
+  let msg = document.getElementById("messageInput").value;
+  if(!msg) return;
+
+  if(!chats[currentChatUser]){
+    chats[currentChatUser]=[];
+  }
+
+  chats[currentChatUser].push("You: "+msg);
+  document.getElementById("messageInput").value="";
+  displayMessages();
+  updateChatList();
 }
+
+function displayMessages(){
+  let box = document.getElementById("chatMessages");
+  box.innerHTML="";
+  if(chats[currentChatUser]){
+    chats[currentChatUser].forEach(m=>{
+      box.innerHTML+=`<p>${m}</p>`;
+    });
+  }
+}
+
+function saveProfile(){
+  alert("Profile Saved!");
+}
+
+document.getElementById("photoUpload").addEventListener("change",function(e){
+  const file=e.target.files[0];
+  if(file){
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      document.getElementById("profilePic").src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
 </script>
 
