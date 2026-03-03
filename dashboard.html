@@ -1,24 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Internal Match Dashboard</title>
-<script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
-body {background:#1a1a1a; color:#f5d061; font-family:Arial, sans-serif; margin:0; padding:0;}
-h2{text-align:center; margin-top:15px;}
-.tab-bar {position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; border-top:1px solid #f5d061; padding:10px 0;}
-.tab-bar button {background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center;}
-.tab-bar img{width:24px; height:24px; margin-bottom:3px;}
-.tab-content{margin-bottom:100px; display:flex; flex-direction:column; align-items:center; justify-content:center;}
-#swipe-container, #liked-container, #chat-box {margin-bottom:10px; text-align:center;}
-#chat-box{border:1px solid #f5d061; padding:10px; width:90%; max-width:400px; height:300px; overflow-y:scroll;}
-button{background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; margin:2px; border-radius:4px; cursor:pointer;}
-input[type=text], input[type=number], select{padding:6px; width:80%; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061;}
-img.profile-small{width:50px; height:50px; border-radius:50%; margin-right:5px; vertical-align:middle;}
-.online-dot{width:10px; height:10px; background:lime; border-radius:50%; display:inline-block; margin-left:5px;}
+body { background:#1a1a1a; color:#f5d061; font-family:Arial, sans-serif; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; }
+h2{text-align:center; margin-top:20px;}
+.tab-content { flex:1; width:100%; max-width:400px; text-align:center; padding:20px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; }
+.tab-bar { position:fixed; bottom:0; width:100%; max-width:400px; display:flex; justify-content:space-around; background:#111; border-top:1px solid #f5d061; padding:10px 0; }
+.tab-bar button { background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center; flex:1; }
+.tab-bar img { width:28px; height:28px; margin-bottom:3px; }
+.card { background:#222; border:1px solid #f5d061; border-radius:12px; padding:15px; margin:10px 0; width:100%; max-width:350px; display:flex; flex-direction:column; align-items:center; position:relative; }
+.card img { width:150px; height:150px; border-radius:50%; margin-bottom:10px; }
+.card h3 { margin:5px 0; font-size:20px; font-weight:bold; }
+.card p { margin:2px 0; font-size:14px; }
+.card .actions { display:flex; justify-content:space-around; width:100%; margin-top:10px; }
+.action-btn { background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+.action-btn img { width:20px; height:20px; margin-left:5px; }
+#chat-header { display:flex; align-items:center; justify-content:flex-start; margin-bottom:10px; width:100%; max-width:350px; }
+#chat-header img { width:60px; height:60px; border-radius:50%; margin-right:10px; }
+#chat-box { border:1px solid #f5d061; padding:10px; height:200px; overflow-y:scroll; margin-bottom:10px; text-align:left; width:100%; max-width:350px; }
+#chat-users button { display:flex; justify-content:space-between; width:100%; margin:5px 0; background:#222; border:none; color:#f5d061; padding:6px 8px; border-radius:4px; cursor:pointer; }
+#chat-users img { width:24px; height:24px; cursor:pointer; }
+input[type=text], input[type=number], select { padding:6px; width:80%; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061; }
+button.save-btn { width:80%; margin-top:10px; }
+.filter-panel { display:flex; flex-direction:column; align-items:center; margin-bottom:10px; width:100%; }
+.filter-panel select { margin:5px; width:80%; }
+.online-dot {width:12px; height:12px; border-radius:50%; background:lime; position:absolute; top:10px; right:10px; border:2px solid #1a1a1a;}
 </style>
 </head>
 <body>
@@ -27,237 +36,206 @@ img.profile-small{width:50px; height:50px; border-radius:50%; margin-right:5px; 
 
 <div class="tab-content">
 
-<!-- Profile Tab -->
-<div id="profile-tab" style="display:none; text-align:center;">
-<h3>My Profile</h3>
-<img id="user-profile-pic" src="" alt="Profile" style="width:120px;height:120px;border-radius:50%; border:2px solid #f5d061;"><br>
-<input type="file" id="profile-pic-input" accept="image/*" capture="user"><br>
-<input type="text" id="username" placeholder="Username">
-<input type="number" id="age" placeholder="Age">
-<select id="gender">
-  <option value="">Gender</option>
-  <option value="Male">Male</option>
-  <option value="Female">Female</option>
-</select>
-<select id="country"></select>
-<select id="interest">
-  <option value="">Interest</option>
-  <option value="Hangout 🩵">Hangout 🩵</option>
-  <option value="Friends 💚">Friends 💚</option>
-  <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-  <option value="Marriage 💘">Marriage 💘</option>
-</select>
-<button onclick="saveProfile()">Save Profile</button>
-<br>
-<p>Email: <span id="user-email"></span></p>
-<p>Coins: <span id="user-coins"></span></p>
-<p>Premium: <span id="user-premium"></span></p>
-<button onclick="buyPremium()">Buy Premium</button>
-<button onclick="useCoin()">Use 1 Coin</button>
-<br><br>
-<button onclick="logout()">Logout</button>
+  <!-- User Profile -->
+  <div id="profile-tab" style="display:none;">
+    <h3>My Profile</h3>
+    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile" style="width:120px;height:120px;border-radius:50%;"><br>
+    <input type="text" id="edit-username" placeholder="Username"><br>
+    <input type="number" id="edit-age" placeholder="Age"><br>
+    <input type="text" id="edit-location" placeholder="Location"><br>
+    <select id="edit-gender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select><br>
+    <input type="text" id="edit-interest" placeholder="Interest"><br>
+    <input type="text" id="edit-pic" placeholder="Profile Picture URL"><br>
+    <div class="filter-panel">
+      <h4>Filters</h4>
+      <select id="filter-gender">
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <select id="filter-location">
+        <option value="">All Locations</option>
+      </select>
+      <select id="filter-interest">
+        <option value="">All Interests</option>
+      </select>
+      <button class="save-btn" onclick="applyFilters()">🔍 Apply Filters</button>
+    </div>
+    <button class="save-btn" onclick="saveProfile()">💾 Save Profile</button>
+  </div>
+
+  <!-- People Profiles -->
+  <div id="people-tab" style="display:none;">
+    <div id="swipe-container">Loading profiles...</div>
+    <div id="chat-users"></div>
+  </div>
+
+  <!-- Likes -->
+  <div id="liked-tab" style="display:none;">
+    <h3>Who Likes Me</h3>
+    <div id="liked-container">No likes yet!</div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chats-tab" style="display:none;">
+    <div id="chat-header">
+      <img id="chat-profile-pic" src="">
+      <span id="chat-name" style="font-weight:bold;font-size:18px;"></span>
+    </div>
+    <div id="chat-box"></div>
+  </div>
+
 </div>
 
-<!-- People Profiles Tab -->
-<div id="people-tab" style="display:none;">
-<h3>People Profiles</h3>
-<div id="swipe-container">Loading profiles...</div>
-<button onclick="swipe('like')">Like</button>
-<button onclick="swipe('dislike')">Ignore</button>
-</div>
-
-<!-- Likes Tab -->
-<div id="liked-tab" style="display:none;">
-<h3>Who Likes Me</h3>
-<div id="liked-container">Loading...</div>
-</div>
-
-<!-- Chat Tab -->
-<div id="chats-tab" style="display:none;">
-<h3 id="chat-person-name"></h3>
-<img id="chat-person-pic" src="" style="width:120px;height:120px;border-radius:50%; border:2px solid #f5d061;"><br>
-<div id="chat-box"></div>
-</div>
-
-</div>
-
-<!-- Bottom Tab Bar -->
 <div class="tab-bar">
-<button onclick="showTab('profile')">
-<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="">Profile
-</button>
-<button onclick="showTab('people')">
-<img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">People
-</button>
-<button onclick="showTab('liked')">
-<img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" alt="">Likes
-</button>
-<button onclick="showTab('chats')">
-<img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" alt="">Chats
-</button>
+  <button onclick="showTab('profile')"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">Profile</button>
+  <button onclick="showTab('people')"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png">People</button>
+  <button onclick="showTab('liked')"><img src="https://cdn-icons-png.flaticon.com/512/833/833472.png">Likes</button>
+  <button onclick="showTab('chats')"><img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png">Chats</button>
 </div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-// Firebase
-const firebaseConfig={apiKey:"AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",authDomain:"internal-match.firebaseapp.com",projectId:"internal-match",storageBucket:"internal-match.appspot.com",messagingSenderId:"129707008837",appId:"1:129707008837:web:f3f0033bbbe673107a542c"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.firestore(), storage=firebase.storage();
-let currentUser=null, profiles=[], currentProfileIndex=0, currentChatId=null;
-
-// Country List (150+)
-const countries=["USA","UK","Canada","France","Germany","Italy","Spain","Nigeria","Ghana","Kenya","South Africa","Egypt","Morocco","Algeria","Brazil","Mexico","Argentina","China","Japan","India","Australia","Russia","Sweden","Norway","Denmark","Finland","Netherlands","Belgium","Switzerland","Austria","Poland","Turkey","Saudi Arabia","UAE","Iran","Iraq","Pakistan","Bangladesh","Philippines","Thailand","Vietnam","Indonesia","Malaysia","Singapore","New Zealand","South Korea","North Korea","Chile","Colombia","Peru","Venezuela","Ecuador","Bolivia","Paraguay","Uruguay","Costa Rica","Panama","Cuba","Jamaica","Haiti","Dominican Republic","Iceland","Portugal","Greece","Hungary","Czech Republic","Slovakia","Slovenia","Croatia","Serbia","Romania","Bulgaria","Ukraine","Belarus","Lithuania","Latvia","Estonia","Luxembourg","Liechtenstein","Monaco","San Marino","Malta","Cyprus","Lebanon","Syria","Jordan","Oman","Qatar","Kuwait","Bahrain","Yemen","Morocco","Algeria","Tunisia","Libya","Sudan","Ethiopia","Somalia","Uganda","Tanzania","Rwanda","Burundi","Zimbabwe","Zambia","Malawi","Mozambique","Botswana","Namibia","Lesotho","Swaziland","Cameroon","Senegal","Ivory Coast","Mali","Niger","Chad","Mauritania","Gambia","Sierra Leone","Liberia","Guinea","Guinea-Bissau","Burkina Faso","Central African Republic","Gabon","Equatorial Guinea","Djibouti","Eritrea","Cape Verde","Sao Tome & Principe"];
-
-// Populate country select
-const countrySelect=document.getElementById("country");
-countries.forEach(c=>{const o=document.createElement("option"); o.value=c; o.text=c; countrySelect.add(o);});
-
 // Tab switching
 function showTab(tab){
-  ['profile','people','liked','chats'].forEach(t=>document.getElementById(t+'-tab').style.display='none');
-  document.getElementById(tab+'-tab').style.display='flex';
+  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>document.getElementById(t).style.display='none');
+  document.getElementById(tab+'-tab').style.display='block';
+}
+showTab('profile');
+
+// Demo profiles
+const malePics = Array.from({length:2000}, (_,i)=>`https://randomuser.me/api/portraits/men/${i%100}.jpg`);
+const femalePics = Array.from({length:2000}, (_,i)=>`https://randomuser.me/api/portraits/women/${i%100}.jpg`);
+const maleNames = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
+const femaleNames = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
+const locations = ["New York","London","Paris","Tokyo","Berlin","Madrid","Sydney","Lagos","Dubai","Rome"];
+const interests = ["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
+const romanticMessages = ["Hey you 😘, I was hoping to meet you today!","You have the most amazing smile 💖","Can't stop thinking about you 💘","Would love to go on a date with you 🥰","You're amazing 😍"];
+
+const demoProfiles = [];
+for(let i=0;i<2000;i++){
+  demoProfiles.push({name: maleNames[Math.floor(Math.random()*maleNames.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:locations[Math.floor(Math.random()*locations.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic: malePics[i], messages: [], addedToChat:false, ignored:false, online:true});
+  demoProfiles.push({name: femaleNames[Math.floor(Math.random()*femaleNames.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:locations[Math.floor(Math.random()*locations.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic: femalePics[i], messages: [], addedToChat:false, ignored:false, online:true});
 }
 
-// Auth state
-auth.onAuthStateChanged(user=>{
-  if(!user) return window.location.href="index.html";
-  currentUser=user;
-  loadProfile();
-  generateDemoProfiles();
-  showTab('profile');
-});
+// Fill filter options
+const locationSelect = document.getElementById('filter-location');
+const interestSelect = document.getElementById('filter-interest');
+locations.forEach(l=>locationSelect.innerHTML+=`<option value="${l}">${l}</option>`);
+interests.forEach(i=>interestSelect.innerHTML+=`<option value="${i}">${i}</option>`);
 
-// Load profile
-function loadProfile(){
-  db.collection('users').doc(currentUser.uid).get().then(doc=>{
-    if(doc.exists){
-      const data=doc.data();
-      document.getElementById('user-email').innerText=currentUser.email;
-      document.getElementById('username').value=data.username||"";
-      document.getElementById('age').value=data.age||"";
-      document.getElementById('gender').value=data.gender||"";
-      document.getElementById('country').value=data.country||"";
-      document.getElementById('interest').value=data.interest||"";
-      document.getElementById('user-coins').innerText=data.coins||10;
-      document.getElementById('user-premium').innerText=data.premium?'Yes':'No';
-      if(data.profilePic) document.getElementById('user-profile-pic').src=data.profilePic;
-    } else {
-      db.collection('users').doc(currentUser.uid).set({coins:10,premium:false});
-    }
-  });
-}
+// Swipe system
+let currentIndex = 0;
+let filteredProfiles = demoProfiles.slice();
+const swipeContainer = document.getElementById('swipe-container');
+const chatUsersDiv = document.getElementById('chat-users');
+const chatBox = document.getElementById('chat-box');
+const chatProfilePic = document.getElementById('chat-profile-pic');
+const chatName = document.getElementById('chat-name');
 
-// Save profile
-function saveProfile(){
-  const username=document.getElementById('username').value;
-  const age=document.getElementById('age').value;
-  const gender=document.getElementById('gender').value;
-  const country=document.getElementById('country').value;
-  const interest=document.getElementById('interest').value;
-  const profilePicInput=document.getElementById('profile-pic-input').files[0];
-
-  if(!username||!age||!gender||!country||!interest) return alert("Fill all fields!");
-
-  const ref=db.collection('users').doc(currentUser.uid);
-
-  if(profilePicInput){
-    const storageRef=storage.ref().child(`profile-pictures/${currentUser.uid}`);
-    storageRef.put(profilePicInput).then(()=>storageRef.getDownloadURL().then(url=>{
-      ref.set({username,age,gender,country,interest,profilePic:url},{merge:true});
-      loadProfile();
-      alert("Profile saved!");
-    }));
-  } else {
-    ref.set({username,age,gender,country,interest},{merge:true});
-    alert("Profile saved!");
-  }
-}
-
-// Logout
-function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
-
-// Coins
-function useCoin(){
-  const ref=db.collection('users').doc(currentUser.uid);
-  ref.get().then(doc=>{
-    const coins=doc.data().coins||0;
-    if(coins>0){ ref.update({coins:coins-1}); document.getElementById('user-coins').innerText=coins-1;}
-    else alert("No coins left! Buy premium 🔥");
-  });
-}
-
-// Paystack
-function buyPremium(){
-  const userRef=db.collection('users').doc(currentUser.uid);
-  let handler=PaystackPop.setup({
-    key:'YOUR_PUBLIC_PAYSTACK_KEY',
-    email:currentUser.email,
-    amount:5000,
-    currency:'NGN',
-    ref:''+Math.floor(Math.random()*1000000000+1),
-    onClose:()=>alert('Payment cancelled'),
-    callback:()=>{ userRef.update({premium:true}); document.getElementById('user-premium').innerText='Yes'; alert("You are now Premium!"); }
-  });
-  handler.openIframe();
-}
-
-// Generate demo profiles dynamically
-function generateDemoProfiles(){
-  const maleNames=["John","Michael","David","James","Robert"];
-  const femaleNames=["Mary","Linda","Patricia","Jennifer","Elizabeth"];
-  const interests=["Hangout 🩵","Friends 💚","Serious Relationship 💖","Marriage 💘"];
-  const countriesMale=["USA","UK","Nigeria","Ghana","Kenya","South Africa"];
-  const countriesFemale=["USA","UK","Nigeria","Ghana","Kenya","South Africa"];
-
-  profiles=[]; currentProfileIndex=0;
-  for(let i=1;i<=20000;i++){
-    const gender=Math.random()>0.5?"Male":"Female";
-    const name=gender==="Male"?maleNames[Math.floor(Math.random()*maleNames.length)]+i
-                              :femaleNames[Math.floor(Math.random()*femaleNames.length)]+i;
-    const age=Math.floor(Math.random()*30)+18;
-    const country=gender==="Male"?countriesMale[Math.floor(Math.random()*countriesMale.length)]
-                                 :countriesFemale[Math.floor(Math.random()*countriesFemale.length)];
-    const interest=interests[Math.floor(Math.random()*interests.length)];
-    const profilePic=gender==="Male"?"https://i.pravatar.cc/150?img="+(i%70+1)
-                                    :"https://i.pravatar.cc/150?img="+(i%70+71);
-    profiles.push({id:"demo"+i,username:name,age,gender,country,interest,profilePic,online:true});
-  }
-  showProfile();
-}
-
-// Show current profile to swipe
 function showProfile(){
-  const container=document.getElementById('swipe-container');
-  if(currentProfileIndex>=profiles.length) return container.innerHTML="No more profiles!";
-  const p=profiles[currentProfileIndex];
-  container.innerHTML=`<img src="${p.profilePic}" style="width:60px;height:60px;border-radius:50%; vertical-align:middle;"> <strong>${p.username}</strong> <span class="online-dot"></span> <br>Age: ${p.age}, Country: ${p.country}, Interest: ${p.interest}<br>
-  <button onclick="openChatDemo(${currentProfileIndex})">💬 Message</button>`;
+  while(currentIndex < filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
+  if(currentIndex >= filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
+  const p = filteredProfiles[currentIndex];
+  swipeContainer.innerHTML=`
+    <div class="card">
+      <span class="online-dot"></span>
+      <img src="${p.pic}">
+      <h3>${p.name}, ${p.age}</h3>
+      <p>${p.gender} | ${p.location}</p>
+      <p>Interest: ${p.interest}</p>
+      <div class="actions">
+        <button class="action-btn" onclick="swipe('like')">💖 Like</button>
+        <button class="action-btn" onclick="swipe('ignore')">❌ Ignore</button>
+        <button class="action-btn" onclick="messageCurrent()">💬 Message</button>
+      </div>
+    </div>
+  `;
 }
 
-// Swipe
-function swipe(type){
-  const p=profiles[currentProfileIndex];
-  // Add like to Firestore if real users
-  if(!p.id.startsWith("demo")) db.collection('likes').add({from:currentUser.uid,to:p.id,type:type});
-  currentProfileIndex++;
+function swipe(action){
+  const p = filteredProfiles[currentIndex];
+  if(action==="like") { addChat(p); autoReply(p); }
+  if(action==="ignore") { p.ignored = true; }
+  currentIndex++;
   showProfile();
 }
 
-// Chat with demo profile
-function openChatDemo(index){
-  const p=profiles[index];
-  currentChatId=p.id;
-  document.getElementById('chat-person-name').innerText=p.username;
-  document.getElementById('chat-person-pic').src=p.profilePic;
-  showTab('chats');
-  document.getElementById('chat-box').innerHTML="💌 This is a demo romantic chat with "+p.username;
+function messageCurrent(){
+  const p = filteredProfiles[currentIndex];
+  if(p) addChat(p);
 }
 
+function addChat(profile){
+  if(!profile.addedToChat) {
+    const btn = document.createElement('button');
+    btn.innerHTML=`<span>${profile.name}</span> <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" title="Message">`;
+    btn.onclick = ()=>openChat(profile);
+    chatUsersDiv.appendChild(btn);
+    profile.addedToChat=true;
+    profile.messages.push({from:profile.name,text:"Hi there! 💖 Let's chat romantically!"});
+  }
+  openChat(profile);
+}
+
+function openChat(profile){
+  chatName.innerText = profile.name;
+  chatProfilePic.src = profile.pic;
+  chatBox.innerHTML = "";
+  profile.messages.forEach(msg=>addMessage(msg.from,msg.text));
+}
+
+function addMessage(sender,text){
+  const div = document.createElement('div');
+  div.innerText = sender+": "+text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function autoReply(profile){
+  const randomMsg = romanticMessages[Math.floor(Math.random()*romanticMessages.length)];
+  setTimeout(()=> {
+    profile.messages.push({from:profile.name, text: randomMsg});
+    if(chatName.innerText === profile.name){
+      addMessage(profile.name, randomMsg);
+    }
+  }, 1000 + Math.random()*2000);
+}
+
+// Profile edit
+function saveProfile(){
+  const userProfile = {
+    name: document.getElementById('edit-username').value || "DemoUser",
+    age: document.getElementById('edit-age').value || 25,
+    location: document.getElementById('edit-location').value || "Lagos",
+    gender: document.getElementById('edit-gender').value,
+    interest: document.getElementById('edit-interest').value || "Serious Relationship 💖",
+    pic: document.getElementById('edit-pic').value || "https://randomuser.me/api/portraits/lego/1.jpg"
+  };
+  document.getElementById('user-profile-pic').src = userProfile.pic;
+  alert("Profile updated!");
+}
+
+// Filters
+function applyFilters(){
+  const gender = document.getElementById('filter-gender').value;
+  const location = document.getElementById('filter-location').value;
+  const interest = document.getElementById('filter-interest').value;
+  filteredProfiles = demoProfiles.filter(p=>{
+    return !p.ignored &&
+           (!gender || p.gender===gender) &&
+           (!location || p.location===location) &&
+           (!interest || p.interest===interest);
+  });
+  currentIndex = 0;
+  showProfile();
+}
+
+// Initial
+showProfile();
 </script>
+
 </body>
 </html>
