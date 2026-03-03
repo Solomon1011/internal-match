@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Complete Your Profile</title>
+  <title>Profile Setup / Edit</title>
   <style>
-    body { background-color:#1a1a1a; color:#f5d061; font-family: Arial, sans-serif; padding:20px; }
-    h2 { text-align:center; }
-    input, select, button { display:block; margin:10px 0; padding:8px; width:80%; border-radius:5px; border:1px solid #f5d061; background:#111; color:#f5d061; }
-    img { display:block; margin:10px 0; width:120px; height:120px; border-radius:50%; object-fit:cover; border:2px solid #f5d061; }
+    body { background-color:#1a1a1a; color:#f5d061; font-family:Arial, sans-serif; padding:20px; text-align:center; }
+    input, select, button { display:block; margin:10px auto; padding:10px; width:80%; border-radius:5px; border:1px solid #f5d061; background:#111; color:#f5d061; }
+    button { background:#f5d061; color:#1a1a1a; border:none; cursor:pointer; }
+    img { max-width:120px; border-radius:50%; margin:10px 0; border:2px solid #f5d061; }
   </style>
 </head>
 <body>
 
-<h2>Complete Your Profile</h2>
+<h2>Set Up / Edit Your Profile</h2>
 
-<!-- Profile Picture Preview -->
-<img id="profile-pic-display" src="" alt="Profile Picture">
+<img id="profile-preview" src="" alt="Profile Picture" style="display:none;">
 
-<input type="file" id="profile-pic" accept="image/*">
 <input type="text" id="username" placeholder="Username">
 <input type="number" id="age" placeholder="Age">
 <input type="text" id="location" placeholder="Location">
@@ -30,12 +28,14 @@
 
 <select id="interest">
   <option value="">What are you interested in?</option>
-  <option value="Hangout">Hangout 🩵</option>
-  <option value="Friends">Friends 💚</option>
-  <option value="Serious Relationship">Serious Relationship 💖</option>
-  <option value="Marriage">Marriage 💘</option>
+  <option value="Hangout 🩵">Hangout 🩵</option>
+  <option value="Friends 💚">Friends 💚</option>
+  <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+  <option value="Marriage 💘">Marriage 💘</option>
 </select>
 
+<label>Profile Picture:</label>
+<input type="file" id="profile-pic">
 <button onclick="saveProfile()">Save Profile</button>
 
 <!-- Firebase -->
@@ -59,77 +59,72 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// Redirect if not logged in
+let currentUser = null;
+
+// Check auth
 auth.onAuthStateChanged(user=>{
-  if(!user) window.location.href="index.html";
-  else loadProfile(user.uid);
+  if(!user) return window.location.href="index.html";
+  currentUser = user;
+  loadProfile();
 });
 
-// Load existing profile (if any)
-function loadProfile(uid){
-  db.collection("users").doc(uid).get().then(doc=>{
+// Load existing profile if any
+function loadProfile(){
+  db.collection('users').doc(currentUser.uid).get().then(doc=>{
     if(doc.exists){
       const data = doc.data();
-      document.getElementById("username").value = data.username || '';
-      document.getElementById("age").value = data.age || '';
-      document.getElementById("location").value = data.location || '';
-      document.getElementById("gender").value = data.gender || '';
-      document.getElementById("interest").value = data.interest || '';
-      if(data.profilePic) document.getElementById("profile-pic-display").src = data.profilePic;
+      if(data.username) document.getElementById('username').value = data.username;
+      if(data.age) document.getElementById('age').value = data.age;
+      if(data.location) document.getElementById('location').value = data.location;
+      if(data.gender) document.getElementById('gender').value = data.gender;
+      if(data.interest) document.getElementById('interest').value = data.interest;
+      if(data.profilePic){
+        const img = document.getElementById('profile-preview');
+        img.src = data.profilePic;
+        img.style.display = 'block';
+      }
     }
   });
 }
 
-// Preview selected profile picture
-document.getElementById("profile-pic").addEventListener("change", function(){
-  const file = this.files[0];
-  if(file){
-    const reader = new FileReader();
-    reader.onload = e => document.getElementById("profile-pic-display").src = e.target.result;
-    reader.readAsDataURL(file);
-  }
-});
-
-// Save profile
+// Save or update profile
 function saveProfile(){
-  const user = auth.currentUser;
-  const username = document.getElementById("username").value.trim();
-  const age = document.getElementById("age").value;
-  const location = document.getElementById("location").value.trim();
-  const gender = document.getElementById("gender").value;
-  const interest = document.getElementById("interest").value;
-  const profilePicFile = document.getElementById("profile-pic").files[0];
+  const username = document.getElementById('username').value.trim();
+  const age = document.getElementById('age').value.trim();
+  const location = document.getElementById('location').value.trim();
+  const gender = document.getElementById('gender').value;
+  const interest = document.getElementById('interest').value;
+  const profilePicFile = document.getElementById('profile-pic').files[0];
 
   if(!username || !age || !location || !gender || !interest){
     return alert("Please fill all fields!");
   }
 
-  const userRef = db.collection("users").doc(user.uid);
+  const userRef = db.collection('users').doc(currentUser.uid);
 
+  // If user selects a new profile picture
   if(profilePicFile){
-    // Upload profile picture
-    const storageRef = storage.ref(`profile-pictures/${user.uid}`);
+    const storageRef = storage.ref().child(`profile-pictures/${currentUser.uid}`);
     storageRef.put(profilePicFile).then(snapshot=>{
       snapshot.ref.getDownloadURL().then(url=>{
-        userRef.set({
-          username, age: parseInt(age), location, gender, interest, profilePic: url, coins: 10, premium: false
-        }, {merge:true}).then(()=>{
+        userRef.update({
+          username, age: parseInt(age), location, gender, interest, profilePic: url
+        }).then(()=> {
           alert("Profile saved!");
           window.location.href="dashboard.html";
         });
       });
-    });
+    }).catch(err=>alert(err.message));
   } else {
-    // Save without updating picture
-    userRef.set({
-      username, age: parseInt(age), location, gender, interest
-    }, {merge:true}).then(()=>{
-      alert("Profile saved!");
-      window.location.href="dashboard.html";
-    });
+    // No new profile picture, just update other fields
+    userRef.update({username, age: parseInt(age), location, gender, interest})
+      .then(()=> {
+        alert("Profile saved!");
+        window.location.href="dashboard.html";
+      })
+      .catch(err=>alert(err.message));
   }
 }
 </script>
-
 </body>
 </html>
