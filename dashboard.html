@@ -76,7 +76,6 @@ const maleNames = ["John","David","Michael","James","Robert","William","Thomas",
 const femaleNames = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
 const locations = ["New York","London","Paris","Tokyo","Berlin","Madrid","Sydney","Lagos","Dubai","Rome"];
 const interests = ["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
-const romanticMessages = ["Hey you 😘, I was hoping to meet you today!","You have the most amazing smile 💖","Can't stop thinking about you 💘","Would love to go on a date with you 🥰","You're amazing 😍"];
 
 const demoProfiles = [];
 for(let i=0;i<500;i++){
@@ -86,9 +85,7 @@ for(let i=0;i<500;i++){
     gender:"Male",
     location:locations[Math.floor(Math.random()*locations.length)],
     interest:interests[Math.floor(Math.random()*interests.length)],
-    pic: malePics[i],
-    messages: [],
-    addedToChat:false
+    pic: malePics[i]
   });
   demoProfiles.push({
     name: femaleNames[Math.floor(Math.random()*femaleNames.length)],
@@ -96,9 +93,7 @@ for(let i=0;i<500;i++){
     gender:"Female",
     location:locations[Math.floor(Math.random()*locations.length)],
     interest:interests[Math.floor(Math.random()*interests.length)],
-    pic: femalePics[i],
-    messages: [],
-    addedToChat:false
+    pic: femalePics[i]
   });
 }
 
@@ -132,10 +127,7 @@ function showProfile(){
 
 function swipe(action){
   const p = demoProfiles[currentIndex];
-  if(action==="like") {
-    addChat(p);
-    autoReply(p);
-  }
+  if(action==="like") addChat(p);
   currentIndex++;
   showProfile();
 }
@@ -146,20 +138,19 @@ function messageCurrent(){
 }
 
 function addChat(profile){
-  if(!profile.addedToChat) {
+  if(!demoProfiles.some(d=>d.name===profile.name && d.addedToChat)) {
     const btn = document.createElement('button');
     btn.innerHTML=`<span>${profile.name}</span> <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" title="Message">`;
     btn.onclick = ()=>openChat(profile);
     chatUsersDiv.appendChild(btn);
     profile.addedToChat=true;
-    profile.messages.push({from:profile.name,text:"Hi there! 💖 Let's chat romantically!"});
   }
 }
 
 function openChat(profile){
   chatWithTitle.innerText = profile.name;
   chatBox.innerHTML = "";
-  profile.messages.forEach(msg=>addMessage(msg.from,msg.text));
+  addMessage(profile.name,"Hi there! 💖 Let's chat romantically!");
 }
 
 function addMessage(sender,text){
@@ -167,17 +158,6 @@ function addMessage(sender,text){
   div.innerText = sender+": "+text;
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function autoReply(profile){
-  // send 1-2 random romantic messages after 1-3 seconds
-  const randomMsg = romanticMessages[Math.floor(Math.random()*romanticMessages.length)];
-  setTimeout(()=> {
-    profile.messages.push({from:profile.name, text: randomMsg});
-    if(chatWithTitle.innerText === profile.name){
-      addMessage(profile.name, randomMsg);
-    }
-  }, 1000 + Math.random()*2000);
 }
 
 // Initial display
