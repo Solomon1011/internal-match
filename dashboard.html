@@ -87,9 +87,9 @@ function showTab(tab){
 }
 showTab('profile');
 
-// Demo profiles
-const malePics = Array.from({length:500}, (_,i)=>`https://randomuser.me/api/portraits/men/${i%100}.jpg`);
-const femalePics = Array.from({length:500}, (_,i)=>`https://randomuser.me/api/portraits/women/${i%100}.jpg`);
+// Demo profiles generation 4000+
+const malePics = Array.from({length:2000}, (_,i)=>`https://randomuser.me/api/portraits/men/${i%100}.jpg`);
+const femalePics = Array.from({length:2000}, (_,i)=>`https://randomuser.me/api/portraits/women/${i%100}.jpg`);
 const maleNames = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
 const femaleNames = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
 const locations = ["New York","London","Paris","Tokyo","Berlin","Madrid","Sydney","Lagos","Dubai","Rome"];
@@ -97,7 +97,7 @@ const interests = ["Friends 💚","Hangout 🩵","Serious Relationship 💖","Ma
 const romanticMessages = ["Hey you 😘, I was hoping to meet you today!","You have the most amazing smile 💖","Can't stop thinking about you 💘","Would love to go on a date with you 🥰","You're amazing 😍"];
 
 const demoProfiles = [];
-for(let i=0;i<500;i++){
+for(let i=0;i<2000;i++){
   demoProfiles.push({
     name: maleNames[Math.floor(Math.random()*maleNames.length)],
     age:20+Math.floor(Math.random()*15),
@@ -120,6 +120,7 @@ for(let i=0;i<500;i++){
   });
 }
 
+// Swipe system
 let currentIndex = 0;
 const swipeContainer = document.getElementById('swipe-container');
 const chatUsersDiv = document.getElementById('chat-users');
@@ -150,10 +151,7 @@ function showProfile(){
 
 function swipe(action){
   const p = demoProfiles[currentIndex];
-  if(action==="like") {
-    addChat(p);
-    autoReply(p);
-  }
+  if(action==="like") { addChat(p); autoReply(p); }
   currentIndex++;
   showProfile();
 }
