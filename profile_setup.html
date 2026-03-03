@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Complete Your Profile</title>
+  <style>
+    body { background-color:#1a1a1a; color:#f5d061; font-family: Arial; padding:20px; }
+    input, select, button { display:block; margin:10px 0; padding:8px; width:80%; border-radius:5px; border:1px solid #f5d061; background:#111; color:#f5d061; }
+  </style>
+</head>
+<body>
+
+<h2>Complete Your Profile</h2>
+
+<input type="text" id="username" placeholder="Username">
+<input type="number" id="age" placeholder="Age">
+<input type="date" id="dob" placeholder="Date of Birth">
+<input type="text" id="location" placeholder="Location">
+
+<select id="gender">
+  <option value="">Select Gender</option>
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+  <option value="Other">Other</option>
+</select>
+
+<select id="interest">
+  <option value="">What are you interested in?</option>
+  <option value="Hangout 🩵">Hangout 🩵</option>
+  <option value="Friends 💚">Friends 💚</option>
+  <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+  <option value="Marriage 💘">Marriage 💘</option>
+</select>
+
+<label>Profile Picture:</label>
+<input type="file" id="profile-pic">
+
+<button onclick="saveProfile()">Save Profile</button>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+  authDomain: "internal-match.firebaseapp.com",
+  projectId: "internal-match",
+  storageBucket: "internal-match.appspot.com",
+  messagingSenderId: "129707008837",
+  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+auth.onAuthStateChanged(user=>{
+  if(!user) window.location.href="index.html";
+});
+
+function saveProfile(){
+  const username = document.getElementById("username").value.trim();
+  const age = document.getElementById("age").value;
+  const dob = document.getElementById("dob").value;
+  const location = document.getElementById("location").value.trim();
+  const gender = document.getElementById("gender").value;
+  const interest = document.getElementById("interest").value;
+  const profilePic = document.getElementById("profile-pic").files[0];
+
+  if(!username || !age || !dob || !location || !gender || !interest || !profilePic){
+    return alert("Please fill all fields and select a profile picture!");
+  }
+
+  const user = auth.currentUser;
+
+  // Upload profile picture to Firebase Storage
+  const storageRef = storage.ref().child(`profile-pictures/${user.uid}`);
+  storageRef.put(profilePic).then(snapshot=>{
+    snapshot.ref.getDownloadURL().then(url=>{
+      // Save user profile in Firestore
+      db.collection("users").doc(user.uid).update({
+        username: username,
+        age: parseInt(age),
+        dob: dob,
+        location: location,
+        gender: gender,
+        interest: interest,
+        profilePic: url
+      }).then(()=>{
+        alert("Profile saved!");
+        window.location.href = "dashboard.html";
+      }).catch(err=>alert(err.message));
+    });
+  });
+}
+</script>
+</body>
+</html>
