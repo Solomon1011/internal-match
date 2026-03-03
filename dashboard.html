@@ -3,76 +3,50 @@
 <head>
   <title>Internal Match Dashboard</title>
   <script src="https://js.paystack.co/v1/inline.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <style>
-    body {
-      background-color: #1a1a1a;
-      color: #f5d061;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding-bottom: 80px; /* space for bottom tab */
-    }
-    h2 { text-align:center; margin-top:20px; }
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      background-color: #111;
-      border-top: 1px solid #f5d061;
-      padding: 10px 0;
-    }
-    .tab-bar button {
-      background:none;
-      border:none;
-      color:#f5d061;
-      font-size:16px;
-      cursor:pointer;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-    }
-    .tab-bar i { font-size:20px; margin-bottom:2px; }
-    .tab-content { padding: 10px 20px; }
-    .profile-pic { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #f5d061; margin-bottom:10px; }
-    .person-card { background:#111; padding:10px; margin:10px 0; border:1px solid #f5d061; border-radius:8px; display:flex; align-items:center; gap:10px; }
-    .person-info { flex:1; }
-    .person-info h4 { margin:0 0 5px 0; }
-    .person-info p { margin:2px 0; font-size:14px; }
-    #chat-box { border:1px solid #f5d061; padding:10px; height:200px; overflow-y:scroll; margin-bottom:10px; }
-    input[type=text] { padding:6px; width:70%; margin-right:5px; border-radius:4px; border:1px solid #f5d061; background-color:#111; color:#f5d061; }
-    button.action-btn { background-color: #f5d061; color:#1a1a1a; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
+    body { background-color:#1a1a1a; color:#f5d061; font-family:Arial; margin:0; padding:20px; }
+    h2{text-align:center;}
+    .tab-bar { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; border-top:1px solid #f5d061; padding:10px 0; }
+    .tab-bar button { background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
+    .tab-bar img{width:24px; height:24px; margin-bottom:3px;}
+    .tab-content{margin-bottom:100px;}
+    #swipe-container, #liked-container, #chat-box { margin-bottom:10px; }
+    #chat-box{border:1px solid #f5d061; padding:10px; height:200px; overflow-y:scroll;}
+    button{background:#f5d061; color:#1a1a1a; border:none; padding:8px 12px; margin:2px; border-radius:4px; cursor:pointer;}
+    input[type=text]{padding:6px; width:70%; margin-right:5px; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061;}
+    img.profile-small{width:40px; height:40px; border-radius:50%; margin-right:5px; vertical-align:middle;}
   </style>
 </head>
 <body>
 
-<h2>💘 Internal Match</h2>
+<h2>💘 Internal Match Dashboard</h2>
 
 <div class="tab-content">
   <!-- Profile Tab -->
   <div id="profile-tab" style="display:none;">
-    <img id="profile-pic-display" src="" class="profile-pic">
-    <h3 id="user-name"></h3>
+    <h3>My Profile</h3>
+    <img id="user-profile-pic" src="" alt="Profile" style="width:120px; height:120px; border-radius:50%; border:2px solid #f5d061;"><br>
     <p>Email: <span id="user-email"></span></p>
+    <p>Username: <span id="user-username"></span></p>
     <p>Age: <span id="user-age"></span></p>
     <p>Location: <span id="user-location"></span></p>
     <p>Gender: <span id="user-gender"></span></p>
     <p>Interest: <span id="user-interest"></span></p>
-    <p>Coins: <span id="coins">Loading...</span></p>
-    <p>Premium: <span id="premium-status">No</span></p>
-    <button class="action-btn" onclick="buyPremium()">Buy Premium</button>
-    <button class="action-btn" onclick="useCoin()">Use 1 Coin</button>
-    <br>
-    <button class="action-btn" onclick="logout()">Logout</button>
+    <p>Coins: <span id="user-coins"></span></p>
+    <p>Premium: <span id="user-premium"></span></p>
+    <button onclick="buyPremium()">Buy Premium</button>
+    <button onclick="useCoin()">Use 1 Coin</button>
+    <button onclick="editProfile()">Edit Profile</button>
+    <br><br>
+    <button onclick="logout()">Logout</button>
   </div>
 
   <!-- People Profiles Tab -->
   <div id="people-tab" style="display:none;">
     <h3>People Profiles</h3>
     <div id="swipe-container">Loading profiles...</div>
-    <button class="action-btn" onclick="swipe('like')">Like</button>
-    <button class="action-btn" onclick="swipe('dislike')">Dislike</button>
+    <button onclick="swipe('like')">Like</button>
+    <button onclick="swipe('dislike')">Dislike</button>
   </div>
 
   <!-- Who Likes Me Tab -->
@@ -81,32 +55,31 @@
     <div id="liked-container">Loading...</div>
   </div>
 
-  <!-- Chats Tab -->
+  <!-- Chat Tab -->
   <div id="chats-tab" style="display:none;">
     <h3>Chats</h3>
     <div id="chat-users" style="margin-bottom:10px;"></div>
     <div id="chat-box"></div>
     <input type="text" id="message-input" placeholder="Type a message">
-    <button class="action-btn" onclick="sendMessage()">Send</button>
+    <button onclick="sendMessage()">Send</button>
   </div>
 </div>
 
 <!-- Bottom Tab Bar -->
 <div class="tab-bar">
-  <button onclick="showTab('profile')"><i class="fa fa-user"></i>Profile</button>
-  <button onclick="showTab('people')"><i class="fa fa-users"></i>People</button>
-  <button onclick="showTab('liked')"><i class="fa fa-heart"></i>Likes</button>
-  <button onclick="showTab('chats')"><i class="fa fa-comments"></i>Chats</button>
+  <button onclick="showTab('profile')"><img src="icons/profile.png" alt="">Profile</button>
+  <button onclick="showTab('people')"><img src="icons/people.png" alt="">People</button>
+  <button onclick="showTab('liked')"><img src="icons/like.png" alt="">Likes</button>
+  <button onclick="showTab('chats')"><img src="icons/chat.png" alt="">Chats</button>
 </div>
 
-<!-- Firebase scripts -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
   authDomain: "internal-match.firebaseapp.com",
@@ -115,7 +88,6 @@ const firebaseConfig = {
   messagingSenderId: "129707008837",
   appId: "1:129707008837:web:f3f0033bbbe673107a542c"
 };
-
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -130,136 +102,119 @@ function showTab(tab){
   document.getElementById(tab+'-tab').style.display='block';
 }
 
-// Auth state
+// Auth
+let currentUser=null;
 auth.onAuthStateChanged(user=>{
-  if(!user) window.location.href="index.html";
-  else {
-    loadUserProfile(user.uid);
-    loadProfiles(user.uid);
-    loadMatches();
-    loadWhoLikedMe();
-    showTab('profile'); // default
-  }
+  if(!user) return window.location.href="index.html";
+  currentUser=user;
+  loadProfile();
+  loadProfiles();
+  loadWhoLikedMe();
+  loadMatches();
+  showTab('profile');
 });
 
-// Load user profile
-function loadUserProfile(uid){
-  db.collection("users").doc(uid).get().then(doc=>{
+// Profile
+function loadProfile(){
+  db.collection('users').doc(currentUser.uid).get().then(doc=>{
     if(doc.exists){
-      const data = doc.data();
-      document.getElementById('user-name').innerText = data.username || '';
-      document.getElementById('user-email').innerText = auth.currentUser.email;
-      document.getElementById('user-age').innerText = data.age || '';
-      document.getElementById('user-location').innerText = data.location || '';
-      document.getElementById('user-gender').innerText = data.gender || '';
-      document.getElementById('user-interest').innerText = data.interest || '';
-      document.getElementById('coins').innerText = data.coins || 10;
-      document.getElementById('premium-status').innerText = data.premium ? 'Yes':'No';
-      if(data.profilePic) document.getElementById('profile-pic-display').src = data.profilePic;
+      const data=doc.data();
+      document.getElementById('user-email').innerText=currentUser.email;
+      document.getElementById('user-username').innerText=data.username||'-';
+      document.getElementById('user-age').innerText=data.age||'-';
+      document.getElementById('user-location').innerText=data.location||'-';
+      document.getElementById('user-gender').innerText=data.gender||'-';
+      document.getElementById('user-interest').innerText=data.interest||'-';
+      document.getElementById('user-coins').innerText=data.coins||10;
+      document.getElementById('user-premium').innerText=data.premium?'Yes':'No';
+      if(data.profilePic) document.getElementById('user-profile-pic').src=data.profilePic;
+    } else {
+      db.collection('users').doc(currentUser.uid).set({coins:10,premium:false});
     }
   });
 }
+
+function editProfile(){ window.location.href="profile_setup.html"; }
+function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
 
 // Coins
 function useCoin(){
-  const user = auth.currentUser;
-  const userRef = db.collection("users").doc(user.uid);
-  userRef.get().then(doc=>{
-    let currentCoins = doc.data().coins;
-    if(currentCoins>0){
-      userRef.update({coins: currentCoins-1});
-      document.getElementById("coins").innerText = currentCoins-1;
-    } else {
-      alert("No coins left! Buy premium 🔥");
-    }
+  const ref=db.collection('users').doc(currentUser.uid);
+  ref.get().then(doc=>{
+    const coins=doc.data().coins||0;
+    if(coins>0){
+      ref.update({coins:coins-1});
+      document.getElementById('user-coins').innerText=coins-1;
+    } else alert("No coins left! Buy premium 🔥");
   });
 }
 
-// Buy Premium (Paystack)
+// Premium (Paystack)
 function buyPremium(){
-  const user = auth.currentUser;
-  const userRef = db.collection("users").doc(user.uid);
-  let handler = PaystackPop.setup({
-    key: 'YOUR_PUBLIC_PAYSTACK_KEY',
-    email: user.email,
+  const userRef=db.collection('users').doc(currentUser.uid);
+  let handler=PaystackPop.setup({
+    key:'YOUR_PUBLIC_PAYSTACK_KEY',
+    email:currentUser.email,
     amount:5000,
-    currency:"NGN",
+    currency:'NGN',
     ref:''+Math.floor(Math.random()*1000000000+1),
-    onClose: ()=>alert('Payment cancelled'),
-    callback: ()=>{ userRef.update({premium:true}); document.getElementById('premium-status').innerText='Yes'; alert("You are now Premium 🔥"); }
+    onClose:()=>alert('Payment cancelled'),
+    callback:()=>{ userRef.update({premium:true}); document.getElementById('user-premium').innerText='Yes'; alert("You are now Premium!"); }
   });
   handler.openIframe();
 }
 
-// Logout
-function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
-
-// ===== Swipe System =====
-let currentProfileIndex=0;
-let profiles=[];
-function loadProfiles(uid){
-  db.collection("users").get().then(snapshot=>{
-    profiles=snapshot.docs.filter(doc=>doc.id!==uid).map(doc=>({id:doc.id,...doc.data()}));
+// Swipe System
+let profiles=[],currentProfileIndex=0;
+function loadProfiles(){
+  db.collection('users').get().then(snapshot=>{
+    profiles=snapshot.docs.filter(doc=>doc.id!==currentUser.uid).map(doc=>({id:doc.id,...doc.data()}));
     showProfile();
   });
 }
 function showProfile(){
-  const container=document.getElementById("swipe-container");
-  if(currentProfileIndex>=profiles.length){
-    container.innerHTML="No more profiles!";
-    return;
-  }
-  const profile=profiles[currentProfileIndex];
-  container.innerHTML=`<div class="person-card">
-    <img src="${profile.profilePic || ''}" class="profile-pic">
-    <div class="person-info">
-      <h4>${profile.username || profile.email}</h4>
-      <p>Age: ${profile.age || '-'}</p>
-      <p>Location: ${profile.location || '-'}</p>
-      <p>Gender: ${profile.gender || '-'}</p>
-      <p>Interest: ${profile.interest || '-'}</p>
-    </div>
-  </div>`;
+  const container=document.getElementById('swipe-container');
+  if(currentProfileIndex>=profiles.length) return container.innerHTML="No more profiles!";
+  const p=profiles[currentProfileIndex];
+  container.innerHTML=`<img src="${p.profilePic||''}" style="width:50px;height:50px;border-radius:50%;vertical-align:middle;"> ${p.username||p.email}`;
 }
 function swipe(type){
-  const user=auth.currentUser;
-  const profile=profiles[currentProfileIndex];
-  db.collection("likes").add({from:user.uid,to:profile.id,type:type});
-  db.collection("likes").where("from","==",profile.id).where("to","==",user.uid).where("type","==","like").get()
-  .then(snap=>{ if(!snap.empty){ db.collection("matches").add({user1:user.uid,user2:profile.id}); alert("It's a match! 💘"); } });
+  const p=profiles[currentProfileIndex];
+  db.collection('likes').add({from:currentUser.uid,to:p.id,type:type});
+  db.collection('likes').where('from','==',p.id).where('to','==',currentUser.uid).where('type','==','like').get()
+  .then(snap=>{ if(!snap.empty) db.collection('matches').add({user1:currentUser.uid,user2:p.id}); if(!snap.empty) alert("It's a match! 💘"); });
   currentProfileIndex++;
   showProfile();
 }
 
-// Who Likes Me
+// Likes tab
 function loadWhoLikedMe(){
-  const user=auth.currentUser;
-  db.collection('likes').where('to','==',user.uid).where('type','==','like').get()
+  db.collection('likes').where('to','==',currentUser.uid).where('type','==','like').get()
   .then(snapshot=>{
-    const container=document.getElementById('liked-container');
-    container.innerHTML='';
-    if(snapshot.empty){ container.innerText='No one liked you yet!'; }
-    else{
-      snapshot.forEach(doc=>{ const like=doc.data(); container.innerHTML+='<div>'+like.from+'</div>'; });
-    }
+    const container=document.getElementById('liked-container'); container.innerHTML='';
+    if(snapshot.empty) container.innerText='No one liked you yet!';
+    else snapshot.forEach(doc=>{
+      const l=doc.data();
+      const imgSpan=document.createElement('div');
+      imgSpan.innerHTML=`<img src="" class="profile-small"> ${l.from}`;
+      container.appendChild(imgSpan);
+    });
   });
 }
 
-// Chat system (only chats user has)
+// Chat tab
 let currentChatId=null;
 function loadMatches(){
-  const user=auth.currentUser;
-  db.collection("matches").where("user1","==",user.uid).get().then(showMatchUsers);
-  db.collection("matches").where("user2","==",user.uid).get().then(showMatchUsers);
+  const chatUsersDiv=document.getElementById('chat-users'); chatUsersDiv.innerHTML='';
+  db.collection('matches').where('user1','==',currentUser.uid).get().then(showMatchUsers);
+  db.collection('matches').where('user2','==',currentUser.uid).get().then(showMatchUsers);
 }
 function showMatchUsers(snapshot){
-  const chatUsersDiv=document.getElementById("chat-users");
-  chatUsersDiv.innerHTML='';
+  const chatUsersDiv=document.getElementById('chat-users');
   snapshot.forEach(doc=>{
     const data=doc.data();
-    const matchUid=data.user1===auth.currentUser.uid?data.user2:data.user1;
-    const btn=document.createElement("button");
-    btn.className='action-btn';
+    const matchUid=data.user1===currentUser.uid?data.user2:data.user1;
+    const btn=document.createElement('button');
     btn.innerText="Chat with "+matchUid;
     btn.onclick=()=>openChat(doc.id,matchUid);
     chatUsersDiv.appendChild(btn);
@@ -267,33 +222,34 @@ function showMatchUsers(snapshot){
 }
 function openChat(chatId,matchUid){
   currentChatId=chatId;
-  const chatBox=document.getElementById("chat-box");
-  chatBox.innerHTML="";
-  const chatDocRef=db.collection("chats").doc(chatId);
+  const chatBox=document.getElementById('chat-box'); chatBox.innerHTML='';
+  const chatDocRef=db.collection('chats').doc(chatId);
   chatDocRef.get().then(doc=>{
-    if(!doc.exists){ chatDocRef.set({participants:[auth.currentUser.uid,matchUid],messages:[]}); }
+    if(!doc.exists) chatDocRef.set({participants:[currentUser.uid,matchUid],messages:[]});
   });
   chatDocRef.onSnapshot(doc=>{
-    chatBox.innerHTML="";
-    const messages=doc.data().messages||[];
-    messages.forEach(msg=>{
-      const div=document.createElement("div");
-      div.innerText=(msg.from===auth.currentUser.uid?"Me: ":"Them: ")+msg.text;
+    chatBox.innerHTML='';
+    const msgs=doc.data().messages||[];
+    msgs.forEach(msg=>{
+      const div=document.createElement('div');
+      div.innerText=(msg.from===currentUser.uid?"Me: ":"Them: ")+msg.text;
       chatBox.appendChild(div);
     });
     chatBox.scrollTop=chatBox.scrollHeight;
   });
 }
 function sendMessage(){
-  if(!currentChatId) return alert("Select a match first!");
-  const input=document.getElementById("message-input");
-  const text=input.value.trim();
+  if(!currentChatId) return alert("Select a chat first!");
+  const text=document.getElementById('message-input').value.trim();
   if(!text) return;
-  db.collection("chats").doc(currentChatId).update({
-    messages: firebase.firestore.FieldValue.arrayUnion({from:auth.currentUser.uid,text,timestamp:firebase.firestore.Timestamp.now()})
+  db.collection('chats').doc(currentChatId).update({
+    messages:firebase.firestore.FieldValue.arrayUnion({
+      from:currentUser.uid,text:text,timestamp:firebase.firestore.Timestamp.now()
+    })
   });
-  input.value="";
+  document.getElementById('message-input').value='';
 }
 </script>
+
 </body>
 </html>
