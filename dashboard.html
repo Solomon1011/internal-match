@@ -8,9 +8,13 @@
 <h2>Welcome to Internal Match</h2>
 
 <h3>Coins: <span id="coins">Loading...</span></h3>
+
+<!-- Buttons -->
 <button onclick="buyPremium()">Buy Premium</button>
+<button onclick="useCoin()">Use 1 Coin</button>
 <button onclick="logout()">Logout</button>
 
+<!-- Firebase scripts -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -29,6 +33,7 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // Protect dashboard
   auth.onAuthStateChanged(user => {
     if (!user) {
       window.location.href = "index.html";
@@ -37,6 +42,7 @@
     }
   });
 
+  // Load coins from Firestore
   function loadCoins(uid) {
     db.collection("users").doc(uid).get().then(doc => {
       if (doc.exists) {
@@ -51,15 +57,37 @@
     });
   }
 
+  // Logout function
   function logout() {
     auth.signOut().then(() => {
       window.location.href = "index.html";
     });
   }
 
+  // Deduct one coin
+  function useCoin() {
+    const user = auth.currentUser;
+    const userRef = db.collection("users").doc(user.uid);
+
+    userRef.get().then(doc => {
+      let currentCoins = doc.data().coins;
+
+      if (currentCoins > 0) {
+        userRef.update({
+          coins: currentCoins - 1
+        });
+        document.getElementById("coins").innerText = currentCoins - 1;
+      } else {
+        alert("No coins left! Buy premium 🔥");
+      }
+    });
+  }
+
+  // Premium system placeholder
   function buyPremium() {
     alert("Premium system coming next 🔥");
   }
+
 </script>
 
 </body>
