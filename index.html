@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,7 +38,9 @@
     const password = document.getElementById("password").value;
 
     auth.createUserWithEmailAndPassword(email, password)
-      .then(() => alert("Account Created Successfully"))
+      .then(() => {
+        window.location.href = "dashboard.html";
+      })
       .catch(error => alert(error.message));
   }
 
@@ -46,14 +49,18 @@
     const password = document.getElementById("password").value;
 
     auth.signInWithEmailAndPassword(email, password)
-      .then(() => alert("Login Successful"))
+      .then(() => {
+        window.location.href = "dashboard.html";
+      })
       .catch(error => alert(error.message));
   }
 
   function googleLogin() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider)
-      .then(() => alert("Google Login Successful"))
+      .then(() => {
+        window.location.href = "dashboard.html";
+      })
       .catch(error => alert(error.message));
   }
 </script>
