@@ -1,43 +1,56 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
-  <!-- Paystack script -->
+  <title>Internal Match Dashboard</title>
   <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
-<body>
+<body style="background-color:#1a1a1a; color:#f5d061; font-family:Arial,sans-serif; padding:20px;">
 
-<h2>Welcome to Internal Match</h2>
+<h2 style="text-align:center;">💘 Internal Match Dashboard</h2>
 
-<h3>Coins: <span id="coins">Loading...</span></h3>
-
-<!-- Buttons -->
-<button onclick="buyPremium()">Buy Premium</button>
-<button onclick="useCoin()">Use 1 Coin</button>
-<button onclick="logout()">Logout</button>
-
-<hr>
-
-<!-- Swipe container -->
-<div id="swipe-container">Loading profiles...</div>
-<button onclick="swipe('like')">Like</button>
-<button onclick="swipe('dislike')">Dislike</button>
-
-<hr>
-
-<!-- Chat UI -->
-<h3>Chat with your matches</h3>
-<div id="chat-users">
-  <!-- Matched users buttons will appear here -->
+<!-- Tabs -->
+<div style="display:flex; justify-content:space-around; margin-bottom:20px;">
+  <button onclick="showTab('profile')">My Profile</button>
+  <button onclick="showTab('people')">People Profiles</button>
+  <button onclick="showTab('liked')">Who Likes Me</button>
+  <button onclick="showTab('chats')">Chats</button>
+  <button onclick="logout()">Logout</button>
 </div>
 
-<div id="chat-box" style="border:1px solid #ccc; padding:10px; height:200px; overflow-y:scroll;">
-  <!-- Messages will appear here -->
+<!-- Tab Contents -->
+
+<!-- Profile Tab -->
+<div id="profile-tab" style="display:none;">
+  <h3>My Profile</h3>
+  <p>Email: <span id="user-email"></span></p>
+  <p>Coins: <span id="coins">Loading...</span></p>
+  <p>Premium: <span id="premium-status">No</span></p>
+  <button onclick="buyPremium()">Buy Premium</button>
+  <button onclick="useCoin()">Use 1 Coin</button>
 </div>
 
-<input type="text" id="message-input" placeholder="Type a message">
-<button onclick="sendMessage()">Send</button>
+<!-- People Profiles Tab -->
+<div id="people-tab" style="display:none;">
+  <h3>People Profiles</h3>
+  <div id="swipe-container" style="margin-bottom:10px;">Loading profiles...</div>
+  <button onclick="swipe('like')">Like</button>
+  <button onclick="swipe('dislike')">Dislike</button>
+</div>
+
+<!-- Who Likes You Tab -->
+<div id="liked-tab" style="display:none;">
+  <h3>Who Likes Me</h3>
+  <div id="liked-container">Loading...</div>
+</div>
+
+<!-- Chat Tab -->
+<div id="chats-tab" style="display:none;">
+  <h3>Chat with Your Matches</h3>
+  <div id="chat-users" style="margin-bottom:10px;"></div>
+  <div id="chat-box" style="border:1px solid #f5d061; padding:10px; height:200px; overflow-y:scroll; margin-bottom:10px;"></div>
+  <input type="text" id="message-input" placeholder="Type a message">
+  <button onclick="sendMessage()">Send</button>
+</div>
 
 <!-- Firebase scripts -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -58,186 +71,207 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Protect dashboard
+// ===== Tab switching =====
+function showTab(tab){
+  document.getElementById('profile-tab').style.display='none';
+  document.getElementById('people-tab').style.display='none';
+  document.getElementById('liked-tab').style.display='none';
+  document.getElementById('chats-tab').style.display='none';
+
+  if(tab==='profile') document.getElementById('profile-tab').style.display='block';
+  if(tab==='people') document.getElementById('people-tab').style.display='block';
+  if(tab==='liked') document.getElementById('liked-tab').style.display='block';
+  if(tab==='chats') document.getElementById('chats-tab').style.display='block';
+}
+
+// ===== Auth & Dashboard Load =====
 auth.onAuthStateChanged(user => {
-  if (!user) {
+  if(!user){
     window.location.href = "index.html";
   } else {
-    loadCoins(user.uid);
-    loadProfiles(user.uid); // Swipe system
-    loadMatches();          // Chat system
+    loadUserProfile(user.uid);
+    loadProfiles(user.uid);
+    loadMatches();
+    loadWhoLikedMe();
+    showTab('profile'); // Default tab
   }
 });
 
-// Load coins
-function loadCoins(uid) {
-  db.collection("users").doc(uid).get().then(doc => {
-    if (doc.exists) {
-      document.getElementById("coins").innerText = doc.data().coins;
+// ===== Load User Profile =====
+function loadUserProfile(uid){
+  db.collection("users").doc(uid).get().then(doc=>{
+    if(doc.exists){
+      document.getElementById('coins').innerText = doc.data().coins;
+      document.getElementById('user-email').innerText = auth.currentUser.email;
+      document.getElementById('premium-status').innerText = doc.data().premium ? 'Yes':'No';
     } else {
-      db.collection("users").doc(uid).set({coins: 10, premium: false});
-      document.getElementById("coins").innerText = 10;
+      db.collection("users").doc(uid).set({coins:10, premium:false});
+      document.getElementById('coins').innerText=10;
+      document.getElementById('user-email').innerText = auth.currentUser.email;
+      document.getElementById('premium-status').innerText='No';
     }
   });
 }
 
-// Logout
-function logout() {
-  auth.signOut().then(() => window.location.href = "index.html");
-}
-
-// Use 1 coin
-function useCoin() {
+// ===== Coins =====
+function useCoin(){
   const user = auth.currentUser;
   const userRef = db.collection("users").doc(user.uid);
-
-  userRef.get().then(doc => {
+  userRef.get().then(doc=>{
     let currentCoins = doc.data().coins;
-    if(currentCoins > 0){
-      userRef.update({coins: currentCoins - 1});
-      document.getElementById("coins").innerText = currentCoins - 1;
+    if(currentCoins>0){
+      userRef.update({coins: currentCoins-1});
+      document.getElementById("coins").innerText = currentCoins-1;
     } else {
       alert("No coins left! Buy premium 🔥");
     }
   });
 }
 
-// Buy Premium with Paystack
-function buyPremium() {
+// ===== Paystack Premium =====
+function buyPremium(){
   const user = auth.currentUser;
   const userRef = db.collection("users").doc(user.uid);
 
   let handler = PaystackPop.setup({
-    key: 'YOUR_PUBLIC_PAYSTACK_KEY', // Replace with your Paystack key
+    key: 'YOUR_PUBLIC_PAYSTACK_KEY', // Replace
     email: user.email,
-    amount: 5000, // 50 NGN
+    amount: 5000,
     currency: "NGN",
-    ref: '' + Math.floor(Math.random() * 1000000000 + 1),
-    onClose: function(){ alert('Payment cancelled'); },
+    ref: ''+Math.floor(Math.random()*1000000000+1),
+    onClose: function(){alert('Payment cancelled');},
     callback: function(response){
-      userRef.update({premium: true});
+      userRef.update({premium:true});
+      document.getElementById('premium-status').innerText='Yes';
       alert("You are now a Premium user 🔥");
     }
   });
-
   handler.openIframe();
 }
 
-// ===== Swipe System =====
-let currentProfileIndex = 0;
-let profiles = [];
+// ===== Logout =====
+function logout(){ auth.signOut().then(()=>window.location.href="index.html"); }
 
-function loadProfiles(uid) {
-  db.collection("users").get().then(snapshot => {
-    profiles = snapshot.docs
-      .filter(doc => doc.id !== uid)
-      .map(doc => ({ id: doc.id, ...doc.data() }));
+// ===== Swipe System =====
+let currentProfileIndex=0;
+let profiles=[];
+
+function loadProfiles(uid){
+  db.collection("users").get().then(snapshot=>{
+    profiles=snapshot.docs.filter(doc=>doc.id!==uid).map(doc=>({id:doc.id,...doc.data()}));
     showProfile();
   });
 }
 
-function showProfile() {
-  const container = document.getElementById("swipe-container");
-  if(currentProfileIndex >= profiles.length){
-    container.innerHTML = "No more profiles!";
+function showProfile(){
+  const container=document.getElementById("swipe-container");
+  if(currentProfileIndex>=profiles.length){
+    container.innerHTML="No more profiles!";
     return;
   }
-  const profile = profiles[currentProfileIndex];
-  container.innerHTML = `<h3>${profile.email}</h3>`;
+  const profile=profiles[currentProfileIndex];
+  container.innerHTML=`<h3>${profile.email}</h3>`;
 }
 
-function swipe(type) {
-  const user = auth.currentUser;
-  const profile = profiles[currentProfileIndex];
+function swipe(type){
+  const user=auth.currentUser;
+  const profile=profiles[currentProfileIndex];
 
-  db.collection("likes").add({
-    from: user.uid,
-    to: profile.id,
-    type: type
+  db.collection("likes").add({from:user.uid, to:profile.id, type:type});
+
+  db.collection("likes").where("from","==",profile.id).where("to","==",user.uid).where("type","==","like").get()
+  .then(snap=>{
+    if(!snap.empty){
+      db.collection("matches").add({user1:user.uid,user2:profile.id});
+      alert("It's a match! 💘");
+    }
   });
-
-  // Check for match
-  db.collection("likes")
-    .where("from", "==", profile.id)
-    .where("to", "==", user.uid)
-    .where("type", "==", "like")
-    .get()
-    .then(snap => {
-      if(!snap.empty){
-        db.collection("matches").add({user1: user.uid, user2: profile.id});
-        alert("It's a match! 💘");
-      }
-    });
 
   currentProfileIndex++;
   showProfile();
 }
 
-// ===== Chat System =====
-let currentChatId = null;
+// ===== Who Likes Me =====
+function loadWhoLikedMe(){
+  const user=auth.currentUser;
+  db.collection('likes').where('to','==',user.uid).where('type','==','like').get()
+  .then(snapshot=>{
+    const container=document.getElementById('liked-container');
+    container.innerHTML='';
+    if(snapshot.empty){
+      container.innerText='No one liked you yet!';
+    } else {
+      snapshot.forEach(doc=>{
+        const like=doc.data();
+        container.innerHTML+='<div>'+like.from+'</div>';
+      });
+    }
+  });
+}
 
-function loadMatches() {
-  const user = auth.currentUser;
+// ===== Chat System =====
+let currentChatId=null;
+
+function loadMatches(){
+  const user=auth.currentUser;
   db.collection("matches").where("user1","==",user.uid).get().then(showMatchUsers);
   db.collection("matches").where("user2","==",user.uid).get().then(showMatchUsers);
 }
 
 function showMatchUsers(snapshot){
-  const chatUsersDiv = document.getElementById("chat-users");
+  const chatUsersDiv=document.getElementById("chat-users");
   snapshot.forEach(doc=>{
-    const data = doc.data();
-    const matchUid = data.user1===auth.currentUser.uid ? data.user2 : data.user1;
+    const data=doc.data();
+    const matchUid=data.user1===auth.currentUser.uid?data.user2:data.user1;
 
-    const btn = document.createElement("button");
-    btn.innerText = "Chat with " + matchUid;
-    btn.onclick = () => openChat(doc.id, matchUid);
+    const btn=document.createElement("button");
+    btn.innerText="Chat with "+matchUid;
+    btn.onclick=()=>openChat(doc.id,matchUid);
     chatUsersDiv.appendChild(btn);
   });
 }
 
-function openChat(chatId, matchUid){
-  currentChatId = chatId;
-  const chatBox = document.getElementById("chat-box");
-  chatBox.innerHTML = "";
+function openChat(chatId,matchUid){
+  currentChatId=chatId;
+  const chatBox=document.getElementById("chat-box");
+  chatBox.innerHTML="";
 
-  const chatDocRef = db.collection("chats").doc(chatId);
+  const chatDocRef=db.collection("chats").doc(chatId);
 
   chatDocRef.get().then(doc=>{
     if(!doc.exists){
-      chatDocRef.set({participants:[auth.currentUser.uid, matchUid], messages:[]});
+      chatDocRef.set({participants:[auth.currentUser.uid,matchUid],messages:[]});
     }
   });
 
   chatDocRef.onSnapshot(doc=>{
-    chatBox.innerHTML = "";
-    const messages = doc.data().messages || [];
+    chatBox.innerHTML="";
+    const messages=doc.data().messages||[];
     messages.forEach(msg=>{
-      const div = document.createElement("div");
-      div.innerText = (msg.from===auth.currentUser.uid?"Me: ":"Them: ")+msg.text;
+      const div=document.createElement("div");
+      div.innerText=(msg.from===auth.currentUser.uid?"Me: ":"Them: ")+msg.text;
       chatBox.appendChild(div);
     });
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop=chatBox.scrollHeight;
   });
 }
 
 function sendMessage(){
   if(!currentChatId) return alert("Select a match first!");
-  const input = document.getElementById("message-input");
-  const text = input.value.trim();
+  const input=document.getElementById("message-input");
+  const text=input.value.trim();
   if(!text) return;
 
   db.collection("chats").doc(currentChatId).update({
     messages: firebase.firestore.FieldValue.arrayUnion({
       from: auth.currentUser.uid,
-      text: text,
+      text:text,
       timestamp: firebase.firestore.Timestamp.now()
     })
   });
 
-  input.value = "";
+  input.value="";
 }
-
 </script>
-
 </body>
 </html>
