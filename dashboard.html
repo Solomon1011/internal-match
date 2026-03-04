@@ -1,18 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💘 Internal Match Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="card">
-  <h2>Dashboard</h2>
-  <p id="welcomeUser"></p>
-  <a href="home.html" class="btn">Go to Home</a>
-  <button onclick="logout()">Logout</button>
+<h2>💘 Internal Match</h2>
+
+<div class="tab-content">
+
+  <!-- User Profile -->
+  <div id="profile-tab">
+    <h3>My Profile</h3>
+    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile" style="width:120px;height:120px;border-radius:50%;">
+    <br>
+    <input type="text" id="edit-username" placeholder="Username"><br>
+    <input type="text" id="edit-email" placeholder="Email" disabled><br>
+    <input type="number" id="edit-age" placeholder="Age"><br>
+    <input type="text" id="edit-location" placeholder="Location"><br>
+    <select id="edit-gender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select><br>
+    <input type="text" id="edit-interest" placeholder="Interest"><br>
+    <input type="text" id="edit-pic" placeholder="Profile Picture URL"><br>
+    <button onclick="saveProfile()">💾 Save Profile</button>
+  </div>
+
+  <!-- People Profiles -->
+  <div id="people-tab" style="display:none;">
+    <div id="swipe-container">Loading profiles...</div>
+    <div id="chat-users"></div>
+  </div>
+
+  <!-- Likes -->
+  <div id="liked-tab" style="display:none;">
+    <h3>Who Likes Me</h3>
+    <div id="liked-container">No likes yet!</div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chats-tab" style="display:none;">
+    <div id="chat-header">
+      <img id="chat-profile-pic" src="">
+      <span id="chat-name" style="font-weight:bold;font-size:18px;"></span>
+    </div>
+    <div id="chat-box" style="height:300px; overflow-y:scroll; border:1px solid #f5d061; padding:10px;"></div>
+    <input type="text" id="chat-input" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
 </div>
 
+<div class="tab-bar">
+  <button onclick="showTab('profile')">Profile</button>
+  <button onclick="showTab('people')">People</button>
+  <button onclick="showTab('liked')">Likes</button>
+  <button onclick="showTab('chats')">Chats</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
