@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,30 +11,39 @@ body {
   color: #f5d061;
   font-family: Arial, sans-serif;
   text-align: center;
-  padding: 50px;
+  padding: 50px 20px;
+}
+h1 {
+  margin-bottom: 40px;
 }
 input {
-  padding: 10px;
-  margin: 8px 0;
+  padding: 12px;
+  margin: 10px 0;
   width: 90%;
   border-radius: 6px;
   border: 1px solid #f5d061;
   background: #222;
   color: #f5d061;
+  font-size: 16px;
 }
 button {
-  padding: 10px 20px;
-  margin: 10px;
+  padding: 12px 25px;
+  margin: 10px 5px;
   border-radius: 6px;
   border: none;
   background: #f5d061;
   color: #111;
   font-weight: bold;
   cursor: pointer;
+  font-size: 16px;
+}
+button:hover {
+  opacity: 0.9;
 }
 #error-msg {
   color: #ff5555;
-  margin-top: 10px;
+  margin-top: 15px;
+  font-size: 14px;
 }
 </style>
 </head>
@@ -55,9 +65,6 @@ button {
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
   import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-  // ---------------------------
-  // 🔹 Firebase Config
-  // ---------------------------
   const firebaseConfig = {
     apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
     authDomain: "internal-match.firebaseapp.com",
@@ -75,9 +82,7 @@ button {
   const passInput = document.getElementById("password");
   const errorMsg = document.getElementById("error-msg");
 
-  // ---------------------------
-  // 🔹 LOGIN
-  // ---------------------------
+  // LOGIN
   document.getElementById("login-btn").addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passInput.value.trim();
@@ -96,9 +101,7 @@ button {
     }
   });
 
-  // ---------------------------
-  // 🔹 SIGNUP
-  // ---------------------------
+  // SIGNUP
   document.getElementById("signup-btn").addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passInput.value.trim();
@@ -116,7 +119,6 @@ button {
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Create user profile in Firestore
       await setDoc(doc(db, "users", userCredential.user.uid), {
         username: "",
         age: "",
@@ -131,5 +133,6 @@ button {
     }
   });
 </script>
+
 </body>
 </html>
