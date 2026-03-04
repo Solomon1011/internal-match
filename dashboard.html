@@ -1,53 +1,18 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Internal Match Dashboard</title>
-<link rel="stylesheet" href="style.css">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>💘 Internal Match Dashboard</h2>
-
-<div class="tab-content">
-  <!-- Profile Tab -->
-  <div id="profile-tab">
-    <h3>My Profile</h3>
-    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile">
-    <input type="text" id="edit-username" placeholder="Username">
-    <input type="number" id="edit-age" placeholder="Age">
-    <input type="text" id="edit-location" placeholder="Location">
-    <select id="edit-gender"><option value="Male">Male</option><option value="Female">Female</option></select>
-    <input type="text" id="edit-interest" placeholder="Interest">
-    <input type="text" id="edit-pic" placeholder="Profile Picture URL">
-    <button onclick="saveProfile()">💾 Save Profile</button>
-  </div>
-
-  <!-- People Tab -->
-  <div id="people-tab"></div>
-
-  <!-- Likes Tab -->
-  <div id="liked-tab"><h3>Who Likes Me</h3><div id="liked-container">No likes yet!</div></div>
-
-  <!-- Chat Tab -->
-  <div id="chats-tab">
-    <div id="chat-header"><img id="chat-profile-pic"><span id="chat-name"></span></div>
-    <div id="chat-box"></div>
-  </div>
+<div class="card">
+  <h2>Dashboard</h2>
+  <p id="welcomeUser"></p>
+  <a href="home.html" class="btn">Go to Home</a>
+  <button onclick="logout()">Logout</button>
 </div>
 
-<div class="tab-bar">
-  <button onclick="showTab('profile')">Profile</button>
-  <button onclick="showTab('people')">People</button>
-  <button onclick="showTab('liked')">Likes</button>
-  <button onclick="showTab('chats')">Chats</button>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
