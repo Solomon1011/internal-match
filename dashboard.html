@@ -1,163 +1,218 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Internal Match - Profile Setup / Login</title>
+<title>💘 Internal Match Dashboard</title>
+
 <style>
-body { background:#1a1a1a; color:#f5d061; font-family:Arial; text-align:center; padding:20px; }
-h2 { margin-bottom:20px; }
-input, select, button { display:block; margin:10px auto; padding:10px; width:80%; border-radius:6px; border:1px solid #f5d061; background:#111; color:#f5d061; font-size:16px; }
-button { background:#f5d061; color:#1a1a1a; font-weight:bold; cursor:pointer; }
-button:hover { background:#e0c850; }
-img { max-width:120px; border-radius:50%; margin:10px 0; border:2px solid #f5d061; }
-p { cursor:pointer; text-decoration:underline; }
+body {
+  margin:0;
+  font-family:Arial;
+  background:#1a1a1a;
+  color:#f5d061;
+  text-align:center;
+}
+
+.tab-content {
+  padding:20px;
+  padding-bottom:80px;
+}
+
+.tab-bar {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  background:#111;
+  border-top:1px solid #f5d061;
+}
+
+.tab-bar button {
+  flex:1;
+  background:none;
+  border:none;
+  color:#f5d061;
+  padding:15px 5px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.card {
+  background:#222;
+  border:1px solid #f5d061;
+  border-radius:12px;
+  padding:15px;
+  margin:15px auto;
+  width:90%;
+  max-width:350px;
+}
+
+.card img {
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  border:2px solid #f5d061;
+}
+
+button.action {
+  margin:5px;
+  padding:8px 15px;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.like { background:#f5d061; color:#1a1a1a; }
+.ignore { background:#444; color:white; }
 </style>
 </head>
 <body>
 
 <h2>💘 Internal Match</h2>
 
-<!-- LOGIN -->
-<div id="loginDiv">
-<h3>Login</h3>
-<input type="email" id="loginEmail" placeholder="Email">
-<input type="password" id="loginPass" placeholder="Password">
-<button onclick="login()">Login</button>
-<p onclick="showSignup()">Create an account</p>
+<div class="tab-content">
+
+  <!-- PROFILE -->
+  <div id="profileTab">
+    <h3>My Profile</h3>
+    <img id="myPic">
+    <p id="myInfo"></p>
+    <button onclick="logout()" class="action ignore">Logout</button>
+  </div>
+
+  <!-- PEOPLE -->
+  <div id="peopleTab" style="display:none;">
+    <div id="peopleContainer">Loading...</div>
+  </div>
+
+  <!-- LIKES -->
+  <div id="likesTab" style="display:none;">
+    <h3>People Who Liked You</h3>
+    <div id="likesContainer">Loading...</div>
+  </div>
+
 </div>
 
-<!-- SIGNUP -->
-<div id="signupDiv" style="display:none;">
-<h3>Sign Up</h3>
-<input type="email" id="signEmail" placeholder="Email">
-<input type="password" id="signPass" placeholder="Password">
-<button onclick="signup()">Sign Up</button>
-<p onclick="showLogin()">Already have account? Login</p>
+<div class="tab-bar">
+  <button onclick="showTab('profileTab')">Profile</button>
+  <button onclick="showTab('peopleTab')">People</button>
+  <button onclick="showTab('likesTab')">Likes</button>
 </div>
 
-<!-- PROFILE SETUP -->
-<div id="profileDiv" style="display:none;">
-<h3>Set Up Your Profile</h3>
-<img id="profile-preview" src="https://randomuser.me/api/portraits/lego/1.jpg">
-<input type="text" id="username" placeholder="Username">
-<input type="number" id="age" placeholder="Age">
-<input type="text" id="location" placeholder="Location">
-<select id="gender">
-    <option value="">Select Gender</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-</select>
-<select id="interest">
-    <option value="">Select Your Interest</option>
-    <option value="Hangout 🩵">Hangout 🩵</option>
-    <option value="Friends 💚">Friends 💚</option>
-    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-    <option value="Marriage 💘">Marriage 💘</option>
-</select>
-<label for="profile-pic" style="cursor:pointer;">📷 Upload Profile Picture</label>
-<input type="file" id="profile-pic" accept="image/*" style="display:none;">
-<button onclick="saveProfile()">Save Profile</button>
-</div>
-
-<!-- Firebase -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-// Initialize Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
   authDomain: "internal-match.firebaseapp.com",
   projectId: "internal-match",
-  storageBucket: "internal-match.appspot.com",
+  storageBucket: "internal-match.firebasestorage.app",
   messagingSenderId: "129707008837",
-  appId: "YOUR_APP_ID"
+  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const storage = firebase.storage();
 
-// Show login/signup
-function showSignup(){ document.getElementById('loginDiv').style.display='none'; document.getElementById('signupDiv').style.display='block'; }
-function showLogin(){ document.getElementById('signupDiv').style.display='none'; document.getElementById('loginDiv').style.display='block'; }
+let currentUser = null;
+let currentProfile = null;
 
-// Signup
-function signup(){
-    const email = document.getElementById('signEmail').value;
-    const pass = document.getElementById('signPass').value;
-    auth.createUserWithEmailAndPassword(email, pass)
-    .then((userCredential) => {
-        alert("Account created!");
-        showProfileSetup();
-    })
-    .catch((error) => alert(error.message));
+function showTab(tab){
+  profileTab.style.display="none";
+  peopleTab.style.display="none";
+  likesTab.style.display="none";
+  document.getElementById(tab).style.display="block";
 }
 
-// Login
-function login(){
-    const email = document.getElementById('loginEmail').value;
-    const pass = document.getElementById('loginPass').value;
-    auth.signInWithEmailAndPassword(email, pass)
-    .then((userCredential) => showProfileSetup())
-    .catch((error) => alert(error.message));
-}
-
-// Show profile setup
-function showProfileSetup(){
-    document.getElementById('loginDiv').style.display='none';
-    document.getElementById('signupDiv').style.display='none';
-    document.getElementById('profileDiv').style.display='block';
-}
-
-// Preview image
-document.getElementById('profile-pic').addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = function(ev){
-            document.getElementById('profile-preview').src = ev.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
+auth.onAuthStateChanged(user=>{
+  if(!user){
+    window.location.href="profile_setup.html";
+  } else {
+    currentUser = user;
+    loadMyProfile();
+    loadPeople();
+    loadLikes();
+  }
 });
 
-// Save profile to Firestore
-function saveProfile(){
-    const user = auth.currentUser;
-    if(!user){ alert("Login first!"); return; }
-
-    const profile = {
-        username: document.getElementById('username').value.trim(),
-        age: document.getElementById('age').value.trim(),
-        location: document.getElementById('location').value.trim(),
-        gender: document.getElementById('gender').value,
-        interest: document.getElementById('interest').value,
-        pic: document.getElementById('profile-preview').src
-    };
-
-    if(!profile.username || !profile.age || !profile.location || !profile.gender || !profile.interest){
-        alert("Please fill all fields!");
-        return;
+function loadMyProfile(){
+  db.collection("users").doc(currentUser.uid).get()
+  .then(doc=>{
+    if(doc.exists){
+      currentProfile = doc.data();
+      myPic.src = currentProfile.pic;
+      myInfo.innerHTML = `
+        <b>${currentProfile.username}</b><br>
+        Age: ${currentProfile.age}<br>
+        ${currentProfile.location}<br>
+        ${currentProfile.interest}
+      `;
     }
-
-    db.collection('users').doc(user.uid).set(profile)
-    .then(()=> {
-        alert("Profile saved successfully!");
-        window.location.href = "dashboard.html";
-    })
-    .catch(err => alert(err.message));
+  });
 }
 
-// Auto redirect if logged in
-auth.onAuthStateChanged((user)=>{
-    if(user){
-        showProfileSetup();
+function loadPeople(){
+  peopleContainer.innerHTML="";
+  db.collection("users").get().then(snapshot=>{
+    snapshot.forEach(doc=>{
+      if(doc.id !== currentUser.uid){
+        const p = doc.data();
+        peopleContainer.innerHTML += `
+          <div class="card">
+            <img src="${p.pic}">
+            <h3>${p.username}, ${p.age}</h3>
+            <p>${p.location}</p>
+            <button class="action like" onclick="likeUser('${doc.id}')">💖 Like</button>
+          </div>
+        `;
+      }
+    });
+  });
+}
+
+function likeUser(userId){
+  db.collection("likes").add({
+    from: currentUser.uid,
+    to: userId,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>alert("Liked!"));
+}
+
+function loadLikes(){
+  likesContainer.innerHTML="";
+  db.collection("likes")
+  .where("to","==",currentUser.uid)
+  .get()
+  .then(snapshot=>{
+    if(snapshot.empty){
+      likesContainer.innerHTML="No likes yet.";
     }
-});
+    snapshot.forEach(doc=>{
+      db.collection("users").doc(doc.data().from).get()
+      .then(userDoc=>{
+        const u = userDoc.data();
+        likesContainer.innerHTML += `
+          <div class="card">
+            <img src="${u.pic}">
+            <h3>${u.username}</h3>
+          </div>
+        `;
+      });
+    });
+  });
+}
+
+function logout(){
+  auth.signOut().then(()=>{
+    window.location.href="profile_setup.html";
+  });
+}
 </script>
 
 </body>
