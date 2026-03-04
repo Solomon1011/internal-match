@@ -1,1 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💘 Internal Match - Login/Sign Up</title>
+  <style>
+    body {
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#111;
+      color:#f5d061;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    h2 { text-align:center; margin-bottom:20px; }
+    input {
+      width:80%;
+      padding:12px;
+      margin:8px 0;
+      border-radius:8px;
+      border:1px solid #f5d061;
+      background:#222;
+      color:#f5d061;
+    }
+    button {
+      width:84%;
+      padding:12px;
+      margin-top:10px;
+      border:none;
+      border-radius:8px;
+      background:#f5d061;
+      color:#111;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    p { cursor:pointer; margin-top:12px; color:#f5d061; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
 
+<h2>💘 Internal Match</h2>
+
+<!-- LOGIN FORM -->
+<div id="loginDiv">
+  <input id="loginEmail" type="email" placeholder="Email">
+  <input id="loginPass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p onclick="showSignup()">Create Account</p>
+</div>
+
+<!-- SIGNUP FORM -->
+<div id="signupDiv" class="hidden">
+  <input id="signEmail" type="email" placeholder="Email">
+  <input id="signPass" type="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <p onclick="showLogin()">Already have account?</p>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+    authDomain: "internal-match.firebaseapp.com",
+    projectId: "internal-match",
+    storageBucket: "internal-match.appspot.com",
+    messagingSenderId: "129707008837",
+    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Toggle between forms
+  function showSignup() {
+    document.getElementById('loginDiv').classList.add('hidden');
+    document.getElementById('signupDiv').classList.remove('hidden');
+  }
+  function showLogin() {
+    document.getElementById('signupDiv').classList.add('hidden');
+    document.getElementById('loginDiv').classList.remove('hidden');
+  }
+
+  // LOGIN FUNCTION
+  function login() {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+
+    if(!email || !pass){ alert("Enter email & password!"); return; }
+
+    auth.signInWithEmailAndPassword(email, pass)
+    .then(() => {
+      alert("Login Successful!");
+      window.location.href = "dashboard.html";
+    })
+    .catch(err => alert(err.message));
+  }
+
+  // SIGNUP FUNCTION
+  function signup() {
+    const email = document.getElementById('signEmail').value;
+    const pass = document.getElementById('signPass').value;
+
+    if(!email || !pass){ alert("Enter email & password!"); return; }
+
+    auth.createUserWithEmailAndPassword(email, pass)
+    .then(cred => {
+      alert("Account Created!");
+      window.location.href = "dashboard.html";
+    })
+    .catch(err => alert(err.message));
+  }
+
+  // AUTO REDIRECT IF ALREADY LOGGED IN
+  auth.onAuthStateChanged(user => {
+    if(user){
+      console.log("Already logged in:", user.email);
+      window.location.href = "dashboard.html";
+    }
+  });
+</script>
+
+</body>
+</html>
