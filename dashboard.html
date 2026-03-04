@@ -1,212 +1,53 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Internal Match Dashboard</title>
-<style>
-body { margin:0; font-family:Arial,sans-serif; background:#111; color:#f5d061; display:flex; flex-direction:column; align-items:center; }
-h2{text-align:center;margin:15px 0;}
-.tab-content { flex:1; width:100%; max-width:400px; text-align:center; padding:10px; box-sizing:border-box; }
-.tab-bar { position:fixed; bottom:0; width:100%; max-width:400px; display:flex; justify-content:space-around; background:#000; border-top:1px solid #f5d061; padding:8px 0; }
-.tab-bar button { flex:1; background:none; border:none; color:#f5d061; font-size:14px; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
-.card { background:#222; border:1px solid #f5d061; border-radius:12px; padding:15px; margin:10px 0; }
-.card img { width:120px; height:120px; border-radius:50%; margin-bottom:10px; }
-.card h3 { margin:5px 0; font-size:18px; }
-.card p { margin:2px 0; font-size:14px; }
-.action-btn { background:#f5d061; color:#111; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; margin:0 5px; font-weight:bold; }
-input[type=text], input[type=number], select { width:80%; padding:6px; margin:5px 0; border-radius:4px; border:1px solid #f5d061; background:#111; color:#f5d061; }
-button.save-btn { width:84%; margin-top:8px; padding:8px; border-radius:6px; border:none; font-weight:bold; cursor:pointer; background:#f5d061; color:#111; }
-#chat-box { border:1px solid #f5d061; padding:8px; height:200px; overflow-y:auto; margin-bottom:10px; text-align:left; background:#222; }
-#chat-users button { display:flex; justify-content:space-between; width:100%; margin:5px 0; background:#222; border:none; color:#f5d061; padding:6px; border-radius:4px; cursor:pointer; }
-#chat-users img { width:24px; height:24px; border-radius:50%; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h2>💘 Internal Match Dashboard</h2>
 
 <div class="tab-content">
-
-  <!-- User Profile -->
+  <!-- Profile Tab -->
   <div id="profile-tab">
     <h3>My Profile</h3>
-    <img id="user-profile-pic" src="" alt="Profile"><br>
-    <input type="text" id="edit-username" placeholder="Username"><br>
-    <input type="number" id="edit-age" placeholder="Age"><br>
-    <input type="text" id="edit-location" placeholder="Location"><br>
-    <select id="edit-gender">
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select><br>
-    <input type="text" id="edit-interest" placeholder="Interest"><br>
-    <input type="text" id="edit-pic" placeholder="Profile Picture URL"><br>
-    <button class="save-btn" onclick="saveProfile()">💾 Save Profile</button>
-    <button class="save-btn" onclick="logout()">🚪 Logout</button>
+    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile">
+    <input type="text" id="edit-username" placeholder="Username">
+    <input type="number" id="edit-age" placeholder="Age">
+    <input type="text" id="edit-location" placeholder="Location">
+    <select id="edit-gender"><option value="Male">Male</option><option value="Female">Female</option></select>
+    <input type="text" id="edit-interest" placeholder="Interest">
+    <input type="text" id="edit-pic" placeholder="Profile Picture URL">
+    <button onclick="saveProfile()">💾 Save Profile</button>
   </div>
 
-  <!-- People Profiles -->
-  <div id="people-tab" style="display:none;">
-    <div id="swipe-container">Loading profiles...</div>
-  </div>
+  <!-- People Tab -->
+  <div id="people-tab"></div>
 
-  <!-- Likes -->
-  <div id="likes-tab" style="display:none;">
-    <h3>Who Likes Me</h3>
-    <div id="liked-container">No likes yet!</div>
-  </div>
+  <!-- Likes Tab -->
+  <div id="liked-tab"><h3>Who Likes Me</h3><div id="liked-container">No likes yet!</div></div>
 
-  <!-- Chat -->
-  <div id="chat-tab" style="display:none;">
-    <div id="chat-users"></div>
+  <!-- Chat Tab -->
+  <div id="chats-tab">
+    <div id="chat-header"><img id="chat-profile-pic"><span id="chat-name"></span></div>
     <div id="chat-box"></div>
-    <input type="text" id="message-input" placeholder="Type message...">
-    <button class="save-btn" onclick="sendMessage()">Send</button>
   </div>
-
 </div>
 
 <div class="tab-bar">
-  <button onclick="showTab('profile-tab')">Profile</button>
-  <button onclick="showTab('people-tab')">People</button>
-  <button onclick="showTab('likes-tab')">Likes</button>
-  <button onclick="showTab('chat-tab')">Chat</button>
+  <button onclick="showTab('profile')">Profile</button>
+  <button onclick="showTab('people')">People</button>
+  <button onclick="showTab('liked')">Likes</button>
+  <button onclick="showTab('chats')">Chats</button>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-    authDomain: "internal-match.firebaseapp.com",
-    projectId: "internal-match",
-    storageBucket: "internal-match.appspot.com",
-    messagingSenderId: "129707008837",
-    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  let currentUser = null;
-  let currentProfile = null;
-
-  // Redirect if not logged in
-  auth.onAuthStateChanged(user => {
-    if(!user){
-      window.location.href = "profile_setup.html";
-    } else {
-      currentUser = user;
-      loadProfile();
-      loadPeople();
-    }
-  });
-
-  function logout() {
-    auth.signOut().then(()=>window.location.href="profile_setup.html");
-  }
-
-  function showTab(tabId){
-    ['profile-tab','people-tab','likes-tab','chat-tab'].forEach(t => document.getElementById(t).style.display='none');
-    document.getElementById(tabId).style.display='block';
-  }
-
-  // Load current user profile
-  function loadProfile() {
-    db.collection("users").doc(currentUser.uid).get().then(doc=>{
-      if(doc.exists){
-        const data = doc.data();
-        currentProfile = data;
-        document.getElementById('user-profile-pic').src = data.pic || "https://randomuser.me/api/portraits/lego/1.jpg";
-        document.getElementById('edit-username').value = data.username || "";
-        document.getElementById('edit-age').value = data.age || "";
-        document.getElementById('edit-location').value = data.location || "";
-        document.getElementById('edit-gender').value = data.gender || "Male";
-        document.getElementById('edit-interest').value = data.interest || "";
-      }
-    });
-  }
-
-  function saveProfile() {
-    const profileData = {
-      username: document.getElementById('edit-username').value,
-      age: document.getElementById('edit-age').value,
-      location: document.getElementById('edit-location').value,
-      gender: document.getElementById('edit-gender').value,
-      interest: document.getElementById('edit-interest').value,
-      pic: document.getElementById('edit-pic').value
-    };
-    db.collection("users").doc(currentUser.uid).set(profileData).then(()=>alert("Profile saved!"));
-  }
-
-  // DEMO people profiles
-  const demoPeople = [
-    {name:"Alice",age:23,gender:"Female",location:"London",interest:"Travel",pic:"https://randomuser.me/api/portraits/women/44.jpg"},
-    {name:"Bob",age:27,gender:"Male",location:"USA",interest:"Music",pic:"https://randomuser.me/api/portraits/men/32.jpg"},
-    {name:"Clara",age:25,gender:"Female",location:"Paris",interest:"Friends",pic:"https://randomuser.me/api/portraits/women/22.jpg"},
-  ];
-
-  function loadPeople() {
-    const container = document.getElementById('swipe-container');
-    container.innerHTML = '';
-    demoPeople.forEach((p,index)=>{
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <img src="${p.pic}">
-        <h3>${p.name}, ${p.age}</h3>
-        <p>${p.gender} | ${p.location}</p>
-        <p>Interest: ${p.interest}</p>
-        <button class="action-btn" onclick="likePerson(${index})">💖 Like</button>
-      `;
-      container.appendChild(card);
-    });
-  }
-
-  // Likes
-  const likedContainer = document.getElementById('liked-container');
-  function likePerson(index){
-    const person = demoPeople[index];
-    const div = document.createElement('div');
-    div.innerText = person.name + " liked you back!";
-    likedContainer.appendChild(div);
-    alert(`You liked ${person.name}!`);
-  }
-
-  // Chat
-  const chatUsersDiv = document.getElementById('chat-users');
-  const chatBox = document.getElementById('chat-box');
-  let currentChat = "";
-
-  demoPeople.forEach(p=>{
-    const btn = document.createElement('button');
-    btn.innerText = p.name;
-    btn.onclick = ()=>openChat(p.name);
-    chatUsersDiv.appendChild(btn);
-  });
-
-  function openChat(name){
-    currentChat = name;
-    chatBox.innerHTML = "";
-  }
-
-  function sendMessage(){
-    const msg = document.getElementById('message-input').value;
-    if(!msg || !currentChat) return;
-    const div = document.createElement('div');
-    div.innerText = "You: "+msg;
-    chatBox.appendChild(div);
-    document.getElementById('message-input').value="";
-    setTimeout(()=>{
-      const reply = document.createElement('div');
-      reply.innerText = currentChat+": Hello!";
-      chatBox.appendChild(reply);
-    },1000);
-  }
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
