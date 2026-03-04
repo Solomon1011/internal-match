@@ -1,65 +1,46 @@
-body.bg {
-    background-color: #000;
-    font-family: Arial;
-    color: gold;
-    text-align: center;
+body {
+  font-family: Arial;
+  background: #1a1a1a;
+  color: #f5d061;
+  margin:0;
+  padding:0;
+  text-align:center;
+}
+
+h2, h3 { margin: 15px; }
+
+input, select, button {
+  padding: 10px;
+  margin: 5px;
+  width: 80%;
+  border-radius: 8px;
+  border: 1px solid #f5d061;
+  background: #111;
+  color: #f5d061;
+}
+
+button { cursor:pointer; }
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: #111;
+}
+
+.tab-bar button {
+  flex:1;
+  background:none;
+  color:#f5d061;
+  border:none;
+  padding:15px 0;
 }
 
 .card {
-    margin: 100px auto;
-    padding: 30px;
-    background: #111;
-    width: 300px;
-    border-radius: 15px;
-    box-shadow: 0 0 15px gold;
-}
-
-input {
-    padding: 10px;
-    width: 90%;
-    margin: 10px 0;
-}
-
-button {
-    padding: 10px 20px;
-    background: gold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.profile-card {
-    background: #111;
-    width: 300px;
-    margin: 50px auto;
-    padding: 20px;
-    border-radius: 15px;
-}
-
-.profile-card img {
-    width: 100%;
-    border-radius: 15px;
-}
-
-.buttons button {
-    margin: 10px;
-}
-
-.premium-btn {
-    margin-bottom: 20px;
-}
-/* Tinder Swipe Effect */
-#swipe-container {
-  position: relative;
-  width: 100%;
-  max-width: 350px;
-  height: 420px;
-  overflow: hidden;
-}
-
-.swipe-card {
-  position: absolute;
-  width: 100%;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  cursor: grab;
+  background: #222;
+  border: 1px solid #f5d061;
+  border-radius: 12px;
+  margin: 15px;
+  padding: 15px;
 }
