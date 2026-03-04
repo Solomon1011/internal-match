@@ -4,14 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Internal Match - Login/Signup</title>
-<style>
-body { font-family: Arial,sans-serif; background:#111; color:#f5d061; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; margin:0; }
-h2{text-align:center;}
-input { width:80%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #f5d061; background:#111; color:#f5d061; }
-button { width:84%; padding:10px; border:none; border-radius:6px; margin:5px 0; background:#f5d061; color:#111; font-weight:bold; cursor:pointer; }
-p.switch { cursor:pointer; color:#f5d061; text-decoration:underline; }
-#error-msg { color:red; margin:5px 0; font-size:14px; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -25,7 +18,7 @@ p.switch { cursor:pointer; color:#f5d061; text-decoration:underline; }
   <p id="error-msg"></p>
 </div>
 
-<!-- FIREBASE -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -43,45 +36,27 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Login
 document.getElementById('login-btn').addEventListener('click', ()=>{
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   auth.signInWithEmailAndPassword(email,password)
-    .then(userCredential=>{
-      window.location.href = "dashboard.html";
-    })
-    .catch(error=>{
-      document.getElementById('error-msg').innerText = error.message;
-    });
+    .then(()=> window.location.href = "dashboard.html")
+    .catch(e=> document.getElementById('error-msg').innerText = e.message);
 });
 
-// Sign Up
 document.getElementById('signup-btn').addEventListener('click', ()=>{
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  if(password.length < 6){
-    document.getElementById('error-msg').innerText = "Password must be at least 6 characters";
-    return;
-  }
+  if(password.length < 6){ document.getElementById('error-msg').innerText = "Password must be at least 6 characters"; return; }
   auth.createUserWithEmailAndPassword(email,password)
     .then(userCredential=>{
-      // Create empty profile in Firestore
       db.collection("users").doc(userCredential.user.uid).set({
-        username:"",
-        age:"",
-        location:"",
-        gender:"Male",
-        interest:"",
-        pic:""
+        username:"", age:"", location:"", gender:"Male", interest:"", pic:""
       });
       window.location.href = "dashboard.html";
     })
-    .catch(error=>{
-      document.getElementById('error-msg').innerText = error.message;
-    });
+    .catch(e=> document.getElementById('error-msg').innerText = e.message);
 });
 </script>
-
 </body>
 </html>
