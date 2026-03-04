@@ -1,11 +1,12 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Internal Match</title>
+<title>Internal Match</title>
 
 <style>
-body {
+body{
   background:#1a1a1a;
   color:#f5d061;
   font-family:Arial;
@@ -13,7 +14,7 @@ body {
   padding:20px;
 }
 
-input, select, button {
+input, select, button{
   display:block;
   margin:10px auto;
   padding:10px;
@@ -24,14 +25,14 @@ input, select, button {
   color:#f5d061;
 }
 
-button {
+button{
   background:#f5d061;
   color:#1a1a1a;
   font-weight:bold;
   cursor:pointer;
 }
 
-img {
+img{
   width:120px;
   height:120px;
   border-radius:50%;
@@ -39,36 +40,40 @@ img {
   margin:10px 0;
 }
 
-p { cursor:pointer; text-decoration:underline; }
+.link{
+  cursor:pointer;
+  text-decoration:underline;
+}
 </style>
 </head>
+
 <body>
 
 <h2>💘 Internal Match</h2>
 
 <!-- LOGIN -->
-<div id="loginDiv">
+<div id="loginBox">
   <h3>Login</h3>
   <input type="email" id="loginEmail" placeholder="Email">
   <input type="password" id="loginPass" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p onclick="showSignup()">Create account</p>
+  <button type="button" onclick="login()">Login</button>
+  <p class="link" onclick="showSignup()">Create Account</p>
 </div>
 
 <!-- SIGNUP -->
-<div id="signupDiv" style="display:none;">
+<div id="signupBox" style="display:none;">
   <h3>Sign Up</h3>
   <input type="email" id="signEmail" placeholder="Email">
   <input type="password" id="signPass" placeholder="Password">
-  <button onclick="signup()">Sign Up</button>
-  <p onclick="showLogin()">Already have account?</p>
+  <button type="button" onclick="signup()">Sign Up</button>
+  <p class="link" onclick="showLogin()">Already have account?</p>
 </div>
 
 <!-- PROFILE SETUP -->
-<div id="profileDiv" style="display:none;">
-  <h3>Set Up Profile</h3>
+<div id="profileBox" style="display:none;">
+  <h3>Profile Setup</h3>
 
-  <img id="profile-preview" src="https://randomuser.me/api/portraits/lego/1.jpg">
+  <img id="preview" src="https://randomuser.me/api/portraits/lego/1.jpg">
 
   <input type="text" id="username" placeholder="Username">
   <input type="number" id="age" placeholder="Age">
@@ -82,23 +87,22 @@ p { cursor:pointer; text-decoration:underline; }
 
   <select id="interest">
     <option value="">Select Interest</option>
-    <option>Hangout 🩵</option>
-    <option>Friends 💚</option>
-    <option>Serious Relationship 💖</option>
-    <option>Marriage 💘</option>
+    <option>Friends</option>
+    <option>Serious Relationship</option>
+    <option>Marriage</option>
   </select>
 
-  <input type="file" id="profile-pic" accept="image/*">
-
-  <button onclick="saveProfile()">Save Profile</button>
+  <input type="file" id="profilePic" accept="image/*">
+  <button type="button" onclick="saveProfile()">Save Profile</button>
 </div>
 
-<!-- FIREBASE COMPAT VERSION -->
+<!-- FIREBASE COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+// YOUR FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
   authDomain: "internal-match.firebaseapp.com",
@@ -113,15 +117,15 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// SWITCH PAGES
+// SWITCH
 function showSignup(){
-  loginDiv.style.display="none";
-  signupDiv.style.display="block";
+  loginBox.style.display="none";
+  signupBox.style.display="block";
 }
 
 function showLogin(){
-  signupDiv.style.display="none";
-  loginDiv.style.display="block";
+  signupBox.style.display="none";
+  loginBox.style.display="block";
 }
 
 // SIGNUP
@@ -130,11 +134,13 @@ function signup(){
   const pass = signPass.value;
 
   auth.createUserWithEmailAndPassword(email, pass)
-  .then(() => {
+  .then(()=>{
     alert("Account Created!");
     showProfile();
   })
-  .catch(err => alert(err.message));
+  .catch(err=>{
+    alert(err.message);
+  });
 }
 
 // LOGIN
@@ -143,28 +149,29 @@ function login(){
   const pass = loginPass.value;
 
   auth.signInWithEmailAndPassword(email, pass)
-  .then(() => {
+  .then(()=>{
     alert("Login Successful!");
     showProfile();
   })
-  .catch(err => alert(err.message));
+  .catch(err=>{
+    alert(err.message);
+  });
 }
 
 // SHOW PROFILE SETUP
 function showProfile(){
-  loginDiv.style.display="none";
-  signupDiv.style.display="none";
-  profileDiv.style.display="block";
+  loginBox.style.display="none";
+  signupBox.style.display="none";
+  profileBox.style.display="block";
 }
 
 // IMAGE PREVIEW
-profilePic = document.getElementById("profile-pic");
-profilePic.addEventListener("change", function(e){
+document.getElementById("profilePic").addEventListener("change", function(e){
   const file = e.target.files[0];
   if(file){
     const reader = new FileReader();
     reader.onload = function(ev){
-      document.getElementById("profile-preview").src = ev.target.result;
+      preview.src = ev.target.result;
     }
     reader.readAsDataURL(file);
   }
@@ -173,7 +180,10 @@ profilePic.addEventListener("change", function(e){
 // SAVE PROFILE
 function saveProfile(){
   const user = auth.currentUser;
-  if(!user){ alert("Login first"); return; }
+  if(!user){
+    alert("Login first");
+    return;
+  }
 
   const profile = {
     username: username.value,
@@ -181,7 +191,7 @@ function saveProfile(){
     location: location.value,
     gender: gender.value,
     interest: interest.value,
-    pic: document.getElementById("profile-preview").src
+    pic: preview.src
   };
 
   if(!profile.username || !profile.age || !profile.location || !profile.gender || !profile.interest){
@@ -190,11 +200,13 @@ function saveProfile(){
   }
 
   db.collection("users").doc(user.uid).set(profile)
-  .then(() => {
+  .then(()=>{
     alert("Profile Saved!");
-    window.location.href = "dashboard.html";
+    window.location.href="dashboard.html";
   })
-  .catch(err => alert(err.message));
+  .catch(err=>{
+    alert(err.message);
+  });
 }
 
 // AUTO LOGIN CHECK
