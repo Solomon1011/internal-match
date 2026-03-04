@@ -3,109 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Internal Match</title>
-<style>
-body { margin:0; font-family:Arial; background:#1a1a1a; color:#f5d061; text-align:center; }
-header{padding:15px;font-size:22px;font-weight:bold;}
-#tabs button{margin:5px;padding:10px;border:none;border-radius:6px;background:#f5d061;color:#1a1a1a;cursor:pointer;}
-.tab{display:none;margin-top:20px;}
-.card { background:#222; width:300px; margin:10px auto; padding:15px; border-radius:12px; border:1px solid #f5d061; position:absolute; top:100px; left:50%; transform:translateX(-50%); transition:0.3s; cursor:grab;}
-.card img{width:120px;height:120px;border-radius:50%;}
-.card h3,p{margin:5px 0;}
-.actions{display:flex;justify-content:space-around;margin-top:10px;}
-button.action-btn{background:#f5d061;color:#1a1a1a;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;}
-#liked-container{margin-top:10px;}
-</style>
+<title>💘 Internal Match Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>💘 Internal Match</header>
-<div id="tabs">
-  <button onclick="showTab('discover')">Discover</button>
-  <button onclick="showTab('liked')">Likes</button>
+<h2>💘 Internal Match</h2>
+
+<div class="tab-content">
+
+  <!-- Profile -->
+  <div id="profile-tab">
+    <h3>My Profile</h3>
+    <img id="userProfilePic" src="https://randomuser.me/api/portraits/lego/1.jpg">
+    <input type="text" id="username" placeholder="Username">
+    <input type="number" id="age" placeholder="Age">
+    <input type="text" id="location" placeholder="Location">
+    <select id="gender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <input type="text" id="interest" placeholder="Interest">
+    <button onclick="saveProfile()">💾 Save Profile</button>
+  </div>
+
+  <!-- People -->
+  <div id="people-tab" style="display:none;">
+    <div id="swipe-container"></div>
+  </div>
+
+  <!-- Likes -->
+  <div id="liked-tab" style="display:none;">
+    <h3>Who Likes Me</h3>
+    <div id="liked-container">No likes yet!</div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chats-tab" style="display:none;">
+    <div id="chat-users"></div>
+    <div id="chat-box"></div>
+    <input type="text" id="messageInput" placeholder="Type message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+</div>
+
+<div class="tab-bar">
   <button onclick="showTab('profile')">Profile</button>
+  <button onclick="showTab('people')">People</button>
+  <button onclick="showTab('liked')">Likes</button>
+  <button onclick="showTab('chats')">Chat</button>
 </div>
 
-<!-- DISCOVER / SWIPE -->
-<div id="discover" class="tab">
-  <div id="swipe-container" style="position:relative;height:400px;"></div>
-</div>
-
-<!-- LIKED -->
-<div id="liked" class="tab">
-  <h3>Who Likes Me</h3>
-  <div id="liked-container">No likes yet!</div>
-</div>
-
-<!-- PROFILE -->
-<div id="profile" class="tab">
-  <h3>My Profile</h3>
-  <img id="profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg"><br>
-  <input id="username" placeholder="Username"><br>
-  <input id="age" placeholder="Age"><br>
-  <input id="location" placeholder="Location"><br>
-  <select id="gender">
-    <option>Male</option><option>Female</option>
-  </select><br>
-  <select id="interest">
-    <option>Friends 💚</option><option>Hangout 🩵</option>
-    <option>Serious Relationship 💖</option><option>Marriage 💘</option>
-  </select><br>
-  <button onclick="saveProfile()">Save Profile</button>
-</div>
-
-<script>
-// Tabs
-function showTab(id){ document.querySelectorAll('.tab').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
-showTab('discover');
-
-// Profiles
-let profiles=[
-  {name:"Sophia",age:22,img:"https://randomuser.me/api/portraits/women/1.jpg"},
-  {name:"Daniel",age:25,img:"https://randomuser.me/api/portraits/men/2.jpg"},
-  {name:"Amara",age:23,img:"https://randomuser.me/api/portraits/women/3.jpg"}
-];
-let likes=[]; // who liked the user
-let currentIndex = profiles.length-1;
-
-function renderCard(){
-  const container=document.getElementById('swipe-container');
-  container.innerHTML="";
-  if(currentIndex<0){ container.innerHTML="<p>No more profiles!</p>"; return; }
-  const p=profiles[currentIndex];
-  const card=document.createElement('div');
-  card.className="card";
-  card.innerHTML=`
-    <img src="${p.img}">
-    <h3>${p.name}, ${p.age}</h3>
-    <p>Interest: ${p.interest||"Serious Relationship 💖"}</p>
-    <div class="actions">
-      <button class="action-btn" onclick="swipe('ignore')">❌ Ignore</button>
-      <button class="action-btn" onclick="swipe('like')">💖 Like</button>
-    </div>
-  `;
-  container.appendChild(card);
-}
-
-function swipe(action){
-  const p=profiles[currentIndex];
-  if(action==='like'){ likes.push(p); updateLikesTab(); }
-  currentIndex--; renderCard();
-}
-
-function updateLikesTab(){
-  const container=document.getElementById('liked-container');
-  container.innerHTML="";
-  likes.forEach(p=>{ container.innerHTML+=`<div>${p.name}, ${p.age}</div>`; });
-}
-
-// Profile save
-function saveProfile(){
-  alert("Profile saved!");
-}
-
-// Initial render
-renderCard();
-</script>
+<script src="script.js"></script>
 </body>
 </html>
