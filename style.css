@@ -1,46 +1,8 @@
-body {
-  font-family: Arial;
-  background: #1a1a1a;
-  color: #f5d061;
-  margin:0;
-  padding:0;
-  text-align:center;
-}
-
-h2, h3 { margin: 15px; }
-
-input, select, button {
-  padding: 10px;
-  margin: 5px;
-  width: 80%;
-  border-radius: 8px;
-  border: 1px solid #f5d061;
-  background: #111;
-  color: #f5d061;
-}
-
-button { cursor:pointer; }
-
-.tab-bar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  background: #111;
-}
-
-.tab-bar button {
-  flex:1;
-  background:none;
-  color:#f5d061;
-  border:none;
-  padding:15px 0;
-}
-
-.card {
-  background: #222;
-  border: 1px solid #f5d061;
-  border-radius: 12px;
-  margin: 15px;
-  padding: 15px;
-}
+body{background:#111;color:#f5d061;font-family:Arial,sans-serif;margin:0;padding:0;}
+h2{text-align:center;margin:15px;}
+input,select,button{margin:5px;padding:10px;border-radius:6px;border:1px solid #f5d061;background:#111;color:#f5d061;}
+button{cursor:pointer;font-weight:bold;}
+.tab-bar{position:fixed;bottom:0;width:100%;display:flex;background:#000;}
+.tab-bar button{flex:1;background:#000;color:#f5d061;border:none;padding:10px;}
+.tab-content{padding-bottom:60px;}
+img{border-radius:50%;}
