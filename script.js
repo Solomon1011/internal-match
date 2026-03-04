@@ -1,38 +1,49 @@
-// Firebase Config
-const firebaseConfig = {
-    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-    authDomain: "internal-match.firebaseapp.com",
-    projectId: "internal-match",
-    storageBucket: "internal-match.appspot.com",
-    messagingSenderId: "129707008837",
-    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
 
-let currentUser = null;
+// Register
+function register() {
+  const email = document.getElementById("registerEmail").value;
+  const password = document.getElementById("registerPassword").value;
 
-auth.onAuthStateChanged(user=>{
-  if(!user) window.location.href="profile_setup.html";
-  else currentUser = user;
-});
+  if (!email || !password) {
+    alert("Fill all fields");
+    return;
+  }
 
-function showTab(tab){
-  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=> document.getElementById(t).style.display='none');
-  document.getElementById(tab+'-tab').style.display='block';
+  localStorage.setItem("userEmail", email);
+  localStorage.setItem("userPassword", password);
+
+  alert("Account created successfully!");
+  window.location.href = "login.html";
 }
-showTab('profile');
 
-function saveProfile(){
-  if(!currentUser) return;
-  db.collection("users").doc(currentUser.uid).set({
-    username: document.getElementById('edit-username').value || "",
-    age: document.getElementById('edit-age').value || "",
-    location: document.getElementById('edit-location').value || "",
-    gender: document.getElementById('edit-gender').value,
-    interest: document.getElementById('edit-interest').value || "",
-    pic: document.getElementById('edit-pic').value || ""
-  });
-  alert("Profile updated!");
+// Login
+function login() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  const savedEmail = localStorage.getItem("userEmail");
+  const savedPassword = localStorage.getItem("userPassword");
+
+  if (email === savedEmail && password === savedPassword) {
+    localStorage.setItem("loggedIn", "true");
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Invalid login details");
+  }
+}
+
+// Logout
+function logout() {
+  localStorage.removeItem("loggedIn");
+  window.location.href = "index.html";
+}
+
+// Show welcome message
+if (window.location.pathname.includes("dashboard.html")) {
+  const email = localStorage.getItem("userEmail");
+  if (!localStorage.getItem("loggedIn")) {
+    window.location.href = "login.html";
+  } else {
+    document.getElementById("welcomeUser").innerText = "Welcome, " + email;
+  }
 }
