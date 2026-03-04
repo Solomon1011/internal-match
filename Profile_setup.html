@@ -5,36 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Internal Match - Login/Signup</title>
 <style>
-  body {
-    background: #111;
-    color: #f5d061;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 50px;
-  }
-  input {
-    padding: 10px;
-    margin: 8px 0;
-    width: 90%;
-    border-radius: 6px;
-    border: 1px solid #f5d061;
-    background: #222;
-    color: #f5d061;
-  }
-  button {
-    padding: 10px 20px;
-    margin: 10px;
-    border-radius: 6px;
-    border: none;
-    background: #f5d061;
-    color: #111;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  #error-msg {
-    color: #ff5555;
-    margin-top: 10px;
-  }
+body {
+  background: #111;
+  color: #f5d061;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 50px;
+}
+input {
+  padding: 10px;
+  margin: 8px 0;
+  width: 90%;
+  border-radius: 6px;
+  border: 1px solid #f5d061;
+  background: #222;
+  color: #f5d061;
+}
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #f5d061;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+#error-msg {
+  color: #ff5555;
+  margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -49,12 +49,12 @@
   <p id="error-msg"></p>
 </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<!-- Firebase Modular SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-<script>
   // ---------------------------
   // 🔹 Firebase Config
   // ---------------------------
@@ -66,64 +66,69 @@
     messagingSenderId: "129707008837",
     appId: "1:129707008837:web:f3f0033bbbe673107a542c"
   };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const emailInput = document.getElementById("email");
+  const passInput = document.getElementById("password");
+  const errorMsg = document.getElementById("error-msg");
 
   // ---------------------------
   // 🔹 LOGIN
   // ---------------------------
-  document.getElementById("login-btn").addEventListener("click", () => {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+  document.getElementById("login-btn").addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+    errorMsg.innerText = "";
 
     if (!email || !password) {
-      document.getElementById("error-msg").innerText = "Email and password required!";
+      errorMsg.innerText = "Email and password required!";
       return;
     }
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        window.location.href = "dashboard.html";
-      })
-      .catch((error) => {
-        document.getElementById("error-msg").innerText = error.message;
-      });
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      errorMsg.innerText = err.message;
+    }
   });
 
   // ---------------------------
   // 🔹 SIGNUP
   // ---------------------------
-  document.getElementById("signup-btn").addEventListener("click", () => {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+  document.getElementById("signup-btn").addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+    errorMsg.innerText = "";
 
     if (!email || !password) {
-      document.getElementById("error-msg").innerText = "Email and password required!";
+      errorMsg.innerText = "Email and password required!";
       return;
     }
 
     if (password.length < 6) {
-      document.getElementById("error-msg").innerText = "Password must be at least 6 characters!";
+      errorMsg.innerText = "Password must be at least 6 characters!";
       return;
     }
 
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        // Create user profile in Firestore
-        db.collection("users").doc(userCredential.user.uid).set({
-          username: "",
-          age: "",
-          location: "",
-          gender: "Male",
-          interest: "",
-          pic: ""
-        });
-        window.location.href = "dashboard.html";
-      })
-      .catch(error => {
-        document.getElementById("error-msg").innerText = error.message;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Create user profile in Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        username: "",
+        age: "",
+        location: "",
+        gender: "Male",
+        interest: "",
+        pic: ""
       });
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      errorMsg.innerText = err.message;
+    }
   });
 </script>
 </body>
