@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Test</title>
+  <title>Create Account</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body style="background:black;color:white;text-align:center;margin-top:100px;">
+<body>
 
-<h2>Test Button</h2>
+<div class="card">
+  <h2>Create Account</h2>
+  <input type="email" id="registerEmail" placeholder="Email">
+  <input type="password" id="registerPassword" placeholder="Password">
+  <button onclick="register()">Create Account</button>
+  <p><a href="index.html">Back</a></p>
+</div>
 
-<button onclick="testClick()" style="padding:15px;font-size:18px;">
-Click Me
-</button>
-
-<script>
-function testClick() {
-  alert("Button Works!");
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
