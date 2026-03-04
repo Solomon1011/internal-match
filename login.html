@@ -1,19 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💘 Internal Match Login</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
 <div class="card">
-  <h2>Login</h2>
-  <input type="email" id="loginEmail" placeholder="Email">
-  <input type="password" id="loginPassword" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p><a href="index.html">Back</a></p>
+  <h1>💘 Internal Match</h1>
+
+  <!-- Login Form -->
+  <div id="loginDiv">
+    <h3>Login</h3>
+    <input type="email" id="loginEmail" placeholder="Email"><br>
+    <input type="password" id="loginPass" placeholder="Password"><br>
+    <button onclick="loginUser()">Login</button>
+    <p onclick="showSignup()">Create account</p>
+  </div>
+
+  <!-- Signup Form -->
+  <div id="signupDiv" style="display:none;">
+    <h3>Create Account</h3>
+    <input type="email" id="signEmail" placeholder="Email"><br>
+    <input type="password" id="signPass" placeholder="Password"><br>
+    <button onclick="createAccount()">Sign Up</button>
+    <p onclick="showLogin()">Already have an account?</p>
+  </div>
 </div>
 
-<script src="script.js"></script>
+<script>
+  // --- Initialize Firebase ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+    authDomain: "internal-match.firebaseapp.com",
+    projectId: "internal-match",
+    storageBucket: "internal-match.appspot.com",
+    messagingSenderId: "129707008837",
+    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // --- Show/Hide Forms ---
+  function showSignup(){
+    document.getElementById("loginDiv").style.display = "none";
+    document.getElementById("signupDiv").style.display = "block";
+  }
+  function showLogin(){
+    document.getElementById("signupDiv").style.display = "none";
+    document.getElementById("loginDiv").style.display = "block";
+  }
+
+  // --- Login Function ---
+  function loginUser() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPass").value;
+
+    if (!email || !password) { alert("Enter email and password"); return; }
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        alert("Login successful!");
+        window.location.href = "dashboard.html"; // redirect to dashboard
+      })
+      .catch((error) => {
+        alert("Login failed: " + error.message);
+      });
+  }
+
+  // --- Create Account Function ---
+  function createAccount() {
+    const email = document.getElementById("signEmail").value;
+    const password = document.getElementById("signPass").value;
+
+    if (!email || !password) { alert("Enter email and password"); return; }
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        alert("Account created successfully!");
+        window.location.href = "dashboard.html"; // redirect to dashboard
+      })
+      .catch((error) => {
+        alert("Sign up failed: " + error.message);
+      });
+  }
+</script>
+
 </body>
 </html>
