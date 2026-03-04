@@ -48,3 +48,18 @@ button {
 .premium-btn {
     margin-bottom: 20px;
 }
+/* Tinder Swipe Effect */
+#swipe-container {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  height: 420px;
+  overflow: hidden;
+}
+
+.swipe-card {
+  position: absolute;
+  width: 100%;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  cursor: grab;
+}
