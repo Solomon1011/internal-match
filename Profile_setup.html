@@ -1,64 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💘 Internal Match - Login/Sign Up</title>
-  <style>
-    body {
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#111;
-      color:#f5d061;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-    }
-    h2 { text-align:center; margin-bottom:20px; }
-    input {
-      width:80%;
-      padding:12px;
-      margin:8px 0;
-      border-radius:8px;
-      border:1px solid #f5d061;
-      background:#222;
-      color:#f5d061;
-    }
-    button {
-      width:84%;
-      padding:12px;
-      margin-top:10px;
-      border:none;
-      border-radius:8px;
-      background:#f5d061;
-      color:#111;
-      font-weight:bold;
-      cursor:pointer;
-    }
-    p { cursor:pointer; margin-top:12px; color:#f5d061; }
-    .hidden { display:none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💘 Internal Match - Login/Signup</title>
+<style>
+body { font-family: Arial,sans-serif; background:#111; color:#f5d061; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; margin:0; }
+h2{text-align:center;}
+input { width:80%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #f5d061; background:#111; color:#f5d061; }
+button { width:84%; padding:10px; border:none; border-radius:6px; margin:5px 0; background:#f5d061; color:#111; font-weight:bold; cursor:pointer; }
+p.switch { cursor:pointer; color:#f5d061; text-decoration:underline; }
+#error-msg { color:red; margin:5px 0; font-size:14px; }
+</style>
 </head>
 <body>
 
 <h2>💘 Internal Match</h2>
 
-<!-- LOGIN FORM -->
-<div id="loginDiv">
-  <input id="loginEmail" type="email" placeholder="Email">
-  <input id="loginPass" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p onclick="showSignup()">Create Account</p>
-</div>
-
-<!-- SIGNUP FORM -->
-<div id="signupDiv" class="hidden">
-  <input id="signEmail" type="email" placeholder="Email">
-  <input id="signPass" type="password" placeholder="Password">
-  <button onclick="signup()">Sign Up</button>
-  <p onclick="showLogin()">Already have account?</p>
+<div id="auth-container">
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button id="login-btn">Login</button>
+  <button id="signup-btn">Create account</button>
+  <p id="error-msg"></p>
 </div>
 
 <!-- FIREBASE -->
@@ -67,68 +31,56 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase configuration
-  const firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
     authDomain: "internal-match.firebaseapp.com",
     projectId: "internal-match",
     storageBucket: "internal-match.appspot.com",
     messagingSenderId: "129707008837",
     appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-  };
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // Toggle between forms
-  function showSignup() {
-    document.getElementById('loginDiv').classList.add('hidden');
-    document.getElementById('signupDiv').classList.remove('hidden');
-  }
-  function showLogin() {
-    document.getElementById('signupDiv').classList.add('hidden');
-    document.getElementById('loginDiv').classList.remove('hidden');
-  }
-
-  // LOGIN FUNCTION
-  function login() {
-    const email = document.getElementById('loginEmail').value;
-    const pass = document.getElementById('loginPass').value;
-
-    if(!email || !pass){ alert("Enter email & password!"); return; }
-
-    auth.signInWithEmailAndPassword(email, pass)
-    .then(() => {
-      alert("Login Successful!");
+// Login
+document.getElementById('login-btn').addEventListener('click', ()=>{
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  auth.signInWithEmailAndPassword(email,password)
+    .then(userCredential=>{
       window.location.href = "dashboard.html";
     })
-    .catch(err => alert(err.message));
+    .catch(error=>{
+      document.getElementById('error-msg').innerText = error.message;
+    });
+});
+
+// Sign Up
+document.getElementById('signup-btn').addEventListener('click', ()=>{
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  if(password.length < 6){
+    document.getElementById('error-msg').innerText = "Password must be at least 6 characters";
+    return;
   }
-
-  // SIGNUP FUNCTION
-  function signup() {
-    const email = document.getElementById('signEmail').value;
-    const pass = document.getElementById('signPass').value;
-
-    if(!email || !pass){ alert("Enter email & password!"); return; }
-
-    auth.createUserWithEmailAndPassword(email, pass)
-    .then(cred => {
-      alert("Account Created!");
+  auth.createUserWithEmailAndPassword(email,password)
+    .then(userCredential=>{
+      // Create empty profile in Firestore
+      db.collection("users").doc(userCredential.user.uid).set({
+        username:"",
+        age:"",
+        location:"",
+        gender:"Male",
+        interest:"",
+        pic:""
+      });
       window.location.href = "dashboard.html";
     })
-    .catch(err => alert(err.message));
-  }
-
-  // AUTO REDIRECT IF ALREADY LOGGED IN
-  auth.onAuthStateChanged(user => {
-    if(user){
-      console.log("Already logged in:", user.email);
-      window.location.href = "dashboard.html";
-    }
-  });
+    .catch(error=>{
+      document.getElementById('error-msg').innerText = error.message;
+    });
+});
 </script>
 
 </body>
