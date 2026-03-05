@@ -230,11 +230,29 @@ let chats = JSON.parse(localStorage.getItem("chats")) || {};
 let currentChatUser = "";
 
 function updateChatList(){
-  chatUsersDiv.innerHTML="";
+  chatUsersDiv.innerHTML = "";
   for(let user in chats){
+    const prof = demoProfiles.find(p => p.name === user);
     const btn = document.createElement("button");
-    btn.innerText = user;
-    btn.onclick = ()=>openChat(user);
+    btn.style.display = "flex";
+    btn.style.alignItems = "center";
+    btn.style.justifyContent = "flex-start";
+    btn.style.gap = "10px";
+
+    // Profile picture
+    const img = document.createElement("img");
+    img.src = prof ? prof.pic : profileData.profilePic;
+    img.style.width = "40px";
+    img.style.height = "40px";
+    img.style.borderRadius = "50%";
+    
+    // Username text
+    const span = document.createElement("span");
+    span.innerText = user;
+    
+    btn.appendChild(img);
+    btn.appendChild(span);
+    btn.onclick = () => openChat(user);
     chatUsersDiv.appendChild(btn);
   }
 }
