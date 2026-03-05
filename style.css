@@ -1,4 +1,3 @@
-
 /* Prevent zoom & side scroll */
 html, body {
   margin: 0;
@@ -46,6 +45,7 @@ input, select {
   border-radius: 15px;
   border: none;
   text-align: center;
+  font-size: 14px;
 }
 
 /* Buttons */
@@ -82,12 +82,73 @@ button {
   font-size: 24px;
 }
 
-/* Chat box */
+/* ---------------- Chat Styles ---------------- */
+#chat-fullscreen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative; /* important for fixed input */
+}
+
 #chat-box {
-  height: 250px;
+  flex: 1; /* take all space above input */
   overflow-y: auto;
-  background: #1a1a1a;
   padding: 10px;
+  background: #111;
+  margin-bottom: 60px; /* leave space for input */
+  border-radius: 10px;
+}
+
+/* Message bubbles */
+.message {
+  max-width: 70%;
+  margin: 5px;
+  padding: 8px 12px;
   border-radius: 15px;
-  margin-top: 10px;
+  word-wrap: break-word;
+  font-size: 14px;
+}
+
+.message.user {
+  background: #25D366;
+  color: #fff;
+  align-self: flex-end;
+}
+
+.message.other {
+  background: #e5e5e5;
+  color: #000;
+  align-self: flex-start;
+}
+
+/* Chat input container fixed at bottom */
+#chat-input-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  padding: 10px;
+  background: #222;
+  box-sizing: border-box;
+}
+
+#chat-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+
+#chat-send-btn {
+  margin-left: 5px;
+  padding: 8px 12px;
+  border: none;
+  background: #25D366;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  cursor: pointer;
 }
