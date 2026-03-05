@@ -1,49 +1,46 @@
-body {
+
+/* Prevent zoom & side scroll */
+html, body {
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   font-family: Arial, sans-serif;
   background: #111;
   color: white;
-  text-align: center;
-  padding-bottom: 80px;
-  overflow-x: hidden;
+  height: 100%;
 }
 
-/* Prevent zoom input focus resize */
-html {
-  touch-action: manipulation;
-}
-
-h2 {
-  margin: 10px 0;
-}
-
-/* Center all tab content */
+/* Main content area */
 .tab-content {
+  min-height: calc(100vh - 80px); /* full height minus bottom nav */
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;   /* center horizontally */
+  align-items: center;       /* center vertically */
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* Card */
+/* Each tab section */
+#profile-tab,
+#people-tab,
+#liked-tab,
+#chats-tab {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Card style */
 .card {
   background: #1c1c1c;
   padding: 20px;
-  margin: 15px;
   border-radius: 20px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 0 15px rgba(255,215,0,0.3);
-}
-
-.card img {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 /* Inputs */
 input, select {
-  width: 85%;
+  width: 90%;
   padding: 10px;
   margin: 6px 0;
   border-radius: 15px;
@@ -63,47 +60,34 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  opacity: 0.85;
-}
-
-/* Bottom Tab Bar */
+/* 🔥 Bottom Navigation */
 .tab-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
+  height: 70px;
   background: #000;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 12px 0;
   border-top: 2px solid gold;
   z-index: 1000;
 }
 
 .tab-bar button {
   background: none;
+  border: none;
   color: gold;
   font-size: 24px;
-  border: none;
-}
-
-/* Center swipe container */
-#swipe-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 
 /* Chat box */
 #chat-box {
-  width: 90%;
-  max-width: 400px;
-  height: 300px;
+  height: 250px;
   overflow-y: auto;
   background: #1a1a1a;
   padding: 10px;
   border-radius: 15px;
-  margin: 10px auto;
+  margin-top: 10px;
 }
