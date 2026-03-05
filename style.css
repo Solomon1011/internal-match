@@ -3,29 +3,52 @@ body {
   font-family: Arial, sans-serif;
   background: #111;
   color: white;
-  padding-bottom: 70px; /* Prevent content hiding behind bottom bar */
+  text-align: center;
+  padding-bottom: 80px;
+  overflow-x: hidden;
+}
+
+/* Prevent zoom input focus resize */
+html {
+  touch-action: manipulation;
 }
 
 h2 {
-  text-align: center;
-  padding: 15px;
-  margin: 0;
+  margin: 10px 0;
 }
 
-/* Card Styling */
+/* Center all tab content */
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Card */
 .card {
   background: #1c1c1c;
   padding: 20px;
   margin: 15px;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 15px rgba(255,215,0,0.3);
 }
 
 .card img {
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
+}
+
+/* Inputs */
+input, select {
+  width: 85%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 15px;
+  border: none;
+  text-align: center;
 }
 
 /* Buttons */
@@ -33,27 +56,28 @@ button {
   background: gold;
   color: black;
   border: none;
-  padding: 10px 15px;
-  margin: 5px;
+  padding: 10px 18px;
+  margin: 6px;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
 }
 
 button:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 /* Bottom Tab Bar */
 .tab-bar {
-  position: fixed;        /* 🔥 This makes it stay at bottom */
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   background: #000;
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
+  align-items: center;
+  padding: 12px 0;
   border-top: 2px solid gold;
   z-index: 1000;
 }
@@ -61,25 +85,25 @@ button:hover {
 .tab-bar button {
   background: none;
   color: gold;
-  font-size: 14px;
+  font-size: 24px;
   border: none;
 }
 
-/* Chat Box */
+/* Center swipe container */
+#swipe-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Chat box */
 #chat-box {
+  width: 90%;
+  max-width: 400px;
   height: 300px;
   overflow-y: auto;
   background: #1a1a1a;
   padding: 10px;
-  border-radius: 10px;
-  margin: 10px;
-}
-
-/* Inputs */
-input, select {
-  width: 80%;
-  padding: 8px;
-  margin: 5px 0;
-  border-radius: 10px;
-  border: none;
+  border-radius: 15px;
+  margin: 10px auto;
 }
