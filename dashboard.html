@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,24 +14,19 @@
 <div class="tab-content">
 
   <!-- Profile Tab -->
-  <div id="profile-tab" style="display:none;">
+  <div id="profile-tab" style="display:none; text-align:center;">
     <h3>My Profile</h3>
-    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" style="width:120px;height:120px;border-radius:50%;"><br>
-    <input type="text" placeholder="Username"><br>
-    <input type="number" placeholder="Age"><br>
-    <input type="text" placeholder="Location"><br>
-    <select>
-      <option>Male</option>
-      <option>Female</option>
-    </select><br>
-    <input type="text" placeholder="Interest"><br>
-    <input type="text" placeholder="Profile Picture URL"><br>
-    <button onclick="saveProfile()">💾 Save Profile</button>
+    <img id="display-pic" style="width:120px;height:120px;border-radius:50%;"><br><br>
+    <p id="display-name"></p>
+    <p id="display-age"></p>
+    <p id="display-location"></p>
+    <p id="display-gender"></p>
+    <p id="display-interest"></p>
   </div>
 
   <!-- People Tab -->
   <div id="people-tab" style="display:none;">
-    <div id="swipe-container">Loading profiles...</div>
+    <div id="swipe-container">People section coming soon...</div>
   </div>
 
   <!-- Likes Tab -->
@@ -65,8 +61,19 @@ function showTab(tab){
   document.getElementById(tab+'-tab').style.display='block';
 }
 
-function saveProfile(){
-  alert("Profile saved!");
+// 🔥 LOAD USER PROFILE FROM LOCAL STORAGE
+const user = JSON.parse(localStorage.getItem("userProfile"));
+
+if(user){
+  document.getElementById("display-pic").src = user.profilePic;
+  document.getElementById("display-name").innerText = "Name: " + user.username;
+  document.getElementById("display-age").innerText = "Age: " + user.age;
+  document.getElementById("display-location").innerText = "Location: " + user.location;
+  document.getElementById("display-gender").innerText = "Gender: " + user.gender;
+  document.getElementById("display-interest").innerText = "Interest: " + user.interest;
+} else {
+  // If no profile found, send back to setup
+  window.location.href = "profile_setup.html";
 }
 
 // Show Profile first
