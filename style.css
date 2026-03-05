@@ -1,35 +1,85 @@
 body {
-  background: black;
-  color: gold;
-  font-family: Arial;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.card {
+  margin: 0;
+  font-family: Arial, sans-serif;
   background: #111;
-  padding: 30px;
-  border-radius: 10px;
+  color: white;
+  padding-bottom: 70px; /* Prevent content hiding behind bottom bar */
+}
+
+h2 {
   text-align: center;
-  width: 300px;
+  padding: 15px;
+  margin: 0;
 }
 
-input {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
+/* Card Styling */
+.card {
+  background: #1c1c1c;
+  padding: 20px;
+  margin: 15px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
-button, .btn {
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
+.card img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+/* Buttons */
+button {
   background: gold;
   color: black;
-  text-decoration: none;
   border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 20px;
+  font-weight: bold;
   cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+/* Bottom Tab Bar */
+.tab-bar {
+  position: fixed;        /* 🔥 This makes it stay at bottom */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #000;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 2px solid gold;
+  z-index: 1000;
+}
+
+.tab-bar button {
+  background: none;
+  color: gold;
+  font-size: 14px;
+  border: none;
+}
+
+/* Chat Box */
+#chat-box {
+  height: 300px;
+  overflow-y: auto;
+  background: #1a1a1a;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+/* Inputs */
+input, select {
+  width: 80%;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 10px;
+  border: none;
 }
