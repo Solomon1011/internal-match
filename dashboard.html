@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="stylesheet" href="style.css">
 <title>💘 Internal Match Dashboard</title>
+<link rel="stylesheet" href="style.css">
 <style>
-  body { font-family: sans-serif; margin:0; padding:0; background:#111; color:#f5d061; }
-  h2 { text-align:center; }
+  body { font-family:sans-serif; margin:0; padding:0; background:#111; color:#f5d061; }
+  h2 { text-align:center; margin:10px 0; }
   .tab-content > div { display:none; padding:10px; text-align:center; }
   .tab-bar { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#222; padding:10px 0; }
   .tab-bar button { background:none; border:none; color:#f5d061; font-size:24px; cursor:pointer; }
@@ -15,8 +15,13 @@
   .card { background:#222; padding:10px; border-radius:10px; margin:10px auto; width:80%; }
   .actions button { margin:5px; padding:5px 10px; border-radius:6px; cursor:pointer; border:none; background:#f5d061; color:#111; }
   #chat-users button { display:block; width:90%; margin:5px auto; background:#333; color:#f5d061; padding:6px; border:none; border-radius:5px; cursor:pointer; }
-  #chat-box { border:1px solid #f5d061; padding:10px; height:200px; overflow-y:auto; text-align:left; margin:10px auto; width:80%; background:#222; }
-  #chat-box-container { display:none; }
+  #chat-box { padding:10px; height:300px; overflow-y:auto; text-align:left; background:#222; margin-bottom:5px; display:flex; flex-direction:column; }
+  .message { max-width:70%; margin:5px; padding:8px 12px; border-radius:15px; word-wrap:break-word; font-size:14px; }
+  .message.user { background:#25D366; color:#fff; align-self:flex-end; }
+  .message.other { background:#e5e5e5; color:#000; align-self:flex-start; }
+  #chat-input { width:70%; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
+  #chat-send-btn { margin-left:5px; padding:8px 15px; border:none; background:#25D366; color:white; border-radius:50%; font-weight:bold; cursor:pointer; }
+  #chat-container { display:flex; flex-direction:column; }
 </style>
 </head>
 <body>
@@ -29,24 +34,17 @@
   <div id="profile-tab">
     <h3>My Profile</h3>
     <div style="text-align:center; margin-bottom:20px;">
-      <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" 
-           style="width:120px;height:120px;border-radius:50%; display:block; margin:auto;">
+      <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" style="width:120px;height:120px;border-radius:50%; display:block; margin:auto;">
       <input type="file" id="profilePicInput" accept="image/*" style="margin-top:10px;">
     </div>
-
     <input type="text" id="edit-username" placeholder="Username"><br>
     <input type="number" id="edit-age" placeholder="Age"><br>
-    
-    <select id="edit-location">
-      <option value="">Select Country</option>
-    </select><br>
-
+    <select id="edit-location"><option value="">Select Country</option></select><br>
     <select id="edit-gender">
       <option value="">Select Gender</option>
       <option value="Male">Male</option>
       <option value="Female">Female</option>
     </select><br>
-    
     <select id="edit-interest">
       <option value="">Select Interest</option>
       <option value="Friends 💚">Friends 💚</option>
@@ -54,8 +52,7 @@
       <option value="Serious Relationship 💖">Serious Relationship 💖</option>
       <option value="Marriage 💘">Marriage 💘</option>
     </select><br>
-
-    <button class="save-btn" onclick="saveProfile()">💾 Save Profile</button>
+    <button onclick="saveProfile()">💾 Save Profile</button>
   </div>
 
   <!-- People Tab -->
@@ -89,21 +86,17 @@
 
   <!-- Chats Tab -->
   <div id="chats-tab">
-    <div id="chat-list-container">
-      <h3>Chats</h3>
-      <div id="chat-users"></div>
-    </div>
-
-    <div id="chat-box-container">
-      <div id="chat-header" style="display:flex; align-items:center; margin-bottom:10px;">
-        <img id="chat-profile-pic" src="" style="width:50px;height:50px;border-radius:50%;margin-right:10px;">
-        <span id="chat-name" style="font-weight:bold;font-size:16px;"></span>
-        <button onclick="deleteCurrentChat()" style="margin-left:auto; background:#f55;color:white;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;">🗑️ Delete Chat</button>
+    <div id="chat-users"></div>
+    <div id="chat-container" style="display:none;">
+      <div style="display:flex; align-items:center; margin-bottom:5px;">
+        <img id="chat-profile-pic" src="" style="width:50px;height:50px;border-radius:50%; margin-right:10px;">
+        <span id="chat-name" style="font-weight:bold;"></span>
+        <button onclick="deleteCurrentChat()" style="margin-left:auto; background:#f55; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer;">🗑️ Delete</button>
       </div>
       <div id="chat-box"></div>
-      <div style="margin-top:10px;">
-        <input type="text" id="messageInput" placeholder="Type message" style="width:70%; padding:5px;">
-        <button onclick="sendMessage()" style="padding:5px 10px;">Send</button>
+      <div style="display:flex; margin-top:5px;">
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button id="chat-send-btn" onclick="sendMessage()">➤</button>
       </div>
     </div>
   </div>
@@ -165,12 +158,7 @@ function saveProfile(){
   const location = editLocation.value;
   const gender = genderInput.value;
   const interest = interestInput.value;
-
-  if(!username || !age || !location || !gender || !interest){
-    alert("Please fill all fields!");
-    return;
-  }
-
+  if(!username || !age || !location || !gender || !interest){ alert("Please fill all fields!"); return; }
   profileData = { username, age, location, gender, interest, profilePic: profilePicPreview.src };
   localStorage.setItem('userProfile', JSON.stringify(profileData));
   alert("Profile saved successfully!");
@@ -178,16 +166,14 @@ function saveProfile(){
 
 // ----- Tabs -----
 function showTab(tab){
-  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{
-    document.getElementById(t).style.display='none';
-  });
+  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{ document.getElementById(t).style.display='none'; });
   document.getElementById(tab+'-tab').style.display='block';
 }
 
 // Show profile first
 showTab('profile');
 
-// ----- Demo People Profiles -----
+// ----- Demo People -----
 const demoProfiles = [];
 const demoNamesMale = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
 const demoNamesFemale = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
@@ -197,6 +183,7 @@ for(let i=0;i<20;i++){
   demoProfiles.push({name: demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, messages: [], addedToChat:false, ignored:false});
 }
 
+// ----- Swipe Profiles -----
 let currentIndex = 0;
 let filteredProfiles = demoProfiles.slice();
 const swipeContainer = document.getElementById('swipe-container');
@@ -204,8 +191,8 @@ const chatUsersDiv = document.getElementById('chat-users');
 const chatBox = document.getElementById('chat-box');
 const chatProfilePic = document.getElementById('chat-profile-pic');
 const chatName = document.getElementById('chat-name');
+const chatContainer = document.getElementById('chat-container');
 
-// ----- Show Profile Card -----
 function showProfileCard(){
   while(currentIndex < filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
   if(currentIndex >= filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
@@ -225,7 +212,6 @@ function showProfileCard(){
   `;
 }
 
-// ----- Swipe -----
 function swipe(action){
   const p = filteredProfiles[currentIndex];
   if(action==="like") addChat(p);
@@ -234,7 +220,6 @@ function swipe(action){
   showProfileCard();
 }
 
-// ----- Message Current -----
 function messageCurrent(){
   const p = filteredProfiles[currentIndex];
   if(p) addChat(p);
@@ -254,32 +239,45 @@ function updateChatList(){
   }
 }
 
+function addChat(profile){
+  const name = profile.name;
+  if(!chats[name]) chats[name]=[];
+  if(!profile.addedToChat){
+    chats[name].push(`${name}: Hi there! 💖 Let's chat!`);
+    profile.addedToChat=true;
+    localStorage.setItem("chats", JSON.stringify(chats));
+  }
+  updateChatList();
+  openChat(name);
+}
+
 function openChat(user){
   currentChatUser = user;
-  document.getElementById("chat-box-container").style.display="block";
+  chatContainer.style.display="flex";
   chatName.innerText = user;
-  chatProfilePic.src = profileData.profilePic;
+  // Use profile pic from demoProfiles
+  const prof = demoProfiles.find(p=>p.name===user);
+  chatProfilePic.src = prof ? prof.pic : profileData.profilePic;
   displayMessages();
 }
 
 function displayMessages(){
   chatBox.innerHTML="";
-  if(chats[currentChatUser]){
-    chats[currentChatUser].forEach(msg=>{
-      const div = document.createElement("div");
-      div.innerText = msg;
-      chatBox.appendChild(div);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+  if(!currentChatUser || !chats[currentChatUser]) return;
+  chats[currentChatUser].forEach(msg=>{
+    const div = document.createElement("div");
+    div.className = msg.startsWith("You:") ? "message user" : "message other";
+    div.innerText = msg;
+    chatBox.appendChild(div);
+  });
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function sendMessage(){
-  const msgInput = document.getElementById("messageInput");
-  const msg = msgInput.value.trim();
-  if(!msg || !currentChatUser) return;
-  if(!chats[currentChatUser]) chats[currentChatUser] = [];
-  chats[currentChatUser].push("You: "+msg);
+  const msgInput = document.getElementById("chat-input");
+  const text = msgInput.value.trim();
+  if(!text || !currentChatUser) return;
+  chats[currentChatUser].push("You: "+text);
   localStorage.setItem("chats", JSON.stringify(chats));
   msgInput.value="";
   displayMessages();
@@ -291,23 +289,10 @@ function deleteCurrentChat(){
       delete chats[currentChatUser];
       localStorage.setItem("chats", JSON.stringify(chats));
       currentChatUser="";
-      document.getElementById("chat-box-container").style.display="none";
+      chatContainer.style.display="none";
       updateChatList();
     }
   }
-}
-
-// ----- Add Chat from People -----
-function addChat(profile){
-  const name = profile.name;
-  if(!chats[name]) chats[name]=[];
-  if(!profile.addedToChat){
-    chats[name].push(`${name}: Hi there! 💖 Let's chat!`);
-    profile.addedToChat=true;
-    localStorage.setItem("chats", JSON.stringify(chats));
-  }
-  updateChatList();
-  openChat(name);
 }
 
 // ----- Filters -----
