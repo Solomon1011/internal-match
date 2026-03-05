@@ -205,7 +205,13 @@
     currentIndex=0;
     showProfile();
   }
+function showTab(tab){
+  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{
+    document.getElementById(t).style.display='none';
+  });
 
+  document.getElementById(tab+'-tab').style.display='block';
+}
   // Show profile tab first
   showTab('profile');
 
