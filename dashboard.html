@@ -134,7 +134,7 @@ const ageInput = document.getElementById('edit-age');
 const genderInput = document.getElementById('edit-gender');
 const interestInput = document.getElementById('edit-interest');
 
-// ----- Load saved profile -----
+// Load saved profile
 let profileData = JSON.parse(localStorage.getItem('userProfile')) || {};
 if(profileData.username) usernameInput.value = profileData.username;
 if(profileData.age) ageInput.value = profileData.age;
@@ -143,7 +143,7 @@ if(profileData.gender) genderInput.value = profileData.gender;
 if(profileData.interest) interestInput.value = profileData.interest;
 if(profileData.profilePic) profilePicPreview.src = profileData.profilePic;
 
-// ----- Profile Picture Upload -----
+// Profile picture upload
 profilePicInput.addEventListener('change', function(e){
   const file = e.target.files[0];
   if(file){
@@ -157,7 +157,7 @@ profilePicInput.addEventListener('change', function(e){
   }
 });
 
-// ----- Save Profile -----
+// Save profile
 function saveProfile(){
   const username = usernameInput.value.trim();
   const age = ageInput.value.trim();
@@ -170,26 +170,24 @@ function saveProfile(){
   alert("Profile saved successfully!");
 }
 
-// ----- Tabs -----
+// Tabs
 function showTab(tab){
   ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{ document.getElementById(t).style.display='none'; });
   document.getElementById(tab+'-tab').style.display='block';
 }
+showTab('profile'); // show profile first
 
-// Show profile first
-showTab('profile');
-
-// ----- Demo People -----
+// Demo profiles
 const demoProfiles = [];
 const demoNamesMale = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
 const demoNamesFemale = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
 const interests = ["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
 for(let i=0;i<20;i++){
-  demoProfiles.push({name: demoNamesMale[Math.floor(Math.random()*demoNamesMale.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/men/${i}.jpg`, messages: [], addedToChat:false, ignored:false});
-  demoProfiles.push({name: demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, messages: [], addedToChat:false, ignored:false});
+  demoProfiles.push({name: demoNamesMale[Math.floor(Math.random()*demoNamesMale.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/men/${i}.jpg`, addedToChat:false, ignored:false});
+  demoProfiles.push({name: demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, addedToChat:false, ignored:false});
 }
 
-// ----- Swipe Profiles -----
+// Swipe profiles
 let currentIndex = 0;
 let filteredProfiles = demoProfiles.slice();
 const swipeContainer = document.getElementById('swipe-container');
@@ -198,6 +196,7 @@ const chatBox = document.getElementById('chat-box');
 const chatProfilePic = document.getElementById('chat-profile-pic');
 const chatName = document.getElementById('chat-name');
 
+// Show profile card
 function showProfileCard(){
   while(currentIndex < filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
   if(currentIndex >= filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
@@ -229,7 +228,7 @@ function swipe(action){
 let chats = JSON.parse(localStorage.getItem("chats")) || {};
 let currentChatUser = "";
 
-// Update chat list with profile pictures
+// Update chat list
 function updateChatList(){
   chatUsersDiv.innerHTML="";
   for(let user in chats){
@@ -268,7 +267,6 @@ function updateChatList(){
 
     container.appendChild(img);
     container.appendChild(textDiv);
-
     container.onclick = ()=>openChat(user);
 
     chatUsersDiv.appendChild(container);
@@ -288,11 +286,9 @@ function addChat(profile){
   openChat(name);
 }
 
-// ----- Full-screen Chat -----
+// Full-screen chat
 function openChat(user){
   currentChatUser = user;
-
-  // Show full-screen, hide chat list
   document.getElementById('chat-list-container').style.display = "none";
   document.getElementById('chat-fullscreen').style.display = "flex";
 
@@ -342,7 +338,6 @@ function deleteCurrentChat(){
   }
 }
 
-// ----- Add chat and open immediately from swipe or message button -----
 function addChatAndOpen(profileName){
   const profile = demoProfiles.find(p => p.name === profileName);
   if(!profile) return;
@@ -359,7 +354,10 @@ function addChatAndOpen(profileName){
   showTab('chats');
 }
 
-// ----- Filters -----
+// Filters
 function applyFilters(){
   const gender = document.getElementById('filter-gender').value;
-  const location = document.getElementById('filter-location
+  const location = document.getElementById('filter-location-people').value;
+  const interest = document.getElementById('filter-interest').value;
+
+  filtered
