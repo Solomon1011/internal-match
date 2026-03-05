@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💘 Complete Your Profile</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💘 Complete Your Profile</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -34,41 +33,50 @@
 </div>
 
 <script>
-  const profilePicInput = document.getElementById('profilePicInput');
-  const profilePicPreview = document.getElementById('profilePicPreview');
+const profilePicInput = document.getElementById('profilePicInput');
+const profilePicPreview = document.getElementById('profilePicPreview');
 
-  // Preview selected image
-  profilePicInput.addEventListener('change', function(event){
-    const file = event.target.files[0];
-    if(file){
-      const reader = new FileReader();
-      reader.onload = function(e){
-        profilePicPreview.src = e.target.result;
-      }
-      reader.readAsDataURL(file);
+// Preview selected image and store as Base64
+let profilePicData = profilePicPreview.src;
+
+profilePicInput.addEventListener('change', function(event){
+  const file = event.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      profilePicPreview.src = e.target.result;
+      profilePicData = e.target.result; // store Base64 for saving
     }
-  });
-
-  function saveProfile(){
-    const username = document.getElementById('username').value.trim();
-    const age = document.getElementById('age').value.trim();
-    const location = document.getElementById('location').value.trim();
-    const gender = document.getElementById('gender').value;
-    const interest = document.getElementById('interest').value.trim();
-    const profilePic = profilePicPreview.src;
-
-    if(!username || !age || !location || !gender || !interest){
-      alert("Please fill all fields");
-      return;
-    }
-
-    // Save to localStorage
-    const userProfile = { username, age, location, gender, interest, profilePic };
-    localStorage.setItem("userProfile", JSON.stringify(userProfile));
-
-    alert("Profile saved successfully!");
-    window.location.href = "dashboard.html"; // redirect to dashboard
+    reader.readAsDataURL(file);
   }
+});
+
+function saveProfile(){
+  const username = document.getElementById('username').value.trim();
+  const age = document.getElementById('age').value.trim();
+  const location = document.getElementById('location').value.trim();
+  const gender = document.getElementById('gender').value;
+  const interest = document.getElementById('interest').value.trim();
+
+  if(!username || !age || !location || !gender || !interest){
+    alert("Please fill all fields!");
+    return;
+  }
+
+  // Save all data to localStorage
+  const userProfile = {
+    username,
+    age,
+    location,
+    gender,
+    interest,
+    profilePic: profilePicData
+  };
+  localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
+  alert("Profile saved successfully!");
+  window.location.href = "dashboard.html"; // redirect to dashboard
+}
 </script>
 
 </body>
