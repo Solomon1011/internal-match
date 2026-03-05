@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>💘 Internal Match Dashboard</title>
-<link rel="stylesheet" href="style.css">
 <style>
   body { font-family:sans-serif; margin:0; padding:0; background:#111; color:#f5d061; }
   h2 { text-align:center; margin:10px 0; }
@@ -22,7 +21,6 @@
   .message.other { background:#e5e5e5; color:#000; align-self:flex-start; }
   #chat-input { width:70%; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
   #chat-send-btn { margin-left:5px; padding:8px 15px; border:none; background:#25D366; color:white; border-radius:50%; font-weight:bold; cursor:pointer; }
-  #chat-container { display:flex; flex-direction:column; }
 </style>
 </head>
 <body>
@@ -87,12 +85,9 @@
 
   <!-- Chats Tab -->
   <div id="chats-tab">
-    <!-- Chat list -->
     <div id="chat-list-container">
       <div id="chat-users"></div>
     </div>
-
-    <!-- Full-screen chat -->
     <div id="chat-fullscreen" style="display:none; flex-direction:column; height:100%;">
       <div style="display:flex; align-items:center; padding:10px; background:#222; color:#f5d061;">
         <button onclick="closeFullChat()" style="margin-right:10px; background:#f55; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer;">⬅ Back</button>
@@ -102,14 +97,13 @@
       <div id="chat-box" style="flex:1; overflow-y:auto; padding:10px; background:#111;"></div>
       <div style="display:flex; padding:10px; background:#222;">
         <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none;">
-        <button id="chat-send-btn" onclick="sendMessage()" style="margin-left:5px; padding:8px 15px; border:none; background:#25D366; color:white; border-radius:50%; font-weight:bold; cursor:pointer;">➤</button>
+        <button id="chat-send-btn" onclick="sendMessage()">➤</button>
       </div>
     </div>
   </div>
 
 </div>
 
-<!-- Bottom Navigation -->
 <div class="tab-bar">
   <button onclick="showTab('profile')">👤</button>
   <button onclick="showTab('people')">🔥</button>
@@ -118,15 +112,12 @@
 </div>
 
 <script>
-// ----- Countries -----
 const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Australia","Austria","Belgium","Brazil","Canada","China","Denmark","Egypt","France","Germany","Ghana","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Japan","Kenya","Malaysia","Mexico","Nepal","Netherlands","New Zealand","Nigeria","Norway","Pakistan","Philippines","Poland","Portugal","Qatar","Russia","Saudi Arabia","Singapore","South Africa","South Korea","Spain","Sweden","Switzerland","Thailand","Turkey","Ukraine","United Arab Emirates","United Kingdom","United States","Vietnam"];
-
 const editLocation = document.getElementById('edit-location');
 const filterLocationPeople = document.getElementById('filter-location-people');
 countries.forEach(c => { editLocation.innerHTML += `<option value="${c}">${c}</option>`; });
 countries.forEach(c => { filterLocationPeople.innerHTML += `<option value="${c}">${c}</option>`; });
 
-// Inputs
 const profilePicInput = document.getElementById('profilePicInput');
 const profilePicPreview = document.getElementById('user-profile-pic');
 const usernameInput = document.getElementById('edit-username');
@@ -134,7 +125,6 @@ const ageInput = document.getElementById('edit-age');
 const genderInput = document.getElementById('edit-gender');
 const interestInput = document.getElementById('edit-interest');
 
-// Load saved profile
 let profileData = JSON.parse(localStorage.getItem('userProfile')) || {};
 if(profileData.username) usernameInput.value = profileData.username;
 if(profileData.age) ageInput.value = profileData.age;
@@ -143,7 +133,6 @@ if(profileData.gender) genderInput.value = profileData.gender;
 if(profileData.interest) interestInput.value = profileData.interest;
 if(profileData.profilePic) profilePicPreview.src = profileData.profilePic;
 
-// Profile picture upload
 profilePicInput.addEventListener('change', function(e){
   const file = e.target.files[0];
   if(file){
@@ -157,50 +146,48 @@ profilePicInput.addEventListener('change', function(e){
   }
 });
 
-// Save profile
 function saveProfile(){
   const username = usernameInput.value.trim();
   const age = ageInput.value.trim();
   const location = editLocation.value;
   const gender = genderInput.value;
   const interest = interestInput.value;
-  if(!username || !age || !location || !gender || !interest){ alert("Please fill all fields!"); return; }
+  if(!username||!age||!location||!gender||!interest){alert("Please fill all fields!"); return;}
   profileData = { username, age, location, gender, interest, profilePic: profilePicPreview.src };
   localStorage.setItem('userProfile', JSON.stringify(profileData));
   alert("Profile saved successfully!");
 }
 
-// Tabs
 function showTab(tab){
-  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{ document.getElementById(t).style.display='none'; });
+  ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>document.getElementById(t).style.display='none');
   document.getElementById(tab+'-tab').style.display='block';
 }
-showTab('profile'); // show profile first
+showTab('profile');
 
-// Demo profiles
-const demoProfiles = [];
-const demoNamesMale = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
-const demoNamesFemale = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
-const interests = ["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
+// ----- Demo Profiles -----
+const demoProfiles=[];
+const demoNamesMale=["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
+const demoNamesFemale=["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
+const interestsArr=["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
 for(let i=0;i<20;i++){
-  demoProfiles.push({name: demoNamesMale[Math.floor(Math.random()*demoNamesMale.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/men/${i}.jpg`, addedToChat:false, ignored:false});
-  demoProfiles.push({name: demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, addedToChat:false, ignored:false});
+  demoProfiles.push({name: demoNamesMale[Math.floor(Math.random()*demoNamesMale.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:countries[Math.floor(Math.random()*countries.length)], interest:interestsArr[Math.floor(Math.random()*interestsArr.length)], pic:`https://randomuser.me/api/portraits/men/${i}.jpg`, addedToChat:false, ignored:false});
+  demoProfiles.push({name: demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interestsArr[Math.floor(Math.random()*interestsArr.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, addedToChat:false, ignored:false});
 }
 
-// Swipe profiles
-let currentIndex = 0;
-let filteredProfiles = demoProfiles.slice();
-const swipeContainer = document.getElementById('swipe-container');
-const chatUsersDiv = document.getElementById('chat-users');
-const chatBox = document.getElementById('chat-box');
-const chatProfilePic = document.getElementById('chat-profile-pic');
-const chatName = document.getElementById('chat-name');
+let currentIndex=0;
+let filteredProfiles=demoProfiles.slice();
+const swipeContainer=document.getElementById('swipe-container');
+const chatUsersDiv=document.getElementById('chat-users');
+const chatBox=document.getElementById('chat-box');
+const chatProfilePic=document.getElementById('chat-profile-pic');
+const chatName=document.getElementById('chat-name');
+let chats=JSON.parse(localStorage.getItem("chats"))||{};
+let currentChatUser="";
 
-// Show profile card
 function showProfileCard(){
-  while(currentIndex < filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
-  if(currentIndex >= filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
-  const p = filteredProfiles[currentIndex];
+  while(currentIndex<filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
+  if(currentIndex>=filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
+  const p=filteredProfiles[currentIndex];
   swipeContainer.innerHTML=`
     <div class="card">
       <img src="${p.pic}" style="width:120px;height:120px;border-radius:50%;"><br>
@@ -217,147 +204,91 @@ function showProfileCard(){
 }
 
 function swipe(action){
-  const p = filteredProfiles[currentIndex];
+  const p=filteredProfiles[currentIndex];
   if(action==="like") addChat(p);
   if(action==="ignore") p.ignored=true;
   currentIndex++;
   showProfileCard();
 }
 
-// ----- Chats -----
-let chats = JSON.parse(localStorage.getItem("chats")) || {};
-let currentChatUser = "";
-
 // Update chat list
 function updateChatList(){
   chatUsersDiv.innerHTML="";
   for(let user in chats){
-    const prof = demoProfiles.find(p => p.name === user);
-    const lastMsg = chats[user].length ? chats[user][chats[user].length -1] : "";
-
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.alignItems = "center";
-    container.style.background = "#222";
-    container.style.color = "#f5d061";
-    container.style.padding = "5px 10px";
-    container.style.margin = "5px";
-    container.style.borderRadius = "8px";
-    container.style.cursor = "pointer";
-
-    const img = document.createElement("img");
-    img.src = prof ? prof.pic : "";
-    img.style.width = "40px";
-    img.style.height = "40px";
-    img.style.borderRadius = "50%";
-    img.style.marginRight = "10px";
-
-    const textDiv = document.createElement("div");
-    textDiv.style.flex = "1";
-    const nameDiv = document.createElement("div");
-    nameDiv.innerText = user;
-    nameDiv.style.fontWeight = "bold";
-    const lastMsgDiv = document.createElement("div");
-    lastMsgDiv.innerText = lastMsg.replace("You: ","");
-    lastMsgDiv.style.fontSize = "12px";
-    lastMsgDiv.style.color = "#ccc";
-
-    textDiv.appendChild(nameDiv);
-    textDiv.appendChild(lastMsgDiv);
-
-    container.appendChild(img);
-    container.appendChild(textDiv);
-    container.onclick = ()=>openChat(user);
-
+    const prof=demoProfiles.find(p=>p.name===user);
+    const lastMsg=chats[user].length?chats[user][chats[user].length-1]:"";
+    const container=document.createElement("div");
+    container.style.cssText="display:flex;align-items:center;background:#222;color:#f5d061;padding:5px 10px;margin:5px;border-radius:8px;cursor:pointer;";
+    const img=document.createElement("img");
+    img.src=prof?prof.pic:"";
+    img.style.cssText="width:40px;height:40px;border-radius:50%;margin-right:10px;";
+    const textDiv=document.createElement("div"); textDiv.style.flex="1";
+    const nameDiv=document.createElement("div"); nameDiv.innerText=user; nameDiv.style.fontWeight="bold";
+    const lastMsgDiv=document.createElement("div"); lastMsgDiv.innerText=lastMsg.replace("You: ",""); lastMsgDiv.style.fontSize="12px"; lastMsgDiv.style.color="#ccc";
+    textDiv.appendChild(nameDiv); textDiv.appendChild(lastMsgDiv);
+    container.appendChild(img); container.appendChild(textDiv);
+    container.onclick=()=>openChat(user);
     chatUsersDiv.appendChild(container);
   }
 }
 
-// Add chat if not exists
 function addChat(profile){
-  const name = profile.name;
+  const name=profile.name;
   if(!chats[name]) chats[name]=[];
-  if(!profile.addedToChat){
-    chats[name].push(`${name}: Hi there! 💖 Let's chat!`);
-    profile.addedToChat=true;
-    localStorage.setItem("chats", JSON.stringify(chats));
-  }
-  updateChatList();
-  openChat(name);
+  if(!profile.addedToChat){ chats[name].push(`${name}: Hi there! 💖 Let's chat!`); profile.addedToChat=true; localStorage.setItem("chats", JSON.stringify(chats)); }
+  updateChatList(); openChat(name);
 }
 
-// Full-screen chat
 function openChat(user){
-  currentChatUser = user;
-  document.getElementById('chat-list-container').style.display = "none";
-  document.getElementById('chat-fullscreen').style.display = "flex";
-
-  chatName.innerText = user;
-  const prof = demoProfiles.find(p => p.name === user);
-  chatProfilePic.src = prof ? prof.pic : profileData.profilePic;
-
+  currentChatUser=user;
+  document.getElementById('chat-list-container').style.display="none";
+  document.getElementById('chat-fullscreen').style.display="flex";
+  chatName.innerText=user;
+  const prof=demoProfiles.find(p=>p.name===user);
+  chatProfilePic.src=prof?prof.pic:profileData.profilePic;
   displayMessages();
 }
 
-function closeFullChat(){
-  currentChatUser = "";
-  document.getElementById('chat-list-container').style.display = "block";
-  document.getElementById('chat-fullscreen').style.display = "none";
-}
+function closeFullChat(){ currentChatUser=""; document.getElementById('chat-list-container').style.display="block"; document.getElementById('chat-fullscreen').style.display="none"; }
 
 function displayMessages(){
   chatBox.innerHTML="";
   if(!currentChatUser || !chats[currentChatUser]) return;
   chats[currentChatUser].forEach(msg=>{
-    const div = document.createElement("div");
-    div.className = msg.startsWith("You:") ? "message user" : "message other";
-    div.innerText = msg;
-    chatBox.appendChild(div);
+    const div=document.createElement("div");
+    div.className=msg.startsWith("You:")?"message user":"message other";
+    div.innerText=msg; chatBox.appendChild(div);
   });
-  chatBox.scrollTop = chatBox.scrollHeight;
+  chatBox.scrollTop=chatBox.scrollHeight;
 }
 
 function sendMessage(){
-  const msgInput = document.getElementById("chat-input");
-  const text = msgInput.value.trim();
-  if(!text || !currentChatUser) return;
-  chats[currentChatUser].push("You: "+text);
-  localStorage.setItem("chats", JSON.stringify(chats));
-  msgInput.value="";
-  displayMessages();
-}
-
-function deleteCurrentChat(){
-  if(currentChatUser && chats[currentChatUser]){
-    if(confirm("Delete chat with "+currentChatUser+"?")){
-      delete chats[currentChatUser];
-      localStorage.setItem("chats", JSON.stringify(chats));
-      closeFullChat();
-      updateChatList();
-    }
-  }
+  const msgInput=document.getElementById("chat-input"); const text=msgInput.value.trim();
+  if(!text||!currentChatUser) return;
+  chats[currentChatUser].push("You: "+text); localStorage.setItem("chats", JSON.stringify(chats)); msgInput.value=""; displayMessages();
 }
 
 function addChatAndOpen(profileName){
-  const profile = demoProfiles.find(p => p.name === profileName);
-  if(!profile) return;
-
-  if(!chats[profileName]) chats[profileName] = [];
-  if(!profile.addedToChat){
-    chats[profileName].push(`${profileName}: Hi there! 💖 Let's chat!`);
-    profile.addedToChat = true;
-    localStorage.setItem("chats", JSON.stringify(chats));
-  }
-
-  updateChatList();
-  openChat(profileName);
-  showTab('chats');
+  const profile=demoProfiles.find(p=>p.name===profileName); if(!profile) return;
+  if(!chats[profileName]) chats[profileName]=[];
+  if(!profile.addedToChat){ chats[profileName].push(`${profileName}: Hi there! 💖 Let's chat!`); profile.addedToChat=true; localStorage.setItem("chats", JSON.stringify(chats)); }
+  updateChatList(); openChat(profileName); showTab('chats');
 }
 
-// Filters
+// ----- Filters -----
 function applyFilters(){
-  const gender = document.getElementById('filter-gender').value;
-  const location = document.getElementById('filter-location-people').value;
-  const interest = document.getElementById('filter-interest').value;
+  const gender=document.getElementById('filter-gender').value;
+  const location=document.getElementById('filter-location-people').value;
+  const interest=document.getElementById('filter-interest').value;
+  filteredProfiles=demoProfiles.filter(p=>{
+    return (gender===""||p.gender===gender) && (location===""||p.location===location) && (interest===""||p.interest===interest);
+  });
+  currentIndex=0; showProfileCard();
+}
 
-  filtered
+// Init
+updateChatList();
+showProfileCard();
+</script>
+</body>
+</html>
