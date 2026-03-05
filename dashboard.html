@@ -16,12 +16,12 @@
   #chat-users div { display:flex; align-items:center; background:#222; color:#f5d061; padding:5px 10px; margin:5px; border-radius:8px; cursor:pointer; }
   #chat-users img { width:40px; height:40px; border-radius:50%; margin-right:10px; }
 
-  /* ----- Chat Styles ----- */
+  /* ----- Chat styles ----- */
   #chat-fullscreen {
     display: flex;
     flex-direction: column;
     height: 100%;
-    position: relative; /* important for fixed input */
+    position: relative; /* for fixed input */
   }
 
   #chat-box {
@@ -29,7 +29,9 @@
     overflow-y: auto;
     padding: 10px;
     background: #111;
-    margin-bottom: 60px; /* leave space for input */
+    margin-bottom: 60px; /* leave space for input container */
+    display: flex;
+    flex-direction: column;
   }
 
   .message { max-width:70%; margin:5px; padding:8px 12px; border-radius:15px; word-wrap:break-word; font-size:14px; }
@@ -159,49 +161,49 @@
 </div>
 
 <script>
-const countries=["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Australia","Austria","Belgium","Brazil","Canada","China","Denmark","Egypt","France","Germany","Ghana","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Japan","Kenya","Malaysia","Mexico","Nepal","Netherlands","New Zealand","Nigeria","Norway","Pakistan","Philippines","Poland","Portugal","Qatar","Russia","Saudi Arabia","Singapore","South Africa","South Korea","Spain","Sweden","Switzerland","Thailand","Turkey","Ukraine","United Arab Emirates","United Kingdom","United States","Vietnam"];
-const editLocation=document.getElementById('edit-location');
-const filterLocationPeople=document.getElementById('filter-location-people');
-countries.forEach(c=>{ editLocation.innerHTML+=`<option value="${c}">${c}</option>`; });
-countries.forEach(c=>{ filterLocationPeople.innerHTML+=`<option value="${c}">${c}</option>`; });
+const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Australia","Austria","Belgium","Brazil","Canada","China","Denmark","Egypt","France","Germany","Ghana","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Japan","Kenya","Malaysia","Mexico","Nepal","Netherlands","New Zealand","Nigeria","Norway","Pakistan","Philippines","Poland","Portugal","Qatar","Russia","Saudi Arabia","Singapore","South Africa","South Korea","Spain","Sweden","Switzerland","Thailand","Turkey","Ukraine","United Arab Emirates","United Kingdom","United States","Vietnam"];
+const editLocation = document.getElementById('edit-location');
+const filterLocationPeople = document.getElementById('filter-location-people');
+countries.forEach(c => { editLocation.innerHTML += `<option value="${c}">${c}</option>`; });
+countries.forEach(c => { filterLocationPeople.innerHTML += `<option value="${c}">${c}</option>`; });
 
-const profilePicInput=document.getElementById('profilePicInput');
-const profilePicPreview=document.getElementById('user-profile-pic');
-const usernameInput=document.getElementById('edit-username');
-const ageInput=document.getElementById('edit-age');
-const genderInput=document.getElementById('edit-gender');
-const interestInput=document.getElementById('edit-interest');
+const profilePicInput = document.getElementById('profilePicInput');
+const profilePicPreview = document.getElementById('user-profile-pic');
+const usernameInput = document.getElementById('edit-username');
+const ageInput = document.getElementById('edit-age');
+const genderInput = document.getElementById('edit-gender');
+const interestInput = document.getElementById('edit-interest');
 
-let profileData=JSON.parse(localStorage.getItem('userProfile'))||{};
-if(profileData.username) usernameInput.value=profileData.username;
-if(profileData.age) ageInput.value=profileData.age;
-if(profileData.location) editLocation.value=profileData.location;
-if(profileData.gender) genderInput.value=profileData.gender;
-if(profileData.interest) interestInput.value=profileData.interest;
-if(profileData.profilePic) profilePicPreview.src=profileData.profilePic;
+let profileData = JSON.parse(localStorage.getItem('userProfile')) || {};
+if(profileData.username) usernameInput.value = profileData.username;
+if(profileData.age) ageInput.value = profileData.age;
+if(profileData.location) editLocation.value = profileData.location;
+if(profileData.gender) genderInput.value = profileData.gender;
+if(profileData.interest) interestInput.value = profileData.interest;
+if(profileData.profilePic) profilePicPreview.src = profileData.profilePic;
 
-profilePicInput.addEventListener('change',function(e){
-  const file=e.target.files[0];
+profilePicInput.addEventListener('change', function(e){
+  const file = e.target.files[0];
   if(file){
-    const reader=new FileReader();
-    reader.onload=function(event){
-      profilePicPreview.src=event.target.result;
-      profileData.profilePic=event.target.result;
-      localStorage.setItem('userProfile',JSON.stringify(profileData));
+    const reader = new FileReader();
+    reader.onload = function(event){
+      profilePicPreview.src = event.target.result;
+      profileData.profilePic = event.target.result;
+      localStorage.setItem('userProfile', JSON.stringify(profileData));
     }
     reader.readAsDataURL(file);
   }
 });
 
 function saveProfile(){
-  const username=usernameInput.value.trim();
-  const age=ageInput.value.trim();
-  const location=editLocation.value;
-  const gender=genderInput.value;
-  const interest=interestInput.value;
+  const username = usernameInput.value.trim();
+  const age = ageInput.value.trim();
+  const location = editLocation.value;
+  const gender = genderInput.value;
+  const interest = interestInput.value;
   if(!username||!age||!location||!gender||!interest){alert("Please fill all fields!"); return;}
-  profileData={username, age, location, gender, interest, profilePic:profilePicPreview.src};
-  localStorage.setItem('userProfile',JSON.stringify(profileData));
+  profileData = { username, age, location, gender, interest, profilePic: profilePicPreview.src };
+  localStorage.setItem('userProfile', JSON.stringify(profileData));
   alert("Profile saved successfully!");
 }
 
@@ -217,8 +219,8 @@ const demoNamesMale=["John","David","Michael","James","Robert","William","Thomas
 const demoNamesFemale=["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
 const interestsArr=["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
 for(let i=0;i<20;i++){
-  demoProfiles.push({name:demoNamesMale[Math.floor(Math.random()*demoNamesMale.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:countries[Math.floor(Math.random()*countries.length)], interest:interestsArr[Math.floor(Math.random()*interestsArr.length)], pic:`https://randomuser.me/api/portraits/men/${i}.jpg`, addedToChat:false, ignored:false});
-  demoProfiles.push({name:demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interestsArr[Math.floor(Math.random()*interestsArr.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, addedToChat:false, ignored:false});
+  demoProfiles.push({name: demoNamesMale[Math.floor(Math.random()*demoNamesMale.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:countries[Math.floor(Math.random()*countries.length)], interest:interestsArr[Math.floor(Math.random()*interestsArr.length)], pic:`https://randomuser.me/api/portraits/men/${i}.jpg`, addedToChat:false, ignored:false});
+  demoProfiles.push({name: demoNamesFemale[Math.floor(Math.random()*demoNamesFemale.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:countries[Math.floor(Math.random()*countries.length)], interest:interestsArr[Math.floor(Math.random()*interestsArr.length)], pic:`https://randomuser.me/api/portraits/women/${i}.jpg`, addedToChat:false, ignored:false});
 }
 
 let currentIndex=0;
@@ -258,7 +260,6 @@ function swipe(action){
   showProfileCard();
 }
 
-// Update chat list
 function updateChatList(){
   chatUsersDiv.innerHTML="";
   for(let user in chats){
@@ -266,9 +267,7 @@ function updateChatList(){
     const lastMsg=chats[user].length?chats[user][chats[user].length-1]:"";
     const container=document.createElement("div");
     container.style.cssText="display:flex;align-items:center;background:#222;color:#f5d061;padding:5px 10px;margin:5px;border-radius:8px;cursor:pointer;";
-    const img=document.createElement("img");
-    img.src=prof?prof.pic:"";
-    img.style.cssText="width:40px;height:40px;border-radius:50%;margin-right:10px;";
+    const img=document.createElement("img"); img.src=prof?prof.pic:""; img.style.cssText="width:40px;height:40px;border-radius:50%;margin-right:10px;";
     const textDiv=document.createElement("div"); textDiv.style.flex="1";
     const nameDiv=document.createElement("div"); nameDiv.innerText=user; nameDiv.style.fontWeight="bold";
     const lastMsgDiv=document.createElement("div"); lastMsgDiv.innerText=lastMsg.replace("You: ",""); lastMsgDiv.style.fontSize="12px"; lastMsgDiv.style.color="#ccc";
@@ -322,7 +321,6 @@ function addChatAndOpen(profileName){
   updateChatList(); openChat(profileName); showTab('chats');
 }
 
-// ----- Filters -----
 function applyFilters(){
   const gender=document.getElementById('filter-gender').value;
   const location=document.getElementById('filter-location-people').value;
