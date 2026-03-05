@@ -306,11 +306,12 @@ function addChat(profile){
 
 function openChat(user){
   currentChatUser = user;
-  chatContainer.style.display="flex";
+  chatContainer.style.display = "flex"; // show full chat
   chatName.innerText = user;
-  // Use profile pic from demoProfiles
-  const prof = demoProfiles.find(p=>p.name===user);
+
+  const prof = demoProfiles.find(p => p.name === user);
   chatProfilePic.src = prof ? prof.pic : profileData.profilePic;
+
   displayMessages();
 }
 
