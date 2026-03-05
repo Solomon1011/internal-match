@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +28,14 @@
     <option value="Male">Male</option>
     <option value="Female">Female</option>
   </select><br>
-  <input type="text" id="interest" placeholder="Interest"><br>
+  
+  <select id="interest">
+    <option value="">Select Interest</option>
+    <option value="Friends 💚">Friends 💚</option>
+    <option value="Hangout 🩵">Hangout 🩵</option>
+    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+    <option value="Marriage 💘">Marriage 💘</option>
+  </select><br>
 
   <button onclick="saveProfile()">💾 Save Profile</button>
 </div>
@@ -56,7 +64,7 @@ function saveProfile(){
   const age = document.getElementById('age').value.trim();
   const location = document.getElementById('location').value.trim();
   const gender = document.getElementById('gender').value;
-  const interest = document.getElementById('interest').value.trim();
+  const interest = document.getElementById('interest').value;
 
   if(!username || !age || !location || !gender || !interest){
     alert("Please fill all fields!");
