@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Complete Your Profile</title>
+<title>💘 Internal Match - Profile</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,7 +22,11 @@
   <!-- Profile Info Form -->
   <input type="text" id="username" placeholder="Username"><br>
   <input type="number" id="age" placeholder="Age"><br>
-  <input type="text" id="location" placeholder="Location"><br>
+  
+  <select id="location">
+    <option value="">Select Country</option>
+  </select><br>
+
   <select id="gender">
     <option value="">Select Gender</option>
     <option value="Male">Male</option>
@@ -43,35 +47,61 @@
 <script>
 const profilePicInput = document.getElementById('profilePicInput');
 const profilePicPreview = document.getElementById('profilePicPreview');
+const usernameInput = document.getElementById('username');
+const ageInput = document.getElementById('age');
+const locationSelect = document.getElementById('location');
+const genderSelect = document.getElementById('gender');
+const interestSelect = document.getElementById('interest');
 
-// Preview selected image and store as Base64
+// List of 152+ countries
+const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua & Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+
+// Fill location dropdown
+countries.forEach(c => {
+  locationSelect.innerHTML += `<option value="${c}">${c}</option>`;
+});
+
 let profilePicData = profilePicPreview.src;
 
+// Preview uploaded image
 profilePicInput.addEventListener('change', function(event){
   const file = event.target.files[0];
   if(file){
     const reader = new FileReader();
     reader.onload = function(e){
       profilePicPreview.src = e.target.result;
-      profilePicData = e.target.result; // store Base64 for saving
+      profilePicData = e.target.result;
     }
     reader.readAsDataURL(file);
   }
 });
 
+// Load saved profile if exists
+window.addEventListener('load', function(){
+  const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
+  if(savedProfile){
+    usernameInput.value = savedProfile.username;
+    ageInput.value = savedProfile.age;
+    locationSelect.value = savedProfile.location;
+    genderSelect.value = savedProfile.gender;
+    interestSelect.value = savedProfile.interest;
+    profilePicPreview.src = savedProfile.profilePic;
+    profilePicData = savedProfile.profilePic;
+  }
+});
+
 function saveProfile(){
-  const username = document.getElementById('username').value.trim();
-  const age = document.getElementById('age').value.trim();
-  const location = document.getElementById('location').value.trim();
-  const gender = document.getElementById('gender').value;
-  const interest = document.getElementById('interest').value;
+  const username = usernameInput.value.trim();
+  const age = ageInput.value.trim();
+  const location = locationSelect.value;
+  const gender = genderSelect.value;
+  const interest = interestSelect.value;
 
   if(!username || !age || !location || !gender || !interest){
     alert("Please fill all fields!");
     return;
   }
 
-  // Save all data to localStorage
   const userProfile = {
     username,
     age,
@@ -80,10 +110,10 @@ function saveProfile(){
     interest,
     profilePic: profilePicData
   };
-  localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
+  localStorage.setItem("userProfile", JSON.stringify(userProfile));
   alert("Profile saved successfully!");
-  window.location.href = "dashboard.html"; // redirect to dashboard
+  window.location.href = "dashboard.html";
 }
 </script>
 
