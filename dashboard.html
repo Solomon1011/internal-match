@@ -294,7 +294,23 @@ function deleteCurrentChat(){
     }
   }
 }
+// ----- Add chat and open immediately -----
+function addChatAndOpen(profileName){
+  // Find the profile object
+  const profile = demoProfiles.find(p => p.name === profileName);
+  if(!profile) return;
 
+  if(!chats[profileName]) chats[profileName] = [];
+  if(!profile.addedToChat){
+    chats[profileName].push(`${profileName}: Hi there! 💖 Let's chat!`);
+    profile.addedToChat = true;
+    localStorage.setItem("chats", JSON.stringify(chats));
+  }
+
+  updateChatList();
+  openChat(profileName);
+  showTab('chats'); // switch to chat tab automatically
+}
 // ----- Filters -----
 function applyFilters(){
   const gender = document.getElementById('filter-gender').value;
