@@ -315,5 +315,16 @@ function applyFilters(){
 // Init
 updateChatList(); showProfileCard();
 </script>
+function openTab(tabId) {
+  var tabs = document.querySelectorAll(".tab-content");
+
+  tabs.forEach(function(tab){
+    tab.style.display = "none";
+  });
+
+  document.getElementById(tabId).style.display = "block";
+}
+</script>
+
 </body>
 </html>
