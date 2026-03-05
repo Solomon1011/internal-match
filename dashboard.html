@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="style.css">
+<title>Dashboard</title>
 </head>
 <body>
 
@@ -13,61 +15,39 @@
   <!-- Profile Tab -->
   <div id="profile-tab" style="display:none;">
     <h3>My Profile</h3>
-    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile" style="width:120px;height:120px;border-radius:50%;"><br>
-    <input type="text" id="edit-username" placeholder="Username"><br>
-    <input type="number" id="edit-age" placeholder="Age"><br>
-    <input type="text" id="edit-location" placeholder="Location"><br>
-    <select id="edit-gender">
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
+    <img id="user-profile-pic" src="https://randomuser.me/api/portraits/lego/1.jpg" style="width:120px;height:120px;border-radius:50%;"><br>
+    <input type="text" placeholder="Username"><br>
+    <input type="number" placeholder="Age"><br>
+    <input type="text" placeholder="Location"><br>
+    <select>
+      <option>Male</option>
+      <option>Female</option>
     </select><br>
-    <input type="text" id="edit-interest" placeholder="Interest"><br>
-    <input type="text" id="edit-pic" placeholder="Profile Picture URL"><br>
-    <button class="save-btn" onclick="saveProfile()">💾 Save Profile</button>
+    <input type="text" placeholder="Interest"><br>
+    <input type="text" placeholder="Profile Picture URL"><br>
+    <button onclick="saveProfile()">💾 Save Profile</button>
   </div>
 
   <!-- People Tab -->
   <div id="people-tab" style="display:none;">
-    <div class="filter-panel">
-      <select id="filter-gender">
-        <option value="">All Genders</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <select id="filter-location">
-        <option value="">All Locations</option>
-      </select>
-      <select id="filter-interest">
-        <option value="">All Interests</option>
-      </select>
-      <button class="save-btn" onclick="applyFilters()">🔍 Apply Filters</button>
-    </div>
     <div id="swipe-container">Loading profiles...</div>
-    <div id="chat-users"></div>
   </div>
 
   <!-- Likes Tab -->
   <div id="liked-tab" style="display:none;">
     <h3>Who Likes Me</h3>
-    <div id="liked-container">No likes yet!</div>
+    <div>No likes yet!</div>
   </div>
 
-  <!-- Chat Tab -->
+  <!-- Chats Tab -->
   <div id="chats-tab" style="display:none;">
-    <div id="chat-header">
-      <img id="chat-profile-pic" src="">
-      <span id="chat-name" style="font-weight:bold;font-size:18px;"></span>
-    </div>
+    <h3>Chats</h3>
     <div id="chat-box"></div>
   </div>
 
 </div>
 
-<!-- Tab Bar -->
-<div class="tab-content">
-   <!-- all your tab sections here -->
-</div>
-
+<!-- Bottom Navigation -->
 <div class="tab-bar">
   <button onclick="showTab('profile')">👤</button>
   <button onclick="showTab('people')">🔥</button>
@@ -75,136 +55,8 @@
   <button onclick="showTab('chats')">💬</button>
 </div>
 
-<script src="script.js"></script>
 <script>
-  // Show tabs
-  function showTab(tab){
-    ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{
-      document.getElementById(t).style.display='none';
-    });
-    document.getElementById(tab+'-tab').style.display='block';
 
-    // Refresh swipe cards when People tab is clicked
-    if(tab==='people'){
-      showProfile();
-    }
-  }
-
-  // Demo profiles
-  const malePics = Array.from({length:100}, (_,i)=>`https://randomuser.me/api/portraits/men/${i}.jpg`);
-  const femalePics = Array.from({length:100}, (_,i)=>`https://randomuser.me/api/portraits/women/${i}.jpg`);
-  const maleNames = ["John","David","Michael","James","Robert","William","Thomas","Henry","Jack","Luke"];
-  const femaleNames = ["Alice","Emma","Olivia","Sophia","Clara","Mia","Grace","Eva","Lily","Amelia"];
-  const locations = ["New York","London","Paris","Tokyo","Berlin","Madrid","Sydney","Lagos","Dubai","Rome"];
-  const interests = ["Friends 💚","Hangout 🩵","Serious Relationship 💖","Marriage 💘"];
-  const romanticMessages = ["Hey you 😘, I was hoping to meet you today!","You have the most amazing smile 💖","Can't stop thinking about you 💘","Would love to go on a date with you 🥰","You're amazing 😍"];
-
-  const demoProfiles = [];
-  for(let i=0;i<50;i++){
-    demoProfiles.push({name: maleNames[Math.floor(Math.random()*maleNames.length)], age:20+Math.floor(Math.random()*15), gender:"Male", location:locations[Math.floor(Math.random()*locations.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic: malePics[i], messages: [], addedToChat:false, ignored:false});
-    demoProfiles.push({name: femaleNames[Math.floor(Math.random()*femaleNames.length)], age:20+Math.floor(Math.random()*15), gender:"Female", location:locations[Math.floor(Math.random()*locations.length)], interest:interests[Math.floor(Math.random()*interests.length)], pic: femalePics[i], messages: [], addedToChat:false, ignored:false});
-  }
-
-  const locationSelect = document.getElementById('filter-location');
-  const interestSelect = document.getElementById('filter-interest');
-  locations.forEach(l=>locationSelect.innerHTML+=`<option value="${l}">${l}</option>`);
-  interests.forEach(i=>interestSelect.innerHTML+=`<option value="${i}">${i}</option>`);
-
-  let currentIndex = 0;
-  let filteredProfiles = demoProfiles.slice();
-  const swipeContainer = document.getElementById('swipe-container');
-  const chatUsersDiv = document.getElementById('chat-users');
-  const chatBox = document.getElementById('chat-box');
-  const chatProfilePic = document.getElementById('chat-profile-pic');
-  const chatName = document.getElementById('chat-name');
-
-  // Show profile card
-  function showProfile(){
-    while(currentIndex < filteredProfiles.length && filteredProfiles[currentIndex].ignored) currentIndex++;
-    if(currentIndex >= filteredProfiles.length){ swipeContainer.innerHTML="No more profiles!"; return; }
-    const p = filteredProfiles[currentIndex];
-    swipeContainer.innerHTML=`
-      <div class="card">
-        <img src="${p.pic}">
-        <h3>${p.name}, ${p.age}</h3>
-        <p>${p.gender} | ${p.location}</p>
-        <p>Interest: ${p.interest}</p>
-        <div class="actions">
-          <button class="action-btn" onclick="swipe('like')">💖 Like</button>
-          <button class="action-btn" onclick="swipe('ignore')">❌ Ignore</button>
-          <button class="action-btn" onclick="messageCurrent()">💬 Message</button>
-        </div>
-      </div>
-    `;
-  }
-
-  // Swipe
-  function swipe(action){
-    const p = filteredProfiles[currentIndex];
-    if(action==="like") { addChat(p); autoReply(p); }
-    if(action==="ignore") { p.ignored = true; }
-    currentIndex++;
-    showProfile();
-  }
-
-  function messageCurrent(){
-    const p = filteredProfiles[currentIndex];
-    if(p) addChat(p);
-  }
-
-  function addChat(profile){
-    if(!profile.addedToChat) {
-      const btn = document.createElement('button');
-      btn.innerHTML=`<span>${profile.name}</span> 💬`;
-      btn.onclick = ()=>openChat(profile);
-      chatUsersDiv.appendChild(btn);
-      profile.addedToChat=true;
-      profile.messages.push({from:profile.name,text:"Hi there! 💖 Let's chat!"});
-    }
-    openChat(profile);
-  }
-
-  function openChat(profile){
-    chatName.innerText = profile.name;
-    chatProfilePic.src = profile.pic;
-    chatBox.innerHTML = "";
-    profile.messages.forEach(msg=>addMessage(msg.from,msg.text));
-  }
-
-  function addMessage(sender,text){
-    const div = document.createElement('div');
-    div.innerText = sender+": "+text;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function autoReply(profile){
-    const randomMsg = romanticMessages[Math.floor(Math.random()*romanticMessages.length)];
-    setTimeout(()=> {
-      profile.messages.push({from:profile.name, text: randomMsg});
-      if(chatName.innerText === profile.name){
-        addMessage(profile.name, randomMsg);
-      }
-    }, 1000 + Math.random()*2000);
-  }
-
-  function saveProfile(){
-    alert("Profile saved!");
-  }
-
-  function applyFilters(){
-    const gender = document.getElementById('filter-gender').value;
-    const location = document.getElementById('filter-location').value;
-    const interest = document.getElementById('filter-interest').value;
-    filteredProfiles = demoProfiles.filter(p=>{
-      return !p.ignored &&
-             (!gender || p.gender===gender) &&
-             (!location || p.location===location) &&
-             (!interest || p.interest===interest);
-    });
-    currentIndex=0;
-    showProfile();
-  }
 function showTab(tab){
   ['profile-tab','people-tab','liked-tab','chats-tab'].forEach(t=>{
     document.getElementById(t).style.display='none';
@@ -212,9 +64,15 @@ function showTab(tab){
 
   document.getElementById(tab+'-tab').style.display='block';
 }
-  // Show profile tab first
-  showTab('profile');
+
+function saveProfile(){
+  alert("Profile saved!");
+}
+
+// Show Profile first
+showTab('profile');
 
 </script>
+
 </body>
 </html>
