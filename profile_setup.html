@@ -1,23 +1,23 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Internal Match - Profile Setup</title>
 
-<link rel="stylesheet" href="style.css">
+<title>Internal Match - Profile</title>
 
 <style>
+
 body{
+margin:0;
 font-family:Arial;
 background:#111;
 color:white;
 display:flex;
 justify-content:center;
 align-items:center;
-min-height:100vh;
-margin:0;
+height:100vh;
 }
 
 .card{
@@ -29,183 +29,141 @@ max-width:400px;
 text-align:center;
 }
 
-input, select{
+h2{
+margin-bottom:20px;
+}
+
+#profilePic{
+width:120px;
+height:120px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+input{
 width:90%;
-padding:10px;
-margin:8px 0;
-border-radius:10px;
+padding:12px;
+margin:8px;
+border-radius:12px;
 border:none;
+font-size:16px;
 }
 
 button{
 background:gold;
 border:none;
-padding:12px 20px;
-border-radius:20px;
+padding:12px 25px;
+border-radius:25px;
+font-size:16px;
 font-weight:bold;
-cursor:pointer;
 margin-top:10px;
+cursor:pointer;
 }
+
 </style>
+
 </head>
 
 <body>
 
 <div class="card">
 
-<h1>💘 Internal Match</h1>
-<h3>Profile Setup</h3>
+<h2>My Profile</h2>
 
-<!-- Profile Picture -->
-<div style="margin-bottom:20px;">
+<img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg">
 
-<img id="profilePicPreview"
-src="https://randomuser.me/api/portraits/lego/1.jpg"
-style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin:auto;display:block;">
+<br>
 
-<input type="file"
-id="profilePicInput"
-accept="image/*"
-capture="environment"
-style="margin-top:10px;">
+<input type="file" id="profileUpload" accept="image/*">
 
-</div>
+<br>
 
-<!-- Profile Form -->
+<input id="name" placeholder="Your Name">
 
-<input type="text" id="username" placeholder="Username">
+<input id="age" type="number" placeholder="Age">
 
-<input type="number" id="age" placeholder="Age" min="18" max="100">
+<input id="country" placeholder="Country">
 
-<select id="location">
-<option value="">Select Country</option>
-</select>
-
-<select id="gender">
-<option value="">Select Gender</option>
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-</select>
-
-<select id="interest">
-<option value="">Select Interest</option>
-<option value="Friends 💚">Friends 💚</option>
-<option value="Hangout 🩵">Hangout 🩵</option>
-<option value="Serious Relationship 💖">Serious Relationship 💖</option>
-<option value="Marriage 💘">Marriage 💘</option>
-</select>
-
-<button onclick="saveProfile()">💾 Save Profile</button>
+<button onclick="saveProfile()">Save Profile</button>
 
 </div>
 
 <script>
 
-const profilePicInput = document.getElementById("profilePicInput");
-const profilePicPreview = document.getElementById("profilePicPreview");
+/* -------- Profile Picture Upload -------- */
 
-const usernameInput = document.getElementById("username");
-const ageInput = document.getElementById("age");
-const locationSelect = document.getElementById("location");
-const genderSelect = document.getElementById("gender");
-const interestSelect = document.getElementById("interest");
+const upload = document.getElementById("profileUpload")
+const profilePic = document.getElementById("profilePic")
 
-let profilePicData = profilePicPreview.src;
+upload.addEventListener("change", function(){
 
-/* Country list */
+const file = this.files[0]
 
-const countries = ["Nigeria","United States","United Kingdom","Canada","Germany","France","Italy","Spain","Brazil","India","China","Japan","Australia","South Africa","Kenya","Ghana","Mexico","Argentina","Turkey","Indonesia","Philippines","Thailand","Vietnam","Pakistan","Saudi Arabia","United Arab Emirates","Egypt","Morocco","Sweden","Norway","Denmark","Netherlands","Belgium","Switzerland","Austria","Poland","Portugal","Ireland","Finland","New Zealand"];
+if(!file) return
 
-/* Populate countries */
-
-countries.forEach(country=>{
-let option=document.createElement("option");
-option.value=country;
-option.textContent=country;
-locationSelect.appendChild(option);
-});
-
-/* Image Upload Preview */
-
-profilePicInput.addEventListener("change",function(event){
-
-const file = event.target.files[0];
-
-if(!file) return;
-
-if(!file.type.startsWith("image/")){
-alert("Please upload an image file.");
-return;
-}
-
-const reader = new FileReader();
+const reader = new FileReader()
 
 reader.onload = function(e){
-profilePicPreview.src = e.target.result;
-profilePicData = e.target.result;
-};
 
-reader.readAsDataURL(file);
+profilePic.src = e.target.result
 
-});
-
-/* Load Saved Profile */
-
-window.addEventListener("load",function(){
-
-const savedProfile = JSON.parse(localStorage.getItem("userProfile"));
-
-if(savedProfile){
-
-usernameInput.value = savedProfile.username;
-ageInput.value = savedProfile.age;
-locationSelect.value = savedProfile.location;
-genderSelect.value = savedProfile.gender;
-interestSelect.value = savedProfile.interest;
-
-if(savedProfile.profilePic){
-profilePicPreview.src = savedProfile.profilePic;
-profilePicData = savedProfile.profilePic;
-}
+localStorage.setItem("profilePic", e.target.result)
 
 }
 
-});
+reader.readAsDataURL(file)
 
-/* Save Profile */
+})
+
+/* -------- Save Profile -------- */
 
 function saveProfile(){
 
-const username = usernameInput.value.trim();
-const age = ageInput.value.trim();
-const location = locationSelect.value;
-const gender = genderSelect.value;
-const interest = interestSelect.value;
+const name = document.getElementById("name").value
+const age = document.getElementById("age").value
+const country = document.getElementById("country").value
 
-if(!username || !age || !location || !gender || !interest){
-alert("Please fill all fields.");
-return;
+if(!name || !age || !country){
+
+alert("Please fill all fields")
+
+return
+
 }
 
-if(age < 18){
-alert("You must be at least 18 years old.");
-return;
+localStorage.setItem("name", name)
+localStorage.setItem("age", age)
+localStorage.setItem("country", country)
+
+alert("Profile Saved Successfully!")
+
 }
 
-const userProfile = {
-username,
-age,
-location,
-gender,
-interest,
-profilePic: profilePicData
-};
+/* -------- Load Profile -------- */
 
-localStorage.setItem("userProfile", JSON.stringify(userProfile));
+window.onload = function(){
 
-alert("✅ Profile saved successfully!");
+const savedName = localStorage.getItem("name")
+const savedAge = localStorage.getItem("age")
+const savedCountry = localStorage.getItem("country")
+const savedPic = localStorage.getItem("profilePic")
 
-window.location.href="dashboard.html";
+if(savedName){
+document.getElementById("name").value = savedName
+}
+
+if(savedAge){
+document.getElementById("age").value = savedAge
+}
+
+if(savedCountry){
+document.getElementById("country").value = savedCountry
+}
+
+if(savedPic){
+document.getElementById("profilePic").src = savedPic
+}
 
 }
 
