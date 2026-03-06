@@ -8,7 +8,6 @@
 body {margin:0;font-family:Arial;background:#111;color:white;display:flex;flex-direction:column;align-items:center;}
 h2{text-align:center;margin:10px 0;}
 .card {background:#1c1c1c;border-radius:20px;padding:20px;width:90%;max-width:400px;text-align:center;margin:15px 0;}
-#profileCard img,#peopleList img,#profile-card img {width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid gold;margin-bottom:10px;}
 button {background:gold;border:none;padding:12px 25px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px;}
 .tab-bar {position:fixed;bottom:0;width:100%;background:black;display:flex;justify-content:space-around;padding:10px 0;border-top:2px solid gold;}
 .tab-bar button {background:none;border:none;color:gold;font-size:22px;}
@@ -16,8 +15,6 @@ button {background:gold;border:none;padding:12px 25px;border-radius:20px;font-we
 .message {padding:8px;margin:5px;border-radius:10px;max-width:70%;}
 .user {background:#25D366;margin-left:auto;}
 .other {background:#333;}
-.people-row {display:flex;justify-content:space-between;align-items:center;background:#1c1c1c;padding:10px;margin:5px 0;border-radius:10px;}
-.people-row span {flex:1;}
 input, select {width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
 </style>
 </head>
@@ -26,32 +23,26 @@ input, select {width:90%;padding:10px;margin:5px;border-radius:10px;border:none;
 <h2>💘 Internal Match</h2>
 
 <!-- Swipe Container -->
-<div id="swipe-container"></div>
-
-<!-- People List -->
-<div class="card" id="people-card" style="display:none;">
-  <h3>People</h3>
-  <div id="people-list"></div>
-</div>
+<div id="swipe-tab" class="tab"></div>
 
 <!-- Liked Users -->
-<div class="card" id="liked-card" style="display:none;">
+<div class="card tab" id="liked-tab" style="display:none;">
   <h3>Liked Users</h3>
   <div id="liked-container"></div>
 </div>
 
 <!-- Chat -->
-<div class="card" id="chat-card" style="display:none;">
+<div class="card tab" id="chat-tab" style="display:none;">
   <h3 id="chatWith">Chat</h3>
   <div id="chat-box"></div>
   <input id="chat-input" placeholder="Type message">
   <button onclick="sendMessage()">Send</button>
 </div>
 
-<!-- Profile Edit -->
-<div class="card" id="profile-card" style="display:none;">
+<!-- Profile -->
+<div class="card tab" id="profile-tab" style="display:none;">
   <h3>My Profile</h3>
-  <img id="dashboardProfilePic" src="https://randomuser.me/api/portraits/lego/1.jpg">
+  <img id="dashboardProfilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" style="width:120px;height:120px;border-radius:50%;border:3px solid gold;margin-bottom:10px;">
   <input type="file" id="photoInput" accept="image/*" capture="user">
   <input type="text" id="nameInput" placeholder="Name">
   <input type="number" id="ageInput" placeholder="Age" min="1" max="120">
@@ -68,22 +59,20 @@ input, select {width:90%;padding:10px;margin:5px;border-radius:10px;border:none;
 <!-- Bottom Navigation -->
 <div class="tab-bar">
   <button onclick="showTab('swipe')">💖 Swipe</button>
-  <button onclick="openPeopleTab()">👥 People</button>
-  <button onclick="showTab('liked')">⭐ Liked</button>
+  <button onclick="showTab('liked')">❤️ Like</button>
+  <button onclick="showTab('chat')">💬 Chat</button>
   <button onclick="showTab('profile')">👤 Profile</button>
 </div>
 
 <script>
 // --- Tabs ---
 function showTab(tab){
-  document.getElementById('swipe-container').style.display = (tab==='swipe')?'block':'none';
-  document.getElementById('people-card').style.display = (tab==='people')?'block':'none';
-  document.getElementById('liked-card').style.display = (tab==='liked')?'block':'none';
-  document.getElementById('chat-card').style.display = (tab==='chat')?'block':'none';
-  document.getElementById('profile-card').style.display = (tab==='profile')?'block':'none';
+  ['swipe','liked','chat','profile'].forEach(t=>{
+    document.getElementById(t+'-tab') ? document.getElementById(t+'-tab').style.display=(t===tab?'block':'none') : null;
+  });
 }
 
-// --- Profile Elements ---
+// --- Profile ---
 const profilePic=document.getElementById("dashboardProfilePic");
 const photoInput=document.getElementById("photoInput");
 const nameInput=document.getElementById("nameInput");
@@ -91,20 +80,15 @@ const ageInput=document.getElementById("ageInput");
 const genderInput=document.getElementById("genderInput");
 const locationInput=document.getElementById("locationInput");
 
-// --- Load Profile ---
 function loadProfile(){
-  profilePic.src=localStorage.getItem("profilePic")||"https://randomuser.me/api/portraits/lego/1.jpg";
+  profilePic.src=localStorage.getItem("profilePic")||profilePic.src;
   nameInput.value=localStorage.getItem("name")||"";
   ageInput.value=localStorage.getItem("age")||"";
   genderInput.value=localStorage.getItem("gender")||"";
   locationInput.value=localStorage.getItem("location")||"";
 }
-
-// --- Save Profile ---
 function saveProfile(){
-  if(!nameInput.value||!ageInput.value||!genderInput.value||!locationInput.value){
-    alert("Fill all fields!"); return;
-  }
+  if(!nameInput.value||!ageInput.value||!genderInput.value||!locationInput.value){alert("Fill all fields!"); return;}
   localStorage.setItem("profilePic",profilePic.src);
   localStorage.setItem("name",nameInput.value);
   localStorage.setItem("age",ageInput.value);
@@ -113,7 +97,7 @@ function saveProfile(){
   alert("Profile saved!");
 }
 
-// --- Photo Upload ---
+// --- Profile Picture Upload ---
 photoInput.addEventListener("change",function(){
   const file=this.files[0];
   if(!file) return;
@@ -123,26 +107,18 @@ photoInput.addEventListener("change",function(){
   reader.readAsDataURL(file);
 });
 
-// --- Swipeable Profiles ---
+// --- Swipe Profiles ---
 let profiles=[];
 for(let i=1;i<=10;i++){
-  profiles.push({
-    name:'User'+i,
-    age:20+i,
-    gender:i%2===0?'Male':'Female',
-    location:'City'+i,
-    pic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,
-    liked:false,
-    messages:[]
-  });
+  profiles.push({name:'User'+i,age:20+i,gender:i%2===0?'Male':'Female',location:'City'+i,pic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,liked:false,messages:[]});
 }
 let currentIndex=0;
-function showProfile(){
-  const container=document.getElementById('swipe-container');
+function showSwipe(){
+  const container=document.getElementById('swipe-tab');
   if(currentIndex>=profiles.length){ container.innerHTML="No more profiles!"; return; }
   const p=profiles[currentIndex];
   container.innerHTML=`
-    <div class="card" id="profileCard">
+    <div class="card">
       <img src="${p.pic}">
       <h3>${p.name}, ${p.age}</h3>
       <p>${p.gender} | ${p.location}</p>
@@ -154,14 +130,8 @@ function showProfile(){
     </div>
   `;
 }
-
-// --- Actions ---
-function likeProfile(){
-  profiles[currentIndex].liked=true;
-  addLike(profiles[currentIndex]);
-  nextProfile();
-}
-function nextProfile(){ currentIndex++; showProfile(); }
+function likeProfile(){ profiles[currentIndex].liked=true; addLike(profiles[currentIndex]); nextProfile(); }
+function nextProfile(){ currentIndex++; showSwipe(); }
 
 // --- Liked Users ---
 function addLike(profile){
@@ -177,7 +147,8 @@ function openChat(user){
   currentChat=user;
   showTab('chat');
   document.getElementById('chatWith').innerText="Chat with "+user;
-  updateChatBox();
+  const box=document.getElementById("chat-box");
+  box.innerHTML=`<div class="message other">Chat with ${user} started!</div>`;
 }
 function sendMessage(){
   if(!currentChat) return;
@@ -191,43 +162,12 @@ function sendMessage(){
   input.value="";
   box.scrollTop=box.scrollHeight;
 }
-function updateChatBox(){
-  const box=document.getElementById("chat-box");
-  box.innerHTML="";
-  if(currentChat){
-    const msg=document.createElement("div");
-    msg.className="message other";
-    msg.innerText="Chat with "+currentChat+" started!";
-    box.appendChild(msg);
-  }
-}
-
-// --- People List with Chat Icon ---
-const peopleProfiles=[
-  {name:"Alice",age:25,gender:"Female",location:"Paris"},
-  {name:"Bob",age:28,gender:"Male",location:"New York"},
-  {name:"Carol",age:22,gender:"Female",location:"Tokyo"}
-];
-function showPeopleList(){
-  const container=document.getElementById("people-list");
-  container.innerHTML="";
-  peopleProfiles.forEach(p=>{
-    const div=document.createElement("div");
-    div.className="people-row";
-    const info=document.createElement("span");
-    info.textContent=`${p.name}, ${p.age} | ${p.gender} | ${p.location}`;
-    const msgBtn=document.createElement("button");
-    msgBtn.innerHTML="💬"; msgBtn.onclick=()=>openChat(p.name);
-    div.appendChild(info); div.appendChild(msgBtn); container.appendChild(div);
-  });
-}
-function openPeopleTab(){ showTab('people'); showPeopleList(); }
 
 // --- Initialize ---
-window.onload = ()=>{
+window.onload=()=>{
   loadProfile();
-  showTab('profile'); // Show profile on page load
-  showProfile();      // Initialize first swipe card
+  showTab('swipe');
+  showSwipe();
 };
 </script>
 </body>
