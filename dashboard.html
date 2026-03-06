@@ -1,204 +1,193 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Internal Match Dashboard</title>
-
+<title>Internal Match - Dashboard</title>
+<link rel="stylesheet" href="style.css">
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#111;
-color:white;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: white;
 }
-
-h2{
-text-align:center;
-margin-top:10px;
+h2 {
+  text-align: center;
+  margin: 10px 0;
 }
-
-.tab-content{
-padding-bottom:80px;
+.tab-content {
+  padding-bottom: 80px;
 }
-
-.tab{
-display:none;
-padding:15px;
-text-align:center;
+.tab {
+  display: none;
+  padding: 15px;
+  text-align: center;
 }
-
-.card{
-background:#1c1c1c;
-padding:20px;
-border-radius:20px;
-margin:10px;
+.card {
+  background: #1c1c1c;
+  padding: 20px;
+  border-radius: 20px;
+  margin: 10px 0;
 }
-
-input{
-width:90%;
-padding:10px;
-margin:5px;
-border-radius:10px;
-border:none;
+input, select, button {
+  width: 90%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
 }
-
-button{
-background:gold;
-border:none;
-padding:10px 20px;
-border-radius:20px;
-margin-top:10px;
-font-weight:bold;
+button {
+  background: gold;
+  font-weight: bold;
 }
-
-/* bottom navigation */
-.tab-bar{
-position:fixed;
-bottom:0;
-width:100%;
-background:black;
-display:flex;
-justify-content:space-around;
-padding:10px 0;
-border-top:2px solid gold;
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: black;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 2px solid gold;
 }
-
-.tab-bar button{
-background:none;
-border:none;
-color:gold;
-font-size:22px;
+.tab-bar button {
+  background: none;
+  border: none;
+  color: gold;
+  font-size: 22px;
 }
-
-/* chat */
-#chat-box{
-height:300px;
-overflow-y:auto;
-background:#000;
-padding:10px;
-margin-bottom:10px;
-border-radius:10px;
+#chat-box {
+  height: 300px;
+  overflow-y: auto;
+  background: #000;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
 }
-
-.message{
-padding:8px;
-margin:5px;
-border-radius:10px;
-max-width:70%;
+.message {
+  padding: 8px;
+  margin: 5px;
+  border-radius: 10px;
+  max-width: 70%;
 }
-
-.user{
-background:#25D366;
-margin-left:auto;
+.user {
+  background: #25D366;
+  margin-left: auto;
 }
-
-.other{
-background:#333;
+.other {
+  background: #333;
 }
 </style>
 </head>
-
 <body>
 
 <h2>💘 Internal Match</h2>
 
 <div class="tab-content">
 
-<!-- PROFILE -->
-<div id="profile" class="tab">
-<div class="card">
-<h3>My Profile</h3>
+  <!-- PROFILE -->
+  <div id="profile" class="tab">
+    <div class="card">
+      <h3>My Profile</h3>
+      <img id="dashboardProfilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" width="120" style="border-radius:50%; margin-bottom:10px;">
+      <p id="dashboardName">Name: -</p>
+      <p id="dashboardAge">Age: -</p>
+      <p id="dashboardGender">Gender: -</p>
+      <p id="dashboardLocation">Location: -</p>
+    </div>
+  </div>
 
-<img src="https://randomuser.me/api/portraits/men/1.jpg" width="100" style="border-radius:50%"><br><br>
+  <!-- PEOPLE -->
+  <div id="people" class="tab">
+    <div class="card">
+      <h3>People</h3>
+      <p>User 1</p><button onclick="openChat('User 1')">Chat</button>
+      <p>User 2</p><button onclick="openChat('User 2')">Chat</button>
+    </div>
+  </div>
 
-<input placeholder="Your Name">
-<input placeholder="Age">
-<input placeholder="Country">
+  <!-- LIKED -->
+  <div id="liked" class="tab">
+    <div class="card">
+      <h3>Liked</h3>
+      <div id="liked-container">No liked users yet</div>
+    </div>
+  </div>
 
-<button>Save Profile</button>
-
-</div>
-</div>
-
-<!-- PEOPLE -->
-<div id="people" class="tab">
-<div class="card">
-<h3>People</h3>
-
-<p>User 1</p>
-<button onclick="openChat()">Chat</button>
-
-<p>User 2</p>
-<button onclick="openChat()">Chat</button>
-
-</div>
-</div>
-
-<!-- LIKED -->
-<div id="liked" class="tab">
-<div class="card">
-<h3>Liked</h3>
-<p>No liked users yet</p>
-</div>
-</div>
-
-<!-- CHAT -->
-<div id="chat" class="tab">
-
-<div id="chat-box"></div>
-
-<input id="chat-input" placeholder="Type message">
-<button onclick="sendMessage()">Send</button>
-
-</div>
+  <!-- CHAT -->
+  <div id="chat" class="tab">
+    <div id="chat-box"></div>
+    <input id="chat-input" placeholder="Type message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
 </div>
 
 <!-- bottom navigation -->
 <div class="tab-bar">
-
-<button onclick="showTab('profile')">👤</button>
-<button onclick="showTab('people')">❤️</button>
-<button onclick="showTab('liked')">⭐</button>
-<button onclick="showTab('chat')">💬</button>
-
+  <button onclick="showTab('profile')">👤</button>
+  <button onclick="showTab('people')">❤️</button>
+  <button onclick="showTab('liked')">⭐</button>
+  <button onclick="showTab('chat')">💬</button>
 </div>
 
 <script>
+// --- Tab Switching ---
+function showTab(tab) {
+  document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
+  document.getElementById(tab).style.display = "block";
+}
+showTab('profile');
 
-function showTab(tab){
+// --- Load profile from localStorage ---
+function loadProfile() {
+  const profilePic = localStorage.getItem("profilePic") || "https://randomuser.me/api/portraits/lego/1.jpg";
+  const name = localStorage.getItem("name") || "-";
+  const age = localStorage.getItem("age") || "-";
+  const gender = localStorage.getItem("gender") || "-";
+  const location = localStorage.getItem("location") || "-";
 
-document.querySelectorAll(".tab").forEach(function(el){
-el.style.display="none"
-})
-
-document.getElementById(tab).style.display="block"
-
+  document.getElementById("dashboardProfilePic").src = profilePic;
+  document.getElementById("dashboardName").textContent = "Name: " + name;
+  document.getElementById("dashboardAge").textContent = "Age: " + age;
+  document.getElementById("dashboardGender").textContent = "Gender: " + gender;
+  document.getElementById("dashboardLocation").textContent = "Location: " + location;
 }
 
-showTab("profile")
-
-function sendMessage(){
-
-let input=document.getElementById("chat-input")
-let box=document.getElementById("chat-box")
-
-if(input.value.trim()=="") return
-
-let msg=document.createElement("div")
-msg.className="message user"
-msg.innerText=input.value
-
-box.appendChild(msg)
-
-input.value=""
-
-box.scrollTop=box.scrollHeight
-
+// --- Chat ---
+let currentChat = null;
+function openChat(user) {
+  currentChat = user;
+  showTab('chat');
+  updateChatBox();
+}
+function sendMessage() {
+  if(!currentChat) return;
+  const input = document.getElementById("chat-input");
+  if(input.value.trim() === "") return;
+  const box = document.getElementById("chat-box");
+  const msg = document.createElement("div");
+  msg.className = "message user";
+  msg.innerText = input.value;
+  box.appendChild(msg);
+  input.value = "";
+  box.scrollTop = box.scrollHeight;
+}
+function updateChatBox() {
+  const box = document.getElementById("chat-box");
+  box.innerHTML = "";
+  if(currentChat) {
+    const msg = document.createElement("div");
+    msg.className = "message other";
+    msg.innerText = "Chat with " + currentChat + " started!";
+    box.appendChild(msg);
+  }
 }
 
+// --- Load profile on page load ---
+window.onload = loadProfile;
 </script>
 
 </body>
