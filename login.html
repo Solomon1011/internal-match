@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>💘 Internal Match - Login</title>
   <style>
-    /* Your existing CSS styles */
+    /* Your existing CSS styling */
   </style>
 </head>
 <body>
@@ -23,19 +23,35 @@
     <div id="errorMsg"></div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <!-- Firebase v9 SDK (Modular) -->
+  <script type="module">
+    // Import the necessary Firebase SDK modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  <script>
-    // Check if the user is already logged in
-    firebase.auth().onAuthStateChanged(user => {
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg", 
+      authDomain: "internal-match.firebaseapp.com", 
+      projectId: "internal-match",
+      storageBucket: "internal-match.appspot.com", 
+      messagingSenderId: "129707008837", 
+      appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Check if the user is already logged in (redirect if logged in)
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Redirect to dashboard if the user is logged in
+        // If the user is logged in, redirect them to the dashboard
         window.location = "dashboard.html";
       }
     });
 
-    // Login function to handle login attempt
+    // Login function
     function login() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
@@ -45,16 +61,16 @@
         return;
       }
 
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          // Successful login: redirect to dashboard
-          window.location = "dashboard.html";
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          window.location = "dashboard.html";  // Redirect to dashboard after successful login
         })
-        .catch(error => {
-          console.error("Login Error: ", error.message);
+        .catch((error) => {
+          console.error("Login failed: ", error.message);
           alert("Login failed. Please try again.");
         });
     }
   </script>
+
 </body>
 </html>
