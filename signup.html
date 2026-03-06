@@ -1,25 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Signup</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sign Up - Internal Match</title>
+<style>
+body {margin:0;font-family:Arial;background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;}
+.card {background:#1c1c1c;padding:30px;border-radius:20px;width:90%;max-width:400px;text-align:center;}
+input {width:90%;padding:12px;margin:10px 0;border-radius:10px;border:none;font-size:16px;}
+button {background:gold;border:none;padding:12px 25px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px;font-size:16px;}
+a {color:gold;cursor:pointer;text-decoration:underline;}
+</style>
 </head>
-
 <body>
 
 <div class="card">
-
-<h2>Create Account</h2>
-
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="signup()">Signup</button>
-
+  <h2>💘 Internal Match</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="signup()">Create Account</button>
+  <p>Already have an account? <a href="login.html">Login</a></p>
 </div>
 
-<script src="app.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// --- Firebase Config ---
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "internal-match.firebaseapp.com",
+  projectId: "internal-match",
+  storageBucket: "internal-match.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+// --- Sign Up ---
+function signup(){
+  const username=document.getElementById("username").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value.trim();
+  if(!username||!email||!password){alert("Fill all fields"); return;}
+  auth.createUserWithEmailAndPassword(email,password)
+  .then(res=>{
+    const uid=res.user.uid;
+    db.ref('users/'+uid).set({username,email});
+    alert("Account created!");
+    window.location="dashboard.html";
+  })
+  .catch(err=>alert(err.message));
+}
+</script>
 
 </body>
 </html>
