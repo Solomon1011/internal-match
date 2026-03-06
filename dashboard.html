@@ -8,7 +8,7 @@
 body {margin:0;font-family:Arial;background:#111;color:white;display:flex;flex-direction:column;align-items:center;}
 h2{text-align:center;margin:10px 0;}
 .card {background:#1c1c1c;border-radius:20px;padding:20px;width:90%;max-width:400px;text-align:center;margin:15px 0;}
-#profileCard img,#peopleList img {width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid gold;margin-bottom:10px;}
+#profileCard img,#peopleList img,#profile-card img {width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid gold;margin-bottom:10px;}
 button {background:gold;border:none;padding:12px 25px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px;}
 .tab-bar {position:fixed;bottom:0;width:100%;background:black;display:flex;justify-content:space-around;padding:10px 0;border-top:2px solid gold;}
 .tab-bar button {background:none;border:none;color:gold;font-size:22px;}
@@ -99,7 +99,10 @@ function loadProfile(){
   genderInput.value=localStorage.getItem("gender")||"";
   locationInput.value=localStorage.getItem("location")||"";
 }
-window.onload=loadProfile;
+window.onload=()=>{
+  loadProfile();
+  showProfile();
+}
 
 // --- Save Profile ---
 function saveProfile(){
@@ -127,7 +130,15 @@ photoInput.addEventListener("change",function(){
 // --- Swipeable Profiles ---
 let profiles=[];
 for(let i=1;i<=10;i++){
-  profiles.push({name:'User'+i,age:20+i,gender:i%2===0?'Male':'Female',location:'City'+i,pic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,liked:false,messages:[]});
+  profiles.push({
+    name:'User'+i,
+    age:20+i,
+    gender:i%2===0?'Male':'Female',
+    location:'City'+i,
+    pic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,
+    liked:false,
+    messages:[]
+  });
 }
 let currentIndex=0;
 function showProfile(){
@@ -139,13 +150,21 @@ function showProfile(){
       <img src="${p.pic}">
       <h3>${p.name}, ${p.age}</h3>
       <p>${p.gender} | ${p.location}</p>
-      <button onclick="likeProfile()">💖 Like</button>
-      <button onclick="nextProfile()">❌ Skip</button>
+      <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+        <button onclick="likeProfile()">💖 Like</button>
+        <button onclick="openChat('${p.name}')">💬 Message</button>
+        <button onclick="nextProfile()">❌ Ignore</button>
+      </div>
     </div>
   `;
 }
-showProfile();
-function likeProfile(){ profiles[currentIndex].liked=true; addLike(profiles[currentIndex]); nextProfile(); }
+
+// --- Actions ---
+function likeProfile(){
+  profiles[currentIndex].liked=true;
+  addLike(profiles[currentIndex]);
+  nextProfile();
+}
 function nextProfile(){ currentIndex++; showProfile(); }
 
 // --- Liked Users ---
@@ -158,21 +177,31 @@ function addLike(profile){
 
 // --- Chat ---
 let currentChat=null;
-function openChat(user){ currentChat=user; showTab('chat'); document.getElementById('chatWith').innerText='Chat with '+user; updateChatBox(); }
+function openChat(user){
+  currentChat=user;
+  showTab('chat');
+  document.getElementById('chatWith').innerText="Chat with "+user;
+  updateChatBox();
+}
 function sendMessage(){
   if(!currentChat) return;
   const input=document.getElementById("chat-input");
   if(!input.value) return;
   const box=document.getElementById("chat-box");
   const msg=document.createElement("div");
-  msg.className="message user"; msg.innerText=input.value;
-  box.appendChild(msg); input.value=""; box.scrollTop=box.scrollHeight;
+  msg.className="message user";
+  msg.innerText=input.value;
+  box.appendChild(msg);
+  input.value="";
+  box.scrollTop=box.scrollHeight;
 }
 function updateChatBox(){
-  const box=document.getElementById("chat-box"); box.innerHTML="";
+  const box=document.getElementById("chat-box");
+  box.innerHTML="";
   if(currentChat){
     const msg=document.createElement("div");
-    msg.className="message other"; msg.innerText="Chat with "+currentChat+" started!";
+    msg.className="message other";
+    msg.innerText="Chat with "+currentChat+" started!";
     box.appendChild(msg);
   }
 }
@@ -197,6 +226,7 @@ function showPeopleList(){
   });
 }
 function openPeopleTab(){ showTab('people'); showPeopleList(); }
+
 </script>
 </body>
 </html>
