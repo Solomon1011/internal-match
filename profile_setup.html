@@ -1,61 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile Setup</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Setup</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Profile Setup</h2>
-  <form id="profileForm">
-    <input type="text" id="displayName" placeholder="Display Name" required><br>
-    <input type="text" id="bio" placeholder="Short Bio"><br>
-    <button type="submit">Save Profile</button>
-  </form>
-  <button id="logoutBtn">Logout</button>
+<h2>Profile Setup</h2>
+<form id="profileForm">
+  <input type="text" id="displayName" placeholder="Display Name" required><br>
+  <input type="text" id="bio" placeholder="Bio"><br>
+  <button type="submit">Save Profile</button>
+</form>
+<button id="logoutBtn">Logout</button>
 
-  <script type="module">
-    import { getCurrentUser, checkAuth, logout } from "./app.js";
-
-    (async () => {
-      const user = await checkAuth();
-      if (!user) {
-        alert("You must be logged in to set up your profile.");
-        window.location.href = "login.html";
-        return;
-      }
-
-      // Pre-fill existing user data if available
-      document.getElementById("displayName").value = user.name || "";
-      document.getElementById("bio").value = user.bio || "";
-
-      const form = document.getElementById("profileForm");
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const displayName = document.getElementById("displayName").value.trim();
-        const bio = document.getElementById("bio").value.trim();
-
-        // Update user in localStorage
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        const currentUser = getCurrentUser();
-
-        const index = users.findIndex(u => u.email === currentUser.email);
-        if (index !== -1) {
-          users[index].name = displayName;
-          users[index].bio = bio;
-          localStorage.setItem("users", JSON.stringify(users));
-          localStorage.setItem("currentUser", JSON.stringify(users[index]));
-          alert("Profile updated! Redirecting to dashboard...");
-          window.location.href = "dashboard.html";
-        }
-      });
-
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        logout();
-        window.location.href = "login.html";
-      });
-    })();
-  </script>
+<script type="module">
+import { checkAuth, logout, updateUserProfile } from "./app.js";
+checkAuth(user => {
+  if (!user) window.location.href = "login.html";
+  else document.getElementById("displayName").value = user.displayName || "";
+});
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await updateUserProfile({ displayName: document.getElementById("displayName").value });
+  alert("Profile updated!");
+});
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await logout();
+  window.location.href = "login.html";
+});
+</script>
 </body>
 </html>
