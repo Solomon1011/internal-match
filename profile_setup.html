@@ -1,156 +1,19 @@
+<!-- Profile_setup.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Internal Match - Profile</title>
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-.container {
-  background: #1c1c1c;
-  padding: 25px;
-  border-radius: 25px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-}
-#profilePic {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid gold;
-  margin-bottom: 15px;
-}
-input, select, button {
-  width: 90%;
-  padding: 12px;
-  margin: 6px 0;
-  border-radius: 12px;
-  border: none;
-  font-size: 16px;
-}
-button {
-  background: gold;
-  font-weight: bold;
-  cursor: pointer;
-}
-.profile-info {
-  font-size: 18px;
-  margin: 10px 0;
-  color: #ccc;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Setup</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
+  <h2>Set up your profile</h2>
 
-  <!-- Profile Picture -->
-  <img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Picture">
-  <input type="file" id="photoInput" accept="image/*" capture="user">
-
-  <!-- Profile Form -->
-  <input id="nameInput" type="text" placeholder="Your Name">
-  <input id="ageInput" type="number" placeholder="Age" min="1" max="120">
-  <select id="genderInput">
-    <option value="">Select Gender</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-    <option value="Other">Other</option>
-  </select>
-  <input id="locationInput" type="text" placeholder="Location">
-
-  <button onclick="saveProfile()">Save Profile</button>
-
-  <!-- Display Info -->
-  <div class="profile-info" id="displayName">Name: -</div>
-  <div class="profile-info" id="displayAge">Age: -</div>
-  <div class="profile-info" id="displayGender">Gender: -</div>
-  <div class="profile-info" id="displayLocation">Location: -</div>
-
-</div>
-
-<script>
-const profilePic = document.getElementById("profilePic");
-const photoInput = document.getElementById("photoInput");
-const nameInput = document.getElementById("nameInput");
-const ageInput = document.getElementById("ageInput");
-const genderInput = document.getElementById("genderInput");
-const locationInput = document.getElementById("locationInput");
-
-const displayName = document.getElementById("displayName");
-const displayAge = document.getElementById("displayAge");
-const displayGender = document.getElementById("displayGender");
-const displayLocation = document.getElementById("displayLocation");
-
-// Load saved profile
-window.onload = () => {
-  if(localStorage.getItem("profilePic")) profilePic.src = localStorage.getItem("profilePic");
-  if(localStorage.getItem("name")) nameInput.value = localStorage.getItem("name");
-  if(localStorage.getItem("age")) ageInput.value = localStorage.getItem("age");
-  if(localStorage.getItem("gender")) genderInput.value = localStorage.getItem("gender");
-  if(localStorage.getItem("location")) locationInput.value = localStorage.getItem("location");
-
-  updateDisplay(
-    localStorage.getItem("name"),
-    localStorage.getItem("age"),
-    localStorage.getItem("gender"),
-    localStorage.getItem("location")
-  );
-};
-
-// Android-friendly image upload using URL.createObjectURL
-photoInput.addEventListener("change", function() {
-  const file = this.files[0];
-  if (!file) return;
-
-  // Create temporary URL for preview
-  const imageURL = URL.createObjectURL(file);
-  profilePic.src = imageURL;
-
-  // Save as Data URL for persistence
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    localStorage.setItem("profilePic", e.target.result);
-  };
-  reader.readAsDataURL(file);
-});
-
-function saveProfile() {
-  const name = nameInput.value.trim();
-  const age = ageInput.value.trim();
-  const gender = genderInput.value;
-  const location = locationInput.value.trim();
-
-  if (!name || !age || !gender || !location) {
-    alert("Please fill all fields.");
-    return;
-  }
-
-  localStorage.setItem("name", name);
-  localStorage.setItem("age", age);
-  localStorage.setItem("gender", gender);
-  localStorage.setItem("location", location);
-
-  updateDisplay(name, age, gender, location);
-  alert("Profile saved successfully!");
-}
-
-function updateDisplay(name, age, gender, location) {
-  displayName.textContent = "Name: " + (name || "-");
-  displayAge.textContent = "Age: " + (age || "-");
-  displayGender.textContent = "Gender: " + (gender || "-");
-  displayLocation.textContent = "Location: " + (location || "-");
-}
-</script>
+  <script type="module">
+    // Example of Profile setup code
+    // You can add Firebase user profile update logic here
+  </script>
 </body>
 </html>
