@@ -1,57 +1,60 @@
 /* style.css */
-
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    margin: 0;
+    padding-bottom: 60px; /* space for bottom tabs */
+    background-color: #fff0f6;
     text-align: center;
-    padding: 20px;
 }
 
-h2 {
-    color: #333;
+h1, h2 {
+    color: #ff4d6d;
 }
 
-form {
-    background-color: #fff;
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 10px;
-    max-width: 350px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-input {
-    width: 90%;
+form input, form button {
+    width: 80%;
     padding: 10px;
     margin: 10px 0;
-    border-radius: 5px;
+    border-radius: 8px;
     border: 1px solid #ccc;
 }
 
 button {
-    padding: 10px 20px;
+    background-color: #ff4d6d;
+    color: #fff;
     border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #ff2a5c;
 }
 
-a {
-    color: #4CAF50;
+/* Bottom Tab Bar */
+.bottom-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #ccc;
+}
+
+.bottom-tabs a {
     text-decoration: none;
+    color: #333;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
-p {
-    margin-top: 15px;
-    color: #555;
+.bottom-tabs img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 2px;
 }
