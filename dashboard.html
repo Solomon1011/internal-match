@@ -7,12 +7,9 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <h2 id="welcome">Loading...</h2>
-
 <button id="logoutBtn">Logout</button>
 
-<!-- Bottom Tab Bar -->
 <div class="bottom-tabs">
   <a href="#"><img src="assets/swipe.svg" alt="Swipe"><span>Swipe</span></a>
   <a href="#"><img src="assets/like.svg" alt="Like"><span>Like</span></a>
@@ -24,23 +21,15 @@
 <script type="module">
 import { checkAuth, logout } from "./app.js";
 
-// Protect page and show user name
 checkAuth(user => {
-  if (!user) {
-    // Not logged in, redirect to login
-    window.location.href = "login.html";
-  } else {
-    // Display welcome message
-    document.getElementById("welcome").textContent = `Welcome, ${user.displayName || "User"}!`;
-  }
+  if (!user) window.location.href = "login.html";
+  else document.getElementById("welcome").textContent = `Welcome, ${user.displayName || "User"}!`;
 });
 
-// Logout button
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await logout();
   window.location.href = "login.html";
 });
 </script>
-
 </body>
 </html>
