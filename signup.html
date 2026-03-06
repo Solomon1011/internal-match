@@ -1,64 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>💘 Internal Match - Sign Up</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
-    .card { background: #1c1c1c; padding: 20px; border-radius: 10px; margin: 20px; max-width: 400px; }
-    input, button { padding: 10px; margin: 10px; width: 90%; border-radius: 5px; }
-    button { background-color: gold; }
-  </style>
-</head>
-<body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  <div class="card">
-    <h2>💘 Internal Match - Sign Up</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="signup()">Create Account</button>
-    <p>Already have an account? <a href="login.html">Login</a></p>
-    <div id="errorMsg"></div>
-  </div>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  function signup() {
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    function signup() {
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (!username || !email || !password) {
-        alert("Please fill out all fields.");
-        return;
-      }
-
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          window.location = "dashboard.html";  // Redirect to dashboard after successful sign-up
-        })
-        .catch((error) => {
-          console.error("Signup failed:", error.message);
-          alert("Signup failed. Please try again.");
-        });
+    if (!username || !email || !password) {
+      alert("Please fill out all fields.");
+      return;
     }
-  </script>
 
-</body>
-</html>
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Redirect to dashboard after successful sign-up
+        window.location = "dashboard.html";
+      })
+      .catch((error) => {
+        console.error("Signup failed:", error.message);
+        alert("Signup failed. Please try again.");
+      });
+  }
+</script>
