@@ -1,42 +1,39 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+<!-- login.html -->
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-    authDomain: "internal-match.firebaseapp.com",
-    projectId: "internal-match",
-    storageBucket: "internal-match.firebasestorage.app",
-    messagingSenderId: "129707008837",
-    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-  };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  <div class="card">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+  </div>
 
-  // Redirect to dashboard if already logged in
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      window.location = "dashboard.html";  // Redirect to dashboard if logged in
-    }
-  });
+  <script type="module">
+    import { login } from "./app.js";
 
-  document.getElementById('loginBtn').addEventListener('click', function() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-    if (!email || !password) {
-      alert("Please enter both email and password.");
-      return;
-    }
+      login(email, password)
+        .then(() => {
+          window.location = "dashboard.html";
+        })
+        .catch((error) => {
+          alert("Login failed: " + error.message);
+        });
+    });
+  </script>
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        window.location = "dashboard.html";  // Redirect to dashboard after successful login
-      })
-      .catch((error) => {
-        console.error("Login failed:", error.code, error.message);  // Log error code and message
-        alert("Login failed. Error code: " + error.code + " - " + error.message);  // Show detailed error
-      });
-  });
-</script>
+</body>
+</html>
