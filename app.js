@@ -23,7 +23,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Signup
+// Signup function
 export async function signup(email, password, displayName) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -37,7 +37,7 @@ export async function signup(email, password, displayName) {
   }
 }
 
-// Login
+// Login function
 export async function login(email, password) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -50,7 +50,7 @@ export async function login(email, password) {
   }
 }
 
-// Logout
+// Logout function
 export async function logout() {
   try {
     await signOut(auth);
@@ -60,18 +60,10 @@ export async function logout() {
   }
 }
 
-// Check auth
+// Check authentication state
 export function checkAuth(callback) {
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, user => {
     console.log("Auth state:", user);
     callback(user);
   });
-}
-
-// Update profile
-export async function updateUserProfile({ displayName }) {
-  if (auth.currentUser) {
-    await updateProfile(auth.currentUser, { displayName });
-    console.log("Profile updated:", displayName);
-  }
 }
