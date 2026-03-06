@@ -32,24 +32,18 @@ img{border-radius:50%;width:100px;height:100px;}
 <div id="profile" class="tab">
 <div class="card">
 <h3>My Profile</h3>
-
 <img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg"><br>
-
 <input type="file" id="profilePicInput" accept="image/*">
-
 <input id="username" placeholder="Username">
 <input id="age" type="number" placeholder="Age">
-
 <select id="gender">
   <option value="">Select Gender</option>
   <option value="Male">Male</option>
   <option value="Female">Female</option>
 </select>
-
 <select id="location">
   <option value="">Select Country</option>
 </select>
-
 <select id="interest">
   <option value="">Select Interest</option>
   <option value="Friends 💚">Friends 💚</option>
@@ -57,7 +51,6 @@ img{border-radius:50%;width:100px;height:100px;}
   <option value="Serious Relationship 💖">Serious Relationship 💖</option>
   <option value="Marriage 💘">Marriage 💘</option>
 </select>
-
 <button onclick="saveProfile()">Save Profile</button>
 <div id="errorProfile"></div>
 </div>
@@ -158,18 +151,10 @@ function showTab(tab){
   document.getElementById(tab).style.display='block';
 }
 
-// --- Load Profile ---
+// --- Current User ---
 let currentUser = null;
-auth.onAuthStateChanged(user=>{
-  if(user){
-    currentUser = user;
-    loadProfile();
-    showTab('people'); // default tab on login
-  } else {
-    window.location='login.html';
-  }
-});
 
+// --- Load Profile ---
 function loadProfile(){
   if(!currentUser) return;
   db.ref('users/' + currentUser.uid).once('value').then(snapshot=>{
@@ -210,23 +195,35 @@ function saveProfile(){
   }).then(()=>errorProfile.innerText="Profile saved!");
 }
 
-// --- Simple swipe/chat demo ---
+// --- People Profiles ---
 let demoProfiles = [];
-for(let i=1;i<=5;i++){
-  demoProfiles.push({name:'User'+i,age:20+i,gender:i%2?'Male':'Female',location:'City'+i,interest:'Friendship',pic:`https://randomuser.me/api/portraits/${i%2?'men':'women'}/${i}.jpg`,liked:false,messages:[]});
+let currentIndex = 0;
+
+function loadPeopleProfiles(){
+  if(!currentUser) return;
+  db.ref('users').once('value').then(snapshot => {
+    const usersObj = snapshot.val() || {};
+    demoProfiles = [];
+    Object.keys(usersObj).forEach(uid => {
+      if(uid !== currentUser.uid){
+        demoProfiles.push({uid, ...usersObj[uid], liked:false});
+      }
+    });
+    currentIndex = 0;
+    showProfile();
+  });
 }
 
-let currentIndex=0;
 function showProfile(){
-  if(currentIndex>=demoProfiles.length){
-    document.getElementById('swipe-container').innerHTML="No more profiles!";
+  if(currentIndex >= demoProfiles.length){
+    document.getElementById('swipe-container').innerHTML = "No more users!";
     return;
   }
   const p = demoProfiles[currentIndex];
-  document.getElementById('swipe-container').innerHTML=`
+  document.getElementById('swipe-container').innerHTML = `
     <div class="card">
-      <img src="${p.pic}">
-      <h3>${p.name}, ${p.age}</h3>
+      <img src="${p.profilePic || 'https://randomuser.me/api/portraits/lego/1.jpg'}">
+      <h3>${p.username}, ${p.age}</h3>
       <p>${p.gender} | ${p.location}</p>
       <p>Interest: ${p.interest}</p>
       <button onclick="likeProfile()">💖 Like</button>
@@ -238,15 +235,67 @@ function showProfile(){
 
 function likeProfile(){demoProfiles[currentIndex].liked=true;addLike(demoProfiles[currentIndex]);nextProfile();}
 function nextProfile(){currentIndex++;showProfile();}
-function addLike(profile){const container=document.getElementById('liked-container');const div=document.createElement('div');div.innerText=profile.name+" 💖";container.appendChild(div);}
+function addLike(profile){const container=document.getElementById('liked-container');const div=document.createElement('div');div.innerText=profile.username+" 💖";container.appendChild(div);}
 
-// --- Chat ---
-let currentChat = null;
-function startChat(index){currentChat=demoProfiles[index];showTab('chat');updateChatBox();}
-function sendMessage(){if(!currentChat)return;const input=document.getElementById('chat-input');if(!input.value)return;currentChat.messages.push({from:'You',text:input.value});input.value='';updateChatBox();}
-function updateChatBox(){const box=document.getElementById('chat-box');box.innerHTML='';if(!currentChat)return;currentChat.messages.forEach(msg=>{box.innerHTML+=`<p><strong>${msg.from}:</strong> ${msg.text}</p>`;});}
+// --- Real-time Chat ---
+let currentChatId = null;
+let currentChatUserName = null;
 
-showProfile();
+function startChat(index){
+  const user = demoProfiles[index];
+  if(!currentUser) return;
+  const ids = [currentUser.uid, user.uid].sort();
+  currentChatId = ids.join("_");
+  currentChatUserName = user.username;
+
+  showTab('chat');
+  updateChatHeader();
+  loadMessages();
+}
+
+function updateChatHeader(){
+  const box = document.getElementById('chat-box');
+  box.innerHTML = `<p style="color:gold;font-weight:bold;">Chat with ${currentChatUserName}</p>`;
+}
+
+function loadMessages(){
+  if(!currentChatId) return;
+  const messagesRef = db.ref('chats/' + currentChatId + '/messages');
+  messagesRef.off();
+  messagesRef.on('child_added', snapshot=>{
+    const msg = snapshot.val();
+    appendMessage(msg.from === currentUser.uid ? 'You' : currentChatUserName, msg.text, msg.from === currentUser.uid);
+  });
+}
+
+function appendMessage(sender,text,isUser){
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'message ' + (isUser ? 'user' : 'other');
+  div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendMessage(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text || !currentChatId) return;
+  db.ref('chats/'+currentChatId+'/messages').push({from:currentUser.uid,text:text,timestamp:Date.now()});
+  input.value='';
+}
+
+// --- Initialize ---
+auth.onAuthStateChanged(user => {
+  if(user){
+    currentUser = user;
+    loadProfile();
+    loadPeopleProfiles();
+    showTab('people');
+  } else {
+    window.location='login.html';
+  }
+});
 </script>
 </body>
 </html>
