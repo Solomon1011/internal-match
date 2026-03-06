@@ -1,205 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>My Profile</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Internal Match - Profile</title>
 <style>
-
-body{
-background:#111;
-font-family:Arial;
-margin:0;
-color:white;
-}
-
-.container{
-width:90%;
-max-width:420px;
-margin:auto;
-padding-top:30px;
-}
-
-.profile-card{
-background:#1c1c1c;
-border-radius:25px;
-padding:20px;
-text-align:center;
-}
-
-.profile-card img{
-width:120px;
-height:120px;
-border-radius:50%;
-object-fit:cover;
-border:3px solid gold;
-}
-
-.name{
-font-size:24px;
-font-weight:bold;
-margin-top:10px;
-}
-
-.info{
-margin-top:8px;
-color:#ccc;
-}
-
-.edit-btn{
-background:gold;
-border:none;
-padding:10px 20px;
-border-radius:25px;
-font-weight:bold;
-margin-top:15px;
-cursor:pointer;
-}
-
-.edit-form{
-margin-top:20px;
-display:none;
-}
-
-input{
-width:90%;
-padding:12px;
-margin:6px;
-border-radius:12px;
-border:none;
-}
-
+  body {
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    background: #1c1c1c;
+    padding: 25px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+  #profilePic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid gold;
+    margin-bottom: 15px;
+  }
+  input[type="file"] {
+    margin-bottom: 20px;
+  }
+  input, button {
+    width: 90%;
+    padding: 12px;
+    margin: 6px 0;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+  }
+  button {
+    background: gold;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .profile-info {
+    font-size: 18px;
+    margin: 8px 0;
+    color: #ccc;
+  }
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
-<div class="profile-card">
+  <img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Picture" />
 
-<img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg">
+  <input type="file" id="photoInput" accept="image/*" />
 
-<div class="name" id="displayName">Your Name</div>
+  <input id="nameInput" type="text" placeholder="Your Name" />
+  <input id="ageInput" type="number" placeholder="Age" min="1" max="120" />
+  <input id="countryInput" type="text" placeholder="Country" />
 
-<div class="info" id="displayAge">Age</div>
+  <button onclick="saveProfile()">Save Profile</button>
 
-<div class="info" id="displayCountry">Country</div>
-
-<button class="edit-btn" onclick="toggleEdit()">Edit Profile</button>
-
-</div>
-
-<div class="edit-form" id="editForm">
-
-<input type="file" id="photoInput" accept="image/*">
-
-<input id="nameInput" placeholder="Your Name">
-
-<input id="ageInput" type="number" placeholder="Age">
-
-<input id="countryInput" placeholder="Country">
-
-<button class="edit-btn" onclick="saveProfile()">Save Profile</button>
-
-</div>
+  <div class="profile-info" id="displayName">Name: -</div>
+  <div class="profile-info" id="displayAge">Age: -</div>
+  <div class="profile-info" id="displayCountry">Country: -</div>
 
 </div>
 
 <script>
+  const profilePic = document.getElementById("profilePic");
+  const photoInput = document.getElementById("photoInput");
+  const nameInput = document.getElementById("nameInput");
+  const ageInput = document.getElementById("ageInput");
+  const countryInput = document.getElementById("countryInput");
 
-const profilePic = document.getElementById("profilePic")
-const photoInput = document.getElementById("photoInput")
+  const displayName = document.getElementById("displayName");
+  const displayAge = document.getElementById("displayAge");
+  const displayCountry = document.getElementById("displayCountry");
 
-/* Upload photo */
+  // Load saved profile on page load
+  window.onload = () => {
+    const savedPic = localStorage.getItem("profilePic");
+    const savedName = localStorage.getItem("name");
+    const savedAge = localStorage.getItem("age");
+    const savedCountry = localStorage.getItem("country");
 
-photoInput.addEventListener("change", function(){
+    if (savedPic) profilePic.src = savedPic;
+    if (savedName) nameInput.value = savedName;
+    if (savedAge) ageInput.value = savedAge;
+    if (savedCountry) countryInput.value = savedCountry;
 
-const file = this.files[0]
+    updateDisplay(savedName, savedAge, savedCountry);
+  };
 
-if(!file) return
+  // When user selects a new photo
+  photoInput.addEventListener("change", () => {
+    const file = photoInput.files[0];
+    if (!file) return;
 
-const reader = new FileReader()
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      profilePic.src = e.target.result;
+      localStorage.setItem("profilePic", e.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
 
-reader.onload = function(e){
+  function saveProfile() {
+    const name = nameInput.value.trim();
+    const age = ageInput.value.trim();
+    const country = countryInput.value.trim();
 
-profilePic.src = e.target.result
+    if (!name || !age || !country) {
+      alert("Please fill in all fields.");
+      return;
+    }
 
-localStorage.setItem("profilePic", e.target.result)
+    localStorage.setItem("name", name);
+    localStorage.setItem("age", age);
+    localStorage.setItem("country", country);
 
-}
+    alert("Profile saved successfully!");
+    updateDisplay(name, age, country);
+  }
 
-reader.readAsDataURL(file)
-
-})
-
-/* Toggle edit form */
-
-function toggleEdit(){
-
-const form = document.getElementById("editForm")
-
-form.style.display = form.style.display === "none" ? "block" : "none"
-
-}
-
-/* Save profile */
-
-function saveProfile(){
-
-const name = document.getElementById("nameInput").value
-const age = document.getElementById("ageInput").value
-const country = document.getElementById("countryInput").value
-
-if(!name || !age || !country){
-
-alert("Fill all fields")
-
-return
-
-}
-
-localStorage.setItem("name", name)
-localStorage.setItem("age", age)
-localStorage.setItem("country", country)
-
-loadProfile()
-
-alert("Profile updated!")
-
-}
-
-/* Load profile */
-
-function loadProfile(){
-
-const name = localStorage.getItem("name")
-const age = localStorage.getItem("age")
-const country = localStorage.getItem("country")
-const pic = localStorage.getItem("profilePic")
-
-if(name){
-document.getElementById("displayName").innerText = name
-}
-
-if(age){
-document.getElementById("displayAge").innerText = "Age: " + age
-}
-
-if(country){
-document.getElementById("displayCountry").innerText = country
-}
-
-if(pic){
-profilePic.src = pic
-}
-
-}
-
-loadProfile()
-
+  function updateDisplay(name, age, country) {
+    displayName.textContent = "Name: " + (name || "-");
+    displayAge.textContent = "Age: " + (age || "-");
+    displayCountry.textContent = "Country: " + (country || "-");
+  }
 </script>
-
 </body>
 </html>
