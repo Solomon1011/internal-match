@@ -5,48 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>💘 Internal Match - Login</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #111;
-      color: white;
-      text-align: center;
-    }
-    .card {
-      background: #1c1c1c;
-      padding: 20px;
-      border-radius: 20px;
-      margin: 20px auto;
-      width: 90%;
-      max-width: 400px;
-    }
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 5px;
-      border-radius: 10px;
-      border: none;
-    }
-    button {
-      background: gold;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 20px;
-      margin-top: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 95%;
-    }
-    a {
-      color: gold;
-      display: block;
-      margin-top: 10px;
-      text-decoration: none;
-    }
-    #errorMsg {
-      color: #ff4c4c;
-      margin-top: 10px;
-    }
+    /* Your existing CSS */
   </style>
 </head>
 <body>
@@ -83,21 +42,13 @@
     // --- Elements ---
     const errorMsg = document.getElementById('errorMsg');
 
-    // --- Ensure session persists across reloads ---
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => {
-        // Check if the user is logged in
-        firebase.auth().onAuthStateChanged(user => {
-          console.log("Auth State Changed:", user);
-          if (user) {
-            // If logged in, redirect to dashboard
-            window.location = "dashboard.html";
-          }
-        });
-      })
-      .catch(error => {
-        console.log("Persistence failed:", error);
-      });
+    // --- Check if the user is already logged in on page load ---
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        // Redirect to dashboard if user is already logged in
+        window.location = "dashboard.html";
+      }
+    });
 
     // --- Login Function ---
     function login() {
@@ -112,11 +63,11 @@
 
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
-          // Successful login: redirect silently
+          // Successful login: redirect to dashboard
           window.location = "dashboard.html";
         })
         .catch(error => {
-          // Friendly error messages
+          // Handle errors
           if (error.code === "auth/wrong-password") {
             errorMsg.innerText = "Wrong password, try again!";
           } else if (error.code === "auth/user-not-found") {
@@ -129,7 +80,7 @@
         });
     }
 
-    // --- Forgot Password ---
+    // --- Forgot Password Function ---
     function forgotPassword() {
       const email = prompt("Enter your email to reset password:");
       if (!email) return;
