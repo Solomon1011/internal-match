@@ -1,47 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign Up - 💘 Internal Match</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<h2>Sign Up</h2>
-
 <form id="signupForm">
-  <input type="text" id="name" placeholder="Full Name" required><br>
-  <input type="email" id="email" placeholder="Email" required><br>
-  <input type="password" id="password" placeholder="Password" required><br>
+  <input type="text" id="name" placeholder="Full Name" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
   <button type="submit">Sign Up</button>
 </form>
-
-<p>Already have an account? <a href="login.html">Login</a></p>
 
 <script type="module">
 import { signup, checkAuth } from "./app.js";
 
-const form = document.getElementById("signupForm");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault(); // Prevent page refresh
-
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  const user = await signup(email, password, name);
-
-  if (!user) {
-    alert("Signup failed! Check your details.");
-    return;
+document.getElementById("signupForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const user = await signup(
+    document.getElementById("email").value.trim(),
+    document.getElementById("password").value,
+    document.getElementById("name").value.trim()
+  );
+  if (user) {
+    checkAuth(u => {
+      if (u) window.location.href = "dashboard.html";
+    });
   }
-
-  // Wait for Firebase auth to confirm user is logged in
-  checkAuth((u) => {
-    if (u) window.location.href = "dashboard.html";
-  });
 });
 </script>
-</body>
-</html>
