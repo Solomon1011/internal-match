@@ -22,16 +22,16 @@ input, select {width:90%;padding:10px;margin:5px;border-radius:10px;border:none;
 
 <h2>💘 Internal Match</h2>
 
-<!-- Swipe Container -->
+<!-- Swipe Tab -->
 <div id="swipe-tab" class="tab"></div>
 
-<!-- Liked Users -->
+<!-- Liked Users Tab -->
 <div class="card tab" id="liked-tab" style="display:none;">
   <h3>Liked Users</h3>
   <div id="liked-container"></div>
 </div>
 
-<!-- Chat -->
+<!-- Chat Tab -->
 <div class="card tab" id="chat-tab" style="display:none;">
   <h3 id="chatWith">Chat</h3>
   <div id="chat-box"></div>
@@ -39,7 +39,7 @@ input, select {width:90%;padding:10px;margin:5px;border-radius:10px;border:none;
   <button onclick="sendMessage()">Send</button>
 </div>
 
-<!-- Profile -->
+<!-- Profile Tab -->
 <div class="card tab" id="profile-tab" style="display:none;">
   <h3>My Profile</h3>
   <img id="dashboardProfilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" style="width:120px;height:120px;border-radius:50%;border:3px solid gold;margin-bottom:10px;">
@@ -56,19 +56,32 @@ input, select {width:90%;padding:10px;margin:5px;border-radius:10px;border:none;
   <button onclick="saveProfile()">Save Profile</button>
 </div>
 
+<!-- Shop Coins Tab -->
+<div class="card tab" id="shop-tab" style="display:none;">
+  <h3>💰 Shop Coins</h3>
+  <p>Current Coins: <span id="coin-count">0</span> 💎</p>
+  <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:10px;">
+    <button onclick="buyCoins(10)">Buy 10 Coins</button>
+    <button onclick="buyCoins(50)">Buy 50 Coins</button>
+    <button onclick="buyCoins(100)">Buy 100 Coins</button>
+  </div>
+</div>
+
 <!-- Bottom Navigation -->
 <div class="tab-bar">
   <button onclick="showTab('swipe')">💖 Swipe</button>
   <button onclick="showTab('liked')">❤️ Like</button>
   <button onclick="showTab('chat')">💬 Chat</button>
   <button onclick="showTab('profile')">👤 Profile</button>
+  <button onclick="showTab('shop')">💎 Shop</button>
 </div>
 
 <script>
 // --- Tabs ---
 function showTab(tab){
-  ['swipe','liked','chat','profile'].forEach(t=>{
-    document.getElementById(t+'-tab') ? document.getElementById(t+'-tab').style.display=(t===tab?'block':'none') : null;
+  ['swipe','liked','chat','profile','shop'].forEach(t=>{
+    const el = document.getElementById(t+'-tab');
+    if(el) el.style.display=(t===tab?'block':'none');
   });
 }
 
@@ -163,11 +176,23 @@ function sendMessage(){
   box.scrollTop=box.scrollHeight;
 }
 
+// --- Shop Coins ---
+let coins = parseInt(localStorage.getItem("coins")) || 0;
+const coinCount = document.getElementById("coin-count");
+function updateCoins(){ coinCount.innerText = coins; }
+function buyCoins(amount){
+  coins += amount;
+  localStorage.setItem("coins", coins);
+  updateCoins();
+  alert(`You bought ${amount} coins!`);
+}
+
 // --- Initialize ---
 window.onload=()=>{
   loadProfile();
   showTab('swipe');
   showSwipe();
+  updateCoins();
 };
 </script>
 </body>
