@@ -1,57 +1,68 @@
 // app.js
 
-// Check if user is logged in
-export async function checkAuth() {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    return user || null;
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.6.1/firebase-auth.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+  authDomain: "internal-match.firebaseapp.com",
+  projectId: "internal-match",
+  storageBucket: "internal-match.appspot.com",
+  messagingSenderId: "129707008837",
+  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Signup
+export async function signup(email, password, displayName) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(userCredential.user, { displayName });
+    return userCredential.user;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
-// Get current user
-export function getCurrentUser() {
-    return JSON.parse(localStorage.getItem("currentUser"));
+// Login
+export async function login(email, password) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
-// Login function
-export function login(email, password) {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        return true;
-    }
-    return false;
+// Logout
+export async function logout() {
+  await signOut(auth);
 }
 
-// Signup function
-export function signup(name, email, password) {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    if (users.find(u => u.email === email)) {
-        return false; // Email already exists
-    }
-    const newUser = { name, email, password, bio: "" };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-    return true;
+// Check auth state
+export function checkAuth(callback) {
+  onAuthStateChanged(auth, (user) => {
+    callback(user); // returns user object if logged in, null if not
+  });
 }
 
-// Logout function
-export function logout() {
-    localStorage.removeItem("currentUser");
-}
-
-// Update profile
-export function updateProfile(name, bio) {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const currentUser = getCurrentUser();
-
-    const index = users.findIndex(u => u.email === currentUser.email);
-    if (index !== -1) {
-        users[index].name = name;
-        users[index].bio = bio;
-        localStorage.setItem("users", JSON.stringify(users));
-        localStorage.setItem("currentUser", JSON.stringify(users[index]));
-        return true;
-    }
-    return false;
+// Update user profile
+export async function updateUserProfile({ displayName, photoURL }) {
+  if (auth.currentUser) {
+    await updateProfile(auth.currentUser, { displayName, photoURL });
+  }
 }
