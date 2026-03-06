@@ -10,7 +10,6 @@
 <h2>Profile Setup</h2>
 <form id="profileForm">
   <input type="text" id="displayName" placeholder="Display Name" required><br>
-  <input type="text" id="bio" placeholder="Bio"><br>
   <button type="submit">Save Profile</button>
 </form>
 <button id="logoutBtn">Logout</button>
@@ -21,7 +20,7 @@ checkAuth(user => {
   if (!user) window.location.href = "login.html";
   else document.getElementById("displayName").value = user.displayName || "";
 });
-document.getElementById("profileForm").addEventListener("submit", async (e) => {
+document.getElementById("profileForm").addEventListener("submit", async e => {
   e.preventDefault();
   await updateUserProfile({ displayName: document.getElementById("displayName").value });
   alert("Profile updated!");
