@@ -83,13 +83,20 @@
     // --- Elements ---
     const errorMsg = document.getElementById('errorMsg');
 
-    // --- Check if the user is already logged in on page load ---
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        // If the user is logged in, redirect to the dashboard
-        window.location = "dashboard.html";
-      }
-    });
+    // --- Ensure user stays logged in ---
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => {
+        // --- Check if the user is already logged in on page load ---
+        firebase.auth().onAuthStateChanged(user => {
+          console.log("Auth State Changed:", user); // Log user info to see if they are signed in
+          if (user) {
+            window.location = "dashboard.html";
+          }
+        });
+      })
+      .catch(error => {
+        console.log("Persistence failed:", error);
+      });
 
     // --- Login Function ---
     function login() {
