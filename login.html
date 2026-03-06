@@ -1,42 +1,71 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>💘 Internal Match - Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
+    .card { background: #1c1c1c; padding: 20px; border-radius: 10px; margin: 20px; max-width: 400px; }
+    input, button { padding: 10px; margin: 10px; width: 90%; border-radius: 5px; }
+    button { background-color: gold; }
+  </style>
+</head>
+<body>
 
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+  <div class="card">
+    <h2>💘 Internal Match - Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    <div id="errorMsg"></div>
+  </div>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  <!-- Firebase SDK (Modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      window.location = "dashboard.html";  // Redirect to dashboard if logged in
-    }
-  });
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-  // Fix: Check that Firebase is initialized and the login button is properly clicked
-  document.getElementById('loginBtn').addEventListener('click', function() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    if (!email || !password) {
-      alert("Please enter both email and password.");
-      return;
-    }
+    // Redirect to dashboard if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location = "dashboard.html";  // Redirect to dashboard if logged in
+      }
+    });
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        window.location = "dashboard.html";  // Redirect to dashboard after successful login
-      })
-      .catch((error) => {
-        console.error("Login failed:", error.message);
-        alert("Login failed. Please check your email and password.");
-      });
-  });
-</script>
+    // Handle login button click
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          window.location = "dashboard.html";  // Redirect to dashboard after successful login
+        })
+        .catch((error) => {
+          console.error("Login failed:", error.message);
+          alert("Login failed. Please check your email and password.");
+        });
+    });
+  </script>
+
+</body>
+</html>
