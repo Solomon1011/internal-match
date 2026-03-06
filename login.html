@@ -10,6 +10,7 @@ body{margin:0;font-family:Arial;background:#111;color:white;text-align:center;}
 input{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
 button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;width:95%;}
 a{color:gold;display:block;margin-top:10px;text-decoration:none;}
+#errorMsg{color:#ff4c4c;margin-top:10px;}
 </style>
 </head>
 <body>
@@ -23,6 +24,8 @@ a{color:gold;display:block;margin-top:10px;text-decoration:none;}
 <button onclick="login()">Login</button>
 <a href="#" onclick="forgotPassword()">Forgot Password?</a>
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+
+<div id="errorMsg"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -41,23 +44,36 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
+// --- Elements ---
+const errorMsg = document.getElementById('errorMsg');
+
 // --- Login Function ---
 function login(){
+  errorMsg.innerText = "";
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
 
   if(!email || !password){
-    alert("Please enter email and password!");
+    errorMsg.innerText = "Please enter email and password!";
     return;
   }
 
   auth.signInWithEmailAndPassword(email,password)
     .then(userCredential=>{
-      alert("Login successful!");
+      // Successful login: redirect silently
       window.location = "dashboard.html";
     })
     .catch(error=>{
-      alert(error.message);
+      // Friendly error messages
+      if(error.code === "auth/wrong-password"){
+        errorMsg.innerText = "Wrong password, try again!";
+      } else if(error.code === "auth/user-not-found"){
+        errorMsg.innerText = "User not found!";
+      } else if(error.code === "auth/invalid-email"){
+        errorMsg.innerText = "Invalid email address!";
+      } else {
+        errorMsg.innerText = "Login failed, try again!";
+      }
     });
 }
 
@@ -70,7 +86,7 @@ function forgotPassword(){
       alert("Password reset email sent! Check your inbox.");
     })
     .catch(error=>{
-      alert(error.message);
+      alert("Failed to send reset email: " + error.message);
     });
 }
 </script>
