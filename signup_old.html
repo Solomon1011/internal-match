@@ -10,6 +10,8 @@ body{margin:0;font-family:Arial;background:#111;color:white;text-align:center;}
 input,select{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
 button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;}
 img{width:120px;height:120px;border-radius:50%;margin:10px auto;display:block;}
+p.note{font-size:12px;color:#ccc;}
+a{color:gold;text-decoration:none;}
 </style>
 </head>
 <body>
@@ -43,10 +45,11 @@ img{width:120px;height:120px;border-radius:50%;margin:10px auto;display:block;}
     <option value="Hangout 🩵">Hangout 🩵</option>
     <option value="Serious Relationship 💖">Serious Relationship 💖</option>
     <option value="Marriage 💘">Marriage 💘</option>
+    <option value="Casual Dating 💛">Casual Dating 💛</option>
   </select><br>
 
   <button onclick="signup()">💾 Signup & Save Profile</button>
-  <p>Already have an account? <a href="index.html" style="color:gold;">Login</a></p>
+  <p class="note">Already have an account? <a href="index.html">Login</a></p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -84,10 +87,10 @@ profilePicInput.addEventListener('change', function(event){
   }
 });
 
-// --- Countries Dropdown ---
+// --- Populate Countries ---
 const locationSelect = document.getElementById('location');
 const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Lucia","Saudi Arabia","Senegal","Serbia","Seychelles","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tanzania","Thailand","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Zambia","Zimbabwe"];
-countries.forEach(c=>{ locationSelect.innerHTML+=`<option value="${c}">${c}</option>` });
+countries.forEach(c=> locationSelect.innerHTML += `<option value="${c}">${c}</option>` );
 
 // --- Signup Function ---
 function signup(){
@@ -104,11 +107,9 @@ function signup(){
     return;
   }
 
-  // Create user in Firebase Auth
   auth.createUserWithEmailAndPassword(email,password)
     .then(cred=>{
       const uid = cred.user.uid;
-      // Save profile info in Firebase Realtime Database
       db.ref('users/'+uid).set({
         username,
         email,
@@ -122,9 +123,8 @@ function signup(){
         window.location.href='dashboard.html';
       });
     })
-    .catch(err=>{ alert("Error: "+err.message); });
+    .catch(err=> alert("Error: "+err.message));
 }
 </script>
-
 </body>
 </html>
