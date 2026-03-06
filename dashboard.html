@@ -1,24 +1,26 @@
-<!-- dashboard.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Welcome to Dashboard!</h2>
+<h2 id="welcome"></h2>
+<button id="logoutBtn">Logout</button>
+<button onclick="window.location.href='profile_setup.html'">Profile Setup</button>
 
-  <script type="module">
-    import { checkAuth } from "./app.js";
-    
-    checkAuth().then(user => {
-      if (!user) {
-        window.location = "login.html"; // Redirect to login if no user is logged in
-      }
-    });
-  </script>
+<script type="module">
+import { checkAuth, logout } from "./app.js";
+checkAuth(user => {
+  if (!user) window.location.href = "login.html";
+  else document.getElementById("welcome").textContent = `Welcome, ${user.displayName}!`;
+});
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await logout();
+  window.location.href = "login.html";
+});
+</script>
 </body>
 </html>
