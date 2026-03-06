@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>💘 Internal Match - Sign Up</title>
   <style>
-    /* Your custom CSS styling for signup page */
     body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
     .card { background: #1c1c1c; padding: 20px; border-radius: 10px; margin: 20px; max-width: 400px; }
     input, button { padding: 10px; margin: 10px; width: 90%; border-radius: 5px; }
@@ -28,7 +27,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    // Firebase Configuration (Use your own config)
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -38,11 +36,9 @@
       appId: "YOUR_APP_ID"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Signup function
     function signup() {
       const username = document.getElementById('username').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -55,8 +51,7 @@
 
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // User signed up successfully
-          window.location = "dashboard.html";  // Redirect to dashboard
+          window.location = "dashboard.html";  // Redirect to dashboard after successful sign-up
         })
         .catch((error) => {
           console.error("Signup failed:", error.message);
@@ -64,5 +59,6 @@
         });
     }
   </script>
+
 </body>
 </html>
