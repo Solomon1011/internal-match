@@ -11,24 +11,17 @@
 <h2>Profile Setup</h2>
 
 <form id="profileForm">
-  <input type="text" id="displayName" placeholder="Display Name"><br>
+  <input type="text" id="displayName" placeholder="Your Name"><br>
   <input type="text" id="bio" placeholder="Short Bio"><br>
   <button type="submit">Save Profile</button>
 </form>
 
-<script type="module">
-import { checkAuth, updateUserProfile } from "./app.js";
-
-checkAuth(user => {
-  if (!user) window.location.href = "login.html";
-  else document.getElementById("displayName").value = user.displayName || "";
-});
-
-document.getElementById("profileForm").addEventListener("submit", async e => {
+<script>
+document.getElementById("profileForm").addEventListener("submit", function(e) {
   e.preventDefault();
   const name = document.getElementById("displayName").value.trim();
-  await updateUserProfile({ displayName: name });
-  alert("Profile updated!");
+  const bio = document.getElementById("bio").value.trim();
+  alert(`Profile saved!\nName: ${name}\nBio: ${bio}`);
 });
 </script>
 
