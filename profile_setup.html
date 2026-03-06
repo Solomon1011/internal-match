@@ -3,32 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile Setup</title>
+<title>Profile Setup - 💘 Internal Match</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <h2>Profile Setup</h2>
+
 <form id="profileForm">
-  <input type="text" id="displayName" placeholder="Display Name" required><br>
+  <input type="text" id="displayName" placeholder="Display Name"><br>
+  <input type="text" id="bio" placeholder="Short Bio"><br>
   <button type="submit">Save Profile</button>
 </form>
-<button id="logoutBtn">Logout</button>
 
 <script type="module">
-import { checkAuth, logout, updateUserProfile } from "./app.js";
+import { checkAuth, updateUserProfile } from "./app.js";
+
 checkAuth(user => {
   if (!user) window.location.href = "login.html";
   else document.getElementById("displayName").value = user.displayName || "";
 });
+
 document.getElementById("profileForm").addEventListener("submit", async e => {
   e.preventDefault();
-  await updateUserProfile({ displayName: document.getElementById("displayName").value });
+  const name = document.getElementById("displayName").value.trim();
+  await updateUserProfile({ displayName: name });
   alert("Profile updated!");
 });
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await logout();
-  window.location.href = "login.html";
-});
 </script>
+
 </body>
 </html>
