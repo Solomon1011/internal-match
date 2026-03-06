@@ -6,10 +6,10 @@
 <title>Internal Match - Profile</title>
 <style>
 body {
+  margin: 0;
+  font-family: Arial, sans-serif;
   background: #111;
   color: white;
-  font-family: Arial, sans-serif;
-  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,14 +24,14 @@ body {
   text-align: center;
 }
 #profilePic {
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid gold;
   margin-bottom: 15px;
 }
-input, button {
+input, select, button {
   width: 90%;
   padding: 12px;
   margin: 6px 0;
@@ -46,58 +46,72 @@ button {
 }
 .profile-info {
   font-size: 18px;
-  margin: 8px 0;
+  margin: 10px 0;
   color: #ccc;
 }
 </style>
 </head>
 <body>
+
 <div class="container">
 
-<img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Picture">
+  <!-- Profile Picture -->
+  <img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Picture">
+  <input type="file" id="photoInput" accept="image/*" capture="user">
 
-<!-- Android-friendly file input -->
-<input type="file" id="photoInput" accept="image/*" capture="user">
+  <!-- Profile Form -->
+  <input id="nameInput" type="text" placeholder="Your Name">
+  <input id="ageInput" type="number" placeholder="Age" min="1" max="120">
+  <select id="genderInput">
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Other">Other</option>
+  </select>
+  <input id="locationInput" type="text" placeholder="Location">
 
-<input id="nameInput" type="text" placeholder="Your Name">
-<input id="ageInput" type="number" placeholder="Age" min="1" max="120">
-<input id="countryInput" type="text" placeholder="Country">
+  <button onclick="saveProfile()">Save Profile</button>
 
-<button onclick="saveProfile()">Save Profile</button>
-
-<div class="profile-info" id="displayName">Name: -</div>
-<div class="profile-info" id="displayAge">Age: -</div>
-<div class="profile-info" id="displayCountry">Country: -</div>
+  <!-- Display Info -->
+  <div class="profile-info" id="displayName">Name: -</div>
+  <div class="profile-info" id="displayAge">Age: -</div>
+  <div class="profile-info" id="displayGender">Gender: -</div>
+  <div class="profile-info" id="displayLocation">Location: -</div>
 
 </div>
 
 <script>
+// Elements
 const profilePic = document.getElementById("profilePic");
 const photoInput = document.getElementById("photoInput");
 const nameInput = document.getElementById("nameInput");
 const ageInput = document.getElementById("ageInput");
-const countryInput = document.getElementById("countryInput");
+const genderInput = document.getElementById("genderInput");
+const locationInput = document.getElementById("locationInput");
 
 const displayName = document.getElementById("displayName");
 const displayAge = document.getElementById("displayAge");
-const displayCountry = document.getElementById("displayCountry");
+const displayGender = document.getElementById("displayGender");
+const displayLocation = document.getElementById("displayLocation");
 
-// Load profile from localStorage
+// Load profile on page load
 window.onload = () => {
   const savedPic = localStorage.getItem("profilePic");
   const savedName = localStorage.getItem("name");
   const savedAge = localStorage.getItem("age");
-  const savedCountry = localStorage.getItem("country");
+  const savedGender = localStorage.getItem("gender");
+  const savedLocation = localStorage.getItem("location");
 
   if (savedPic) profilePic.src = savedPic;
   if (savedName) nameInput.value = savedName;
   if (savedAge) ageInput.value = savedAge;
-  if (savedCountry) countryInput.value = savedCountry;
+  if (savedGender) genderInput.value = savedGender;
+  if (savedLocation) locationInput.value = savedLocation;
 
-  updateDisplay(savedName, savedAge, savedCountry);
+  updateDisplay(savedName, savedAge, savedGender, savedLocation);
 };
 
-// Mobile-friendly file upload
+// Photo Upload (Android-friendly)
 photoInput.addEventListener("change", function() {
   const file = this.files[0];
   if (!file) return;
@@ -108,34 +122,40 @@ photoInput.addEventListener("change", function() {
     localStorage.setItem("profilePic", e.target.result);
   };
   reader.onerror = function() {
-    alert("Failed to read image. Please try a different photo.");
+    alert("Failed to read image. Try another photo.");
   };
   reader.readAsDataURL(file);
 });
 
+// Save profile function
 function saveProfile() {
   const name = nameInput.value.trim();
   const age = ageInput.value.trim();
-  const country = countryInput.value.trim();
+  const gender = genderInput.value;
+  const location = locationInput.value.trim();
 
-  if (!name || !age || !country) {
-    alert("Please fill in all fields.");
+  if (!name || !age || !gender || !location) {
+    alert("Please fill all fields.");
     return;
   }
 
   localStorage.setItem("name", name);
   localStorage.setItem("age", age);
-  localStorage.setItem("country", country);
+  localStorage.setItem("gender", gender);
+  localStorage.setItem("location", location);
 
+  updateDisplay(name, age, gender, location);
   alert("Profile saved successfully!");
-  updateDisplay(name, age, country);
 }
 
-function updateDisplay(name, age, country) {
+// Update displayed profile info
+function updateDisplay(name, age, gender, location) {
   displayName.textContent = "Name: " + (name || "-");
   displayAge.textContent = "Age: " + (age || "-");
-  displayCountry.textContent = "Country: " + (country || "-");
+  displayGender.textContent = "Gender: " + (gender || "-");
+  displayLocation.textContent = "Location: " + (location || "-");
 }
 </script>
+
 </body>
 </html>
