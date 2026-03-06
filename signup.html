@@ -1,36 +1,39 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Create Account</h2>
+  <form id="signupForm">
+    <input type="text" id="name" placeholder="Full Name" required><br>
+    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button type="submit">Sign Up</button>
+  </form>
+  <p>Already have an account? <a href="login.html">Login</a></p>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-    authDomain: "internal-match.firebaseapp.com",
-    projectId: "internal-match",
-    storageBucket: "internal-match.firebasestorage.app",
-    messagingSenderId: "129707008837",
-    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-  };
+  <script type="module">
+    import { signup } from "./app.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const form = document.getElementById("signupForm");
 
-  document.getElementById('signupBtn').addEventListener('click', function() {
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-    if (!username || !email || !password) {
-      alert("Please fill out all fields.");
-      return;
-    }
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        window.location = "dashboard.html";  // Redirect to dashboard after successful sign-up
-      })
-      .catch((error) => {
-        console.error("Signup failed:", error.code, error.message);  // Log error code and message
-        alert("Signup failed. Error code: " + error.code + " - " + error.message);  // Show detailed error
-      });
-  });
-</script>
+      if (signup(name, email, password)) {
+        alert("Signup successful! Redirecting to profile setup...");
+        window.location.href = "profile_setup.html";
+      } else {
+        alert("Email already exists! Try logging in.");
+      }
+    });
+  </script>
+</body>
+</html>
