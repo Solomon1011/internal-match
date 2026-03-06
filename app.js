@@ -1,6 +1,4 @@
 // app.js
-
-// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
 import {
   getAuth,
@@ -55,14 +53,10 @@ export async function logout() {
 
 // Check auth state
 export function checkAuth(callback) {
-  onAuthStateChanged(auth, (user) => {
-    callback(user); // returns user object if logged in, null if not
-  });
+  onAuthStateChanged(auth, (user) => callback(user));
 }
 
-// Update user profile
-export async function updateUserProfile({ displayName, photoURL }) {
-  if (auth.currentUser) {
-    await updateProfile(auth.currentUser, { displayName, photoURL });
-  }
+// Update profile
+export async function updateUserProfile({ displayName }) {
+  if (auth.currentUser) await updateProfile(auth.currentUser, { displayName });
 }
