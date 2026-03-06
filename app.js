@@ -29,8 +29,7 @@ export async function signup(email, password, displayName) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName });
     return userCredential.user;
-  } catch (error) {
-    console.error(error);
+  } catch {
     return null;
   }
 }
@@ -40,8 +39,7 @@ export async function login(email, password) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
-  } catch (error) {
-    console.error(error);
+  } catch {
     return null;
   }
 }
@@ -51,7 +49,7 @@ export async function logout() {
   await signOut(auth);
 }
 
-// Check auth state
+// Check auth
 export function checkAuth(callback) {
   onAuthStateChanged(auth, (user) => callback(user));
 }
