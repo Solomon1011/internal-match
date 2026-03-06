@@ -14,10 +14,10 @@ input, select{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
 button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;}
 .tab-bar{position:fixed;bottom:0;width:100%;background:black;display:flex;justify-content:space-around;padding:10px 0;border-top:2px solid gold;}
 .tab-bar button{background:none;border:none;color:gold;font-size:22px;}
-#chat-box{height:300px;overflow-y:auto;background:#000;padding:10px;margin-bottom:10px;border-radius:10px;}
-.message{padding:8px;margin:5px;border-radius:10px;max-width:70%;}
-.user{background:#25D366;margin-left:auto;}
-.other{background:#333;}
+#chat-box{height:300px;overflow-y:auto;background:#000;padding:10px;margin-bottom:10px;border-radius:10px;text-align:left;}
+.message{padding:8px;margin:5px;border-radius:10px;max-width:70%;word-wrap:break-word;}
+.user{background:#25D366;margin-left:auto;color:black;}
+.other{background:#333;color:white;}
 img{border-radius:50%;}
 </style>
 </head>
@@ -80,6 +80,7 @@ img{border-radius:50%;}
   <button onclick="showTab('shop')">🛒 Shop</button>
 </div>
 
+<!-- Firebase Scripts -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -124,14 +125,13 @@ function loadUserProfile(){
 let demoProfiles = [];
 for(let i=1;i<=10;i++){
   demoProfiles.push({
+    uid: 'demo'+i,
     name:'User'+i,
     age: 20+i,
     gender: i%2===0?'Male':'Female',
     location:'City'+i,
     interest:'Friendship',
-    pic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,
-    liked:false,
-    messages:[]
+    profilePic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,
   });
 }
 
@@ -144,20 +144,23 @@ function showProfile(){
   const p = demoProfiles[currentIndex];
   document.getElementById('swipe-container').innerHTML=`
     <div class="card">
-      <img src="${p.pic}" width="120" height="120">
+      <img src="${p.profilePic}" width="120" height="120">
       <h3>${p.name}, ${p.age}</h3>
       <p>${p.gender} | ${p.location}</p>
       <p>Interest: ${p.interest}</p>
       <button onclick="likeProfile()">💖 Like</button>
-      <button onclick="startChat('${currentIndex}')">💬 Chat</button>
+      <button onclick="startChat('${p.uid}')">💬 Chat</button>
       <button onclick="nextProfile()">❌ Ignore</button>
     </div>
   `;
 }
 
+// --- Likes ---
 function likeProfile(){
-  demoProfiles[currentIndex].liked = true;
-  addLike(demoProfiles[currentIndex]);
+  const p = demoProfiles[currentIndex];
+  const user = auth.currentUser;
+  if(user) db.ref('likes/' + user.uid + '/' + p.uid).set({liked:true});
+  addLike(p);
   nextProfile();
 }
 
@@ -166,7 +169,6 @@ function nextProfile(){
   showProfile();
 }
 
-// --- Likes ---
 function addLike(profile){
   const container = document.getElementById('liked-container');
   const div = document.createElement('div');
@@ -174,31 +176,46 @@ function addLike(profile){
   container.appendChild(div);
 }
 
-// --- Chat ---
-let currentChatIndex = null;
-function startChat(index){
-  currentChatIndex = index;
+// --- Chat with Firebase ---
+let currentChatUserId = null;
+function startChat(targetUid){
+  currentChatUserId = targetUid;
   showTab('chats');
-  updateChatBox();
+  loadChat();
+}
+
+function loadChat(){
+  const box = document.getElementById('chat-box');
+  box.innerHTML = '';
+  if(!currentChatUserId) return;
+
+  const chatRef = db.ref('chats/' + auth.currentUser.uid + '/' + currentChatUserId);
+  chatRef.off();
+  chatRef.on('child_added', snapshot=>{
+    const msg = snapshot.val();
+    const div = document.createElement('div');
+    div.className = msg.from === auth.currentUser.uid ? 'message user' : 'message other';
+    div.innerText = msg.text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  });
 }
 
 function sendMessage(){
-  if(currentChatIndex===null) return;
   const input = document.getElementById('chat-input');
-  const text = input.value;
-  if(!text) return;
-  demoProfiles[currentChatIndex].messages.push({from:'You', text:text});
-  input.value='';
-  updateChatBox();
-}
+  const text = input.value.trim();
+  if(!text || !currentChatUserId) return;
 
-function updateChatBox(){
-  const box = document.getElementById('chat-box');
-  box.innerHTML='';
-  if(currentChatIndex===null) return;
-  demoProfiles[currentChatIndex].messages.forEach(msg=>{
-    box.innerHTML+=`<p><strong>${msg.from}:</strong> ${msg.text}</p>`;
-  });
+  const timestamp = Date.now();
+  const senderId = auth.currentUser.uid;
+  const receiverId = currentChatUserId;
+
+  // Save for sender
+  db.ref('chats/' + senderId + '/' + receiverId + '/' + timestamp).set({from: senderId, text: text, timestamp: timestamp});
+  // Save for receiver
+  db.ref('chats/' + receiverId + '/' + senderId + '/' + timestamp).set({from: senderId, text: text, timestamp: timestamp});
+
+  input.value = '';
 }
 
 // --- Auth Check ---
