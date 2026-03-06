@@ -1,140 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Internal Match - Profile</title>
 <style>
-  body {
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  .container {
-    background: #1c1c1c;
-    padding: 25px;
-    border-radius: 25px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-  }
-  #profilePic {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid gold;
-    margin-bottom: 15px;
-  }
-  input[type="file"] {
-    margin-bottom: 20px;
-  }
-  input, button {
-    width: 90%;
-    padding: 12px;
-    margin: 6px 0;
-    border-radius: 12px;
-    border: none;
-    font-size: 16px;
-  }
-  button {
-    background: gold;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .profile-info {
-    font-size: 18px;
-    margin: 8px 0;
-    color: #ccc;
-  }
+body {
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.container {
+  background: #1c1c1c;
+  padding: 25px;
+  border-radius: 25px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+#profilePic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid gold;
+  margin-bottom: 15px;
+}
+input, button {
+  width: 90%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+}
+button {
+  background: gold;
+  font-weight: bold;
+  cursor: pointer;
+}
+.profile-info {
+  font-size: 18px;
+  margin: 8px 0;
+  color: #ccc;
+}
 </style>
 </head>
 <body>
 <div class="container">
 
-  <img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Picture" />
+<img id="profilePic" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Picture">
 
-  <input type="file" id="photoInput" accept="image/*" />
+<!-- Android-friendly file input -->
+<input type="file" id="photoInput" accept="image/*" capture="user">
 
-  <input id="nameInput" type="text" placeholder="Your Name" />
-  <input id="ageInput" type="number" placeholder="Age" min="1" max="120" />
-  <input id="countryInput" type="text" placeholder="Country" />
+<input id="nameInput" type="text" placeholder="Your Name">
+<input id="ageInput" type="number" placeholder="Age" min="1" max="120">
+<input id="countryInput" type="text" placeholder="Country">
 
-  <button onclick="saveProfile()">Save Profile</button>
+<button onclick="saveProfile()">Save Profile</button>
 
-  <div class="profile-info" id="displayName">Name: -</div>
-  <div class="profile-info" id="displayAge">Age: -</div>
-  <div class="profile-info" id="displayCountry">Country: -</div>
+<div class="profile-info" id="displayName">Name: -</div>
+<div class="profile-info" id="displayAge">Age: -</div>
+<div class="profile-info" id="displayCountry">Country: -</div>
 
 </div>
 
 <script>
-  const profilePic = document.getElementById("profilePic");
-  const photoInput = document.getElementById("photoInput");
-  const nameInput = document.getElementById("nameInput");
-  const ageInput = document.getElementById("ageInput");
-  const countryInput = document.getElementById("countryInput");
+const profilePic = document.getElementById("profilePic");
+const photoInput = document.getElementById("photoInput");
+const nameInput = document.getElementById("nameInput");
+const ageInput = document.getElementById("ageInput");
+const countryInput = document.getElementById("countryInput");
 
-  const displayName = document.getElementById("displayName");
-  const displayAge = document.getElementById("displayAge");
-  const displayCountry = document.getElementById("displayCountry");
+const displayName = document.getElementById("displayName");
+const displayAge = document.getElementById("displayAge");
+const displayCountry = document.getElementById("displayCountry");
 
-  // Load saved profile on page load
-  window.onload = () => {
-    const savedPic = localStorage.getItem("profilePic");
-    const savedName = localStorage.getItem("name");
-    const savedAge = localStorage.getItem("age");
-    const savedCountry = localStorage.getItem("country");
+// Load profile from localStorage
+window.onload = () => {
+  const savedPic = localStorage.getItem("profilePic");
+  const savedName = localStorage.getItem("name");
+  const savedAge = localStorage.getItem("age");
+  const savedCountry = localStorage.getItem("country");
 
-    if (savedPic) profilePic.src = savedPic;
-    if (savedName) nameInput.value = savedName;
-    if (savedAge) ageInput.value = savedAge;
-    if (savedCountry) countryInput.value = savedCountry;
+  if (savedPic) profilePic.src = savedPic;
+  if (savedName) nameInput.value = savedName;
+  if (savedAge) ageInput.value = savedAge;
+  if (savedCountry) countryInput.value = savedCountry;
 
-    updateDisplay(savedName, savedAge, savedCountry);
+  updateDisplay(savedName, savedAge, savedCountry);
+};
+
+// Mobile-friendly file upload
+photoInput.addEventListener("change", function() {
+  const file = this.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    profilePic.src = e.target.result;
+    localStorage.setItem("profilePic", e.target.result);
   };
+  reader.onerror = function() {
+    alert("Failed to read image. Please try a different photo.");
+  };
+  reader.readAsDataURL(file);
+});
 
-  // When user selects a new photo
-  photoInput.addEventListener("change", () => {
-    const file = photoInput.files[0];
-    if (!file) return;
+function saveProfile() {
+  const name = nameInput.value.trim();
+  const age = ageInput.value.trim();
+  const country = countryInput.value.trim();
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      profilePic.src = e.target.result;
-      localStorage.setItem("profilePic", e.target.result);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  function saveProfile() {
-    const name = nameInput.value.trim();
-    const age = ageInput.value.trim();
-    const country = countryInput.value.trim();
-
-    if (!name || !age || !country) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    localStorage.setItem("name", name);
-    localStorage.setItem("age", age);
-    localStorage.setItem("country", country);
-
-    alert("Profile saved successfully!");
-    updateDisplay(name, age, country);
+  if (!name || !age || !country) {
+    alert("Please fill in all fields.");
+    return;
   }
 
-  function updateDisplay(name, age, country) {
-    displayName.textContent = "Name: " + (name || "-");
-    displayAge.textContent = "Age: " + (age || "-");
-    displayCountry.textContent = "Country: " + (country || "-");
-  }
+  localStorage.setItem("name", name);
+  localStorage.setItem("age", age);
+  localStorage.setItem("country", country);
+
+  alert("Profile saved successfully!");
+  updateDisplay(name, age, country);
+}
+
+function updateDisplay(name, age, country) {
+  displayName.textContent = "Name: " + (name || "-");
+  displayAge.textContent = "Age: " + (age || "-");
+  displayCountry.textContent = "Country: " + (country || "-");
+}
 </script>
 </body>
 </html>
