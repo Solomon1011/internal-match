@@ -111,18 +111,17 @@ auth.onAuthStateChanged(user=>{
   if(user){
     currentUser=user;
     loadUserProfile();
+    loadDemoProfiles();
     showTab('swipe');
-    showProfile();
   } else {
     window.location='login.html';
   }
 });
 
-// --- Load Profile ---
+// --- Load User Profile ---
 function loadUserProfile(){
   if(!currentUser) return;
-  const userRef = db.ref('users/'+currentUser.uid);
-  userRef.once('value').then(snapshot=>{
+  db.ref('users/'+currentUser.uid).once('value').then(snapshot=>{
     const data = snapshot.val();
     if(!data) return;
     document.getElementById('profile-pic').src = data.profilePic || 'https://randomuser.me/api/portraits/lego/1.jpg';
@@ -133,25 +132,23 @@ function loadUserProfile(){
   });
 }
 
-// --- Edit Profile ---
-function editProfile(){
-  alert("Profile editing can be done in profile setup page.");
+function editProfile(){ alert("Edit profile in Profile Setup page."); }
+
+// --- Load Demo/Other Users ---
+let demoProfiles=[];
+let currentIndex=0;
+function loadDemoProfiles(){
+  db.ref('users').once('value').then(snapshot=>{
+    const users = snapshot.val();
+    demoProfiles = Object.keys(users)
+      .filter(uid=>uid!==currentUser.uid)
+      .map(uid=>({uid, ...users[uid]}));
+    currentIndex=0;
+    showProfile();
+  });
 }
 
 // --- Swipe Cards ---
-let demoProfiles=[];
-for(let i=1;i<=10;i++){
-  demoProfiles.push({
-    name:'User'+i,
-    age:20+i,
-    gender:i%2===0?'Male':'Female',
-    location:'City'+i,
-    pic:`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i}.jpg`,
-    liked:false,
-    messages:[]
-  });
-}
-let currentIndex=0;
 function showProfile(){
   if(currentIndex>=demoProfiles.length){
     document.getElementById('swipe-container').innerHTML="No more profiles!";
@@ -160,11 +157,11 @@ function showProfile(){
   const p = demoProfiles[currentIndex];
   document.getElementById('swipe-container').innerHTML=`
     <div class="card">
-      <img src="${p.pic}">
-      <h3>${p.name}, ${p.age}</h3>
+      <img src="${p.profilePic}">
+      <h3>${p.username}, ${p.age}</h3>
       <p>${p.gender} | ${p.location}</p>
       <button onclick="likeProfile()">💖 Like</button>
-      <button onclick="startChatDemo()">💬 Message</button>
+      <button onclick="startChat('${p.uid}')">💬 Message</button>
       <button onclick="nextProfile()">❌ Ignore</button>
     </div>
   `;
@@ -177,36 +174,53 @@ function likeProfile(){
 }
 
 function nextProfile(){ currentIndex++; showProfile(); }
+
 function addLike(profile){
   const container = document.getElementById('liked-container');
   const div = document.createElement('div');
-  div.innerText = profile.name + " 💖";
+  div.innerText = profile.username + " 💖";
   container.appendChild(div);
 }
 
-// --- Chat Demo ---
-let currentChat = null;
-function startChatDemo(){
-  currentChat = demoProfiles[currentIndex];
+// --- Real-time Chat ---
+let currentChatUid = null;
+let chatRef = null;
+function startChat(uid){
+  if(!currentUser) return;
+  currentChatUid = uid;
   showTab('chats');
-  updateChatBox();
+
+  const chatId = [currentUser.uid,currentChatUid].sort().join("_");
+  chatRef = db.ref('chats/' + chatId);
+
+  chatRef.off();
+  chatRef.on('value', snapshot=>{
+    const box = document.getElementById('chat-box');
+    box.innerHTML='';
+    const messages = snapshot.val() || [];
+    messages.forEach(msg=>{
+      const div = document.createElement('div');
+      div.className = 'message '+(msg.from===currentUser.uid?'user':'other');
+      div.innerText = msg.text;
+      box.appendChild(div);
+    });
+    box.scrollTop = box.scrollHeight;
+  });
 }
+
 function sendMessage(){
-  if(!currentChat) return;
+  if(!currentChatUid || !currentUser) return;
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if(!text) return;
-  currentChat.messages.push({from:'You', text});
-  input.value='';
-  updateChatBox();
-}
-function updateChatBox(){
-  const box = document.getElementById('chat-box');
-  box.innerHTML='';
-  if(!currentChat) return;
-  currentChat.messages.forEach(msg=>{
-    box.innerHTML+=`<p><strong>${msg.from}:</strong> ${msg.text}</p>`;
+  const chatId = [currentUser.uid,currentChatUid].sort().join("_");
+  const chatRef = db.ref('chats/' + chatId);
+  chatRef.once('value').then(snapshot=>{
+    const messages = snapshot.val() || [];
+    messages.push({from: currentUser.uid,text});
+    chatRef.set(messages);
   });
+  input.value='';
 }
 </script>
 </body>
