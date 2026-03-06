@@ -3,27 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login - Internal Match</title>
+<title>💘 Internal Match - Signup & Profile Setup</title>
 <style>
-body {margin:0;font-family:Arial;background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;}
-.card {background:#1c1c1c;padding:30px;border-radius:20px;width:90%;max-width:400px;text-align:center;}
-input {width:90%;padding:12px;margin:10px 0;border-radius:10px;border:none;font-size:16px;}
-button {background:gold;border:none;padding:12px 25px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px;font-size:16px;}
-a {color:gold;cursor:pointer;text-decoration:underline;}
+body{margin:0;font-family:Arial;background:#111;color:white;text-align:center;}
+.card{background:#1c1c1c;padding:20px;border-radius:20px;margin:20px auto;width:90%;max-width:400px;}
+input,select{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
+button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;}
+img{width:120px;height:120px;border-radius:50%;margin:10px auto;display:block;}
+p.note{font-size:12px;color:#ccc;}
+a{color:gold;text-decoration:none;}
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h2>💘 Internal Match</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p><a onclick="forgotPassword()">Forgot Password?</a></p>
-  <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+  <h1>💘 Internal Match - Signup & Profile</h1>
+
+  <!-- Profile Picture -->
+  <img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg">
+  <input type="file" id="profilePicInput" accept="image/*">
+
+  <!-- Signup Info -->
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <input type="number" id="age" placeholder="Age"><br>
+
+  <select id="gender">
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select><br>
+
+  <select id="location">
+    <option value="">Select Country</option>
+  </select><br>
+
+  <select id="interest">
+    <option value="">Select Interest</option>
+    <option value="Friends 💚">Friends 💚</option>
+    <option value="Hangout 🩵">Hangout 🩵</option>
+    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+    <option value="Marriage 💘">Marriage 💘</option>
+    <option value="Casual Dating 💛">Casual Dating 💛</option>
+  </select><br>
+
+  <button onclick="signup()">💾 Signup & Save Profile</button>
+  <p class="note">Already have an account? <a href="index.html">Login</a></p>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -42,23 +70,60 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// --- Login Function ---
-function login(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  if(!email || !password){ alert("Fill all fields"); return; }
-  auth.signInWithEmailAndPassword(email,password)
-    .then(()=> { window.location.href="dashboard.html"; })
-    .catch(err=> alert(err.message));
-}
+// --- Profile Picture Upload ---
+const profilePicInput = document.getElementById('profilePicInput');
+const profilePicPreview = document.getElementById('profilePicPreview');
+let profilePicData = profilePicPreview.src;
 
-// --- Forgot Password ---
-function forgotPassword(){
-  const email = prompt("Enter your email to reset password:");
-  if(!email) return;
-  auth.sendPasswordResetEmail(email)
-    .then(()=> alert("Password reset email sent! Check your inbox."))
-    .catch(err=> alert(err.message));
+profilePicInput.addEventListener('change', function(event){
+  const file = event.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      profilePicPreview.src = e.target.result;
+      profilePicData = e.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+// --- Populate Countries ---
+const locationSelect = document.getElementById('location');
+const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Lucia","Saudi Arabia","Senegal","Serbia","Seychelles","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tanzania","Thailand","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Zambia","Zimbabwe"];
+countries.forEach(c=> locationSelect.innerHTML += `<option value="${c}">${c}</option>` );
+
+// --- Signup Function ---
+function signup(){
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const age = document.getElementById('age').value.trim();
+  const gender = document.getElementById('gender').value;
+  const location = locationSelect.value;
+  const interest = document.getElementById('interest').value;
+
+  if(!username || !email || !password || !age || !gender || !location || !interest){
+    alert("Please fill all fields!");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email,password)
+    .then(cred=>{
+      const uid = cred.user.uid;
+      db.ref('users/'+uid).set({
+        username,
+        email,
+        age,
+        gender,
+        location,
+        interest,
+        profilePic: profilePicData
+      }).then(()=>{
+        alert("Signup and Profile Setup Successful!");
+        window.location.href='dashboard.html';
+      });
+    })
+    .catch(err=> alert("Error: "+err.message));
 }
 </script>
 </body>
