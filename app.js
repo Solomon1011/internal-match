@@ -1,3 +1,4 @@
+// app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
 import {
   getAuth,
@@ -22,12 +23,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Signup with logging
+// Signup
 export async function signup(email, password, displayName) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName });
-    console.log("Signup successful:", userCredential.user);
+    console.log("Signup success:", userCredential.user);
     return userCredential.user;
   } catch (error) {
     console.error("Signup error:", error.code, error.message);
@@ -36,11 +37,11 @@ export async function signup(email, password, displayName) {
   }
 }
 
-// Login with logging
+// Login
 export async function login(email, password) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    console.log("Login successful:", userCredential.user);
+    console.log("Login success:", userCredential.user);
     return userCredential.user;
   } catch (error) {
     console.error("Login error:", error.code, error.message);
@@ -53,7 +54,7 @@ export async function login(email, password) {
 export async function logout() {
   try {
     await signOut(auth);
-    console.log("Logged out successfully");
+    console.log("Logged out");
   } catch (error) {
     console.error("Logout error:", error.code, error.message);
   }
@@ -62,7 +63,7 @@ export async function logout() {
 // Check auth
 export function checkAuth(callback) {
   onAuthStateChanged(auth, (user) => {
-    console.log("Auth state changed:", user);
+    console.log("Auth state:", user);
     callback(user);
   });
 }
