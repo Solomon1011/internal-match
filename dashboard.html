@@ -3,23 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<title>💘 Internal Match</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <h2 id="welcome"></h2>
-<button id="logoutBtn">Logout</button>
-<button onclick="window.location.href='profile_setup.html'">Profile Setup</button>
+
+<!-- Bottom Tab Bar -->
+<div class="bottom-tabs">
+  <a href="#"><img src="assets/swipe.svg" alt="Swipe"><span>Swipe</span></a>
+  <a href="#"><img src="assets/like.svg" alt="Like"><span>Like</span></a>
+  <a href="#"><img src="assets/message.svg" alt="Message"><span>Message</span></a>
+  <a href="#"><img src="assets/shop.svg" alt="Shop"><span>Shop</span></a>
+  <a href="profile_setup.html"><img src="assets/user.svg" alt="Profile"><span>Profile</span></a>
+</div>
 
 <script type="module">
 import { checkAuth, logout } from "./app.js";
 checkAuth(user => {
   if (!user) window.location.href = "login.html";
   else document.getElementById("welcome").textContent = `Welcome, ${user.displayName}!`;
-});
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await logout();
-  window.location.href = "login.html";
 });
 </script>
 </body>
