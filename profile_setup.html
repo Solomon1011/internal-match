@@ -4,117 +4,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Internal Match - Profile</title>
+<title>💘 Internal Match - Profile Setup</title>
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+body{
+font-family:Arial;
+background:#111;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+margin:0;
+}
+
+.card{
+background:#1c1c1c;
+padding:25px;
+border-radius:20px;
+width:90%;
+max-width:400px;
+text-align:center;
+}
+
+input, select{
+width:90%;
+padding:10px;
+margin:8px 0;
+border-radius:10px;
+border:none;
+}
+
+button{
+background:gold;
+border:none;
+padding:12px 20px;
+border-radius:20px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+</style>
 </head>
+
 <body>
 
 <div class="card">
-  <h1>💘 Internal Match - Profile Setup</h1>
 
-  <!-- Profile Picture -->
-  <div style="text-align:center; margin-bottom:20px;">
-    <img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg" 
-         style="width:120px;height:120px;border-radius:50%; display:block; margin:auto;">
-    <input type="file" id="profilePicInput" accept="image/*" style="margin-top:10px;">
-  </div>
+<h1>💘 Internal Match</h1>
+<h3>Profile Setup</h3>
 
-  <!-- Profile Info Form -->
-  <input type="text" id="username" placeholder="Username"><br>
-  <input type="number" id="age" placeholder="Age"><br>
-  
-  <select id="location">
-    <option value="">Select Country</option>
-  </select><br>
+<!-- Profile Picture -->
+<div style="margin-bottom:20px;">
 
-  <select id="gender">
-    <option value="">Select Gender</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-  </select><br>
-  
-  <select id="interest">
-    <option value="">Select Interest</option>
-    <option value="Friends 💚">Friends 💚</option>
-    <option value="Hangout 🩵">Hangout 🩵</option>
-    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-    <option value="Marriage 💘">Marriage 💘</option>
-  </select><br>
+<img id="profilePicPreview"
+src="https://randomuser.me/api/portraits/lego/1.jpg"
+style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin:auto;display:block;">
 
-  <button onclick="saveProfile()">💾 Save Profile</button>
+<input type="file"
+id="profilePicInput"
+accept="image/*"
+capture="environment"
+style="margin-top:10px;">
+
+</div>
+
+<!-- Profile Form -->
+
+<input type="text" id="username" placeholder="Username">
+
+<input type="number" id="age" placeholder="Age" min="18" max="100">
+
+<select id="location">
+<option value="">Select Country</option>
+</select>
+
+<select id="gender">
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+</select>
+
+<select id="interest">
+<option value="">Select Interest</option>
+<option value="Friends 💚">Friends 💚</option>
+<option value="Hangout 🩵">Hangout 🩵</option>
+<option value="Serious Relationship 💖">Serious Relationship 💖</option>
+<option value="Marriage 💘">Marriage 💘</option>
+</select>
+
+<button onclick="saveProfile()">💾 Save Profile</button>
+
 </div>
 
 <script>
-const profilePicInput = document.getElementById('profilePicInput');
-const profilePicPreview = document.getElementById('profilePicPreview');
-const usernameInput = document.getElementById('username');
-const ageInput = document.getElementById('age');
-const locationSelect = document.getElementById('location');
-const genderSelect = document.getElementById('gender');
-const interestSelect = document.getElementById('interest');
 
-// List of 152+ countries
-const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua & Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+const profilePicInput = document.getElementById("profilePicInput");
+const profilePicPreview = document.getElementById("profilePicPreview");
 
-// Fill location dropdown
-countries.forEach(c => {
-  locationSelect.innerHTML += `<option value="${c}">${c}</option>`;
-});
+const usernameInput = document.getElementById("username");
+const ageInput = document.getElementById("age");
+const locationSelect = document.getElementById("location");
+const genderSelect = document.getElementById("gender");
+const interestSelect = document.getElementById("interest");
 
 let profilePicData = profilePicPreview.src;
 
-// Preview uploaded image
-profilePicInput.addEventListener('change', function(event){
-  const file = event.target.files[0];
-  if(file){
-    const reader = new FileReader();
-    reader.onload = function(e){
-      profilePicPreview.src = e.target.result;
-      profilePicData = e.target.result;
-    }
-    reader.readAsDataURL(file);
-  }
+/* Country list */
+
+const countries = ["Nigeria","United States","United Kingdom","Canada","Germany","France","Italy","Spain","Brazil","India","China","Japan","Australia","South Africa","Kenya","Ghana","Mexico","Argentina","Turkey","Indonesia","Philippines","Thailand","Vietnam","Pakistan","Saudi Arabia","United Arab Emirates","Egypt","Morocco","Sweden","Norway","Denmark","Netherlands","Belgium","Switzerland","Austria","Poland","Portugal","Ireland","Finland","New Zealand"];
+
+/* Populate countries */
+
+countries.forEach(country=>{
+let option=document.createElement("option");
+option.value=country;
+option.textContent=country;
+locationSelect.appendChild(option);
 });
 
-// Load saved profile if exists
-window.addEventListener('load', function(){
-  const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
-  if(savedProfile){
-    usernameInput.value = savedProfile.username;
-    ageInput.value = savedProfile.age;
-    locationSelect.value = savedProfile.location;
-    genderSelect.value = savedProfile.gender;
-    interestSelect.value = savedProfile.interest;
-    profilePicPreview.src = savedProfile.profilePic;
-    profilePicData = savedProfile.profilePic;
-  }
+/* Image Upload Preview */
+
+profilePicInput.addEventListener("change",function(event){
+
+const file = event.target.files[0];
+
+if(!file) return;
+
+if(!file.type.startsWith("image/")){
+alert("Please upload an image file.");
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = function(e){
+profilePicPreview.src = e.target.result;
+profilePicData = e.target.result;
+};
+
+reader.readAsDataURL(file);
+
 });
+
+/* Load Saved Profile */
+
+window.addEventListener("load",function(){
+
+const savedProfile = JSON.parse(localStorage.getItem("userProfile"));
+
+if(savedProfile){
+
+usernameInput.value = savedProfile.username;
+ageInput.value = savedProfile.age;
+locationSelect.value = savedProfile.location;
+genderSelect.value = savedProfile.gender;
+interestSelect.value = savedProfile.interest;
+
+if(savedProfile.profilePic){
+profilePicPreview.src = savedProfile.profilePic;
+profilePicData = savedProfile.profilePic;
+}
+
+}
+
+});
+
+/* Save Profile */
 
 function saveProfile(){
-  const username = usernameInput.value.trim();
-  const age = ageInput.value.trim();
-  const location = locationSelect.value;
-  const gender = genderSelect.value;
-  const interest = interestSelect.value;
 
-  if(!username || !age || !location || !gender || !interest){
-    alert("Please fill all fields!");
-    return;
-  }
+const username = usernameInput.value.trim();
+const age = ageInput.value.trim();
+const location = locationSelect.value;
+const gender = genderSelect.value;
+const interest = interestSelect.value;
 
-  const userProfile = {
-    username,
-    age,
-    location,
-    gender,
-    interest,
-    profilePic: profilePicData
-  };
-
-  localStorage.setItem("userProfile", JSON.stringify(userProfile));
-  alert("Profile saved successfully!");
-  window.location.href = "dashboard.html";
+if(!username || !age || !location || !gender || !interest){
+alert("Please fill all fields.");
+return;
 }
+
+if(age < 18){
+alert("You must be at least 18 years old.");
+return;
+}
+
+const userProfile = {
+username,
+age,
+location,
+gender,
+interest,
+profilePic: profilePicData
+};
+
+localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
+alert("✅ Profile saved successfully!");
+
+window.location.href="dashboard.html";
+
+}
+
 </script>
 
 </body>
