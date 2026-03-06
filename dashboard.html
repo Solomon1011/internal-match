@@ -1,46 +1,24 @@
+<!-- dashboard.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💘 Internal Match - Dashboard</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
-  </style>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h2>Welcome to Dashboard!</h2>
 
-<h2>💘 Internal Match - Dashboard</h2>
-
-<p>Welcome to your dashboard!</p>
-
-<!-- Firebase SDK (Modular) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
-  // Firebase Configuration (Use your own config)
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Check if the user is logged in
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location = "login.html";  // Redirect to login if not logged in
-    } else {
-      console.log("User is logged in:", user);
-    }
-  });
-</script>
-
+  <script type="module">
+    import { checkAuth } from "./app.js";
+    
+    checkAuth().then(user => {
+      if (!user) {
+        window.location = "login.html"; // Redirect to login if no user is logged in
+      }
+    });
+  </script>
 </body>
 </html>
