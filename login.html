@@ -18,7 +18,7 @@
 <script type="module">
 import { login } from "./app.js";
 const form = document.getElementById("loginForm");
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
   const user = await login(
     document.getElementById("email").value.trim(),
