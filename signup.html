@@ -19,7 +19,7 @@
 <script type="module">
 import { signup } from "./app.js";
 const form = document.getElementById("signupForm");
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
   const user = await signup(
     document.getElementById("email").value.trim(),
