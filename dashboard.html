@@ -2,112 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💘 Internal Match - Dashboard</title>
   <style>
-    /* Your existing CSS styles */
+    /* Your custom CSS styling for dashboard page */
+    body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
   </style>
 </head>
 <body>
 
-<h2>💘 Internal Match</h2>
+<h2>💘 Internal Match - Dashboard</h2>
 
-<div class="tab-content">
-  <!-- PROFILE -->
-  <div id="profile" class="tab">
-    <div class="card">
-      <h3>My Profile</h3>
-      <img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg"><br>
-      <input type="file" id="profilePicInput" accept="image/*">
-      <input id="username" placeholder="Username">
-      <input id="age" type="number" placeholder="Age">
-      <select id="gender">
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <select id="location">
-        <option value="">Select Country</option>
-      </select>
-      <select id="interest">
-        <option value="">Select Interest</option>
-        <option value="Friends 💚">Friends 💚</option>
-        <option value="Hangout 🩵">Hangout 🩵</option>
-        <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-        <option value="Marriage 💘">Marriage 💘</option>
-      </select>
-      <button onclick="saveProfile()">Save Profile</button>
-      <div id="errorProfile"></div>
-    </div>
-  </div>
-
-  <!-- Other tabs (People, Liked, etc.) -->
-</div>
-
-<!-- Bottom navigation -->
-<div class="tab-bar">
-  <button onclick="showTab('people')">💘 Swipe</button>
-  <button onclick="showTab('liked')">❤️ Likes</button>
-  <button onclick="showTab('chat')">💬 Chat <span id="chatBadge"></span></button>
-  <button onclick="showTab('profile')">👤 Profile</button>
-  <button onclick="showTab('shop')">💰 Shop</button>
-</div>
+<p>Welcome to your dashboard!</p>
 
 <!-- Firebase SDK (Modular) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
+  // Firebase Configuration (Use your own config)
   const firebaseConfig = {
-    apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg", 
-    authDomain: "internal-match.firebaseapp.com", 
-    projectId: "internal-match",
-    storageBucket: "internal-match.appspot.com", 
-    messagingSenderId: "129707008837", 
-    appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getDatabase(app);
 
   // Check if the user is logged in
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       window.location = "login.html";  // Redirect to login if not logged in
     } else {
-      currentUser = user;
-      loadProfile();
-      setOnlineStatus();
-      loadPeopleProfiles();
-      listenForUnreadMessages();
-      showTab('people'); // Show the first tab by default
+      console.log("User is logged in:", user);
     }
   });
-
-  function loadProfile() {
-    if (!currentUser) return;
-    // Load user profile data from Firebase Database
-  }
-
-  function setOnlineStatus() {
-    if (!currentUser) return;
-    // Set user as online in the database
-  }
-
-  function loadPeopleProfiles() {
-    // Load people profiles logic
-  }
-
-  function listenForUnreadMessages() {
-    // Listen for unread messages logic
-  }
-
-  function showTab(tab) {
-    document.querySelectorAll(".tab").forEach(el => el.style.display = 'none');
-    document.getElementById(tab).style.display = 'block';
-  }
 </script>
 
 </body>
