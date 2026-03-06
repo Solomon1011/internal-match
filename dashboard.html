@@ -7,19 +7,23 @@
 <style>
 body{margin:0;font-family:Arial;background:#111;color:white;}
 h2{text-align:center;margin:10px 0;}
-.tab-content{padding-bottom:80px;}
+.tab-content{padding-bottom:100px;}
 .tab{display:none;padding:15px;text-align:center;}
-.card{background:#1c1c1c;padding:20px;border-radius:20px;margin:10px;}
+.card{background:#1c1c1c;padding:20px;border-radius:20px;margin:10px;position:relative;}
 input, select{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
 button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;}
 .tab-bar{position:fixed;bottom:0;width:100%;background:black;display:flex;justify-content:space-around;padding:10px 0;border-top:2px solid gold;}
-.tab-bar button{background:none;border:none;color:gold;font-size:22px;cursor:pointer;}
+.tab-bar button{background:none;border:none;color:gold;font-size:22px;cursor:pointer;position:relative;}
+#chatBadge{color:red;font-weight:bold;position:absolute;top:0;right:10px;}
 #chat-box{height:300px;overflow-y:auto;background:#000;padding:10px;margin-bottom:10px;border-radius:10px;}
 .message{padding:8px;margin:5px;border-radius:10px;max-width:70%;}
 .user{background:#25D366;margin-left:auto;}
 .other{background:#333;}
 #errorProfile{color:#ff4c4c;margin-top:5px;}
 img{border-radius:50%;width:100px;height:100px;}
+.live-dot{width:12px;height:12px;border-radius:50%;position:absolute;top:10px;right:10px;border:2px solid #111;}
+#callArea{display:none;margin-top:10px;}
+#local-stream,#remote-stream{width:150px;height:150px;background:black;margin:5px;display:inline-block;}
 </style>
 </head>
 <body>
@@ -77,6 +81,14 @@ img{border-radius:50%;width:100px;height:100px;}
 <div id="chat-box"></div>
 <input id="chat-input" placeholder="Type message">
 <button onclick="sendMessage()">Send</button>
+<button onclick="startCallAgora()">📞 Call</button>
+
+<div id="callArea">
+  <h3>Call with <span id="callWithName"></span></h3>
+  <div id="local-stream"></div>
+  <div id="remote-stream"></div>
+  <button onclick="endCall()">End Call</button>
+</div>
 </div>
 
 <!-- SHOP COINS -->
@@ -94,24 +106,28 @@ img{border-radius:50%;width:100px;height:100px;}
 <div class="tab-bar">
 <button onclick="showTab('people')">💘 Swipe</button>
 <button onclick="showTab('liked')">❤️ Likes</button>
-<button onclick="showTab('chat')">💬 Chat</button>
+<button onclick="showTab('chat')">💬 Chat <span id="chatBadge"></span></button>
 <button onclick="showTab('profile')">👤 Profile</button>
 <button onclick="showTab('shop')">💰 Shop</button>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<!-- Agora SDK -->
+<script src="https://cdn.agora.io/sdk/release/AgoraRTC_N.js"></script>
+
 <script>
 // --- Firebase Config ---
 const firebaseConfig = {
-  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+  apiKey: "YOUR_FIREBASE_API_KEY",
   authDomain: "internal-match.firebaseapp.com",
   projectId: "internal-match",
   storageBucket: "internal-match.appspot.com",
-  messagingSenderId: "129707008837",
-  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -145,11 +161,8 @@ profilePicInput.addEventListener('change', e=>{
   }
 });
 
-// --- Show Tab ---
-function showTab(tab){
-  document.querySelectorAll(".tab").forEach(el=>el.style.display='none');
-  document.getElementById(tab).style.display='block';
-}
+// --- Tabs ---
+function showTab(tab){document.querySelectorAll(".tab").forEach(el=>el.style.display='none');document.getElementById(tab).style.display='block';}
 
 // --- Current User ---
 let currentUser = null;
@@ -178,124 +191,42 @@ function saveProfile(){
   const gender = genderSelect.value;
   const location = locationSelect.value;
   const interest = interestSelect.value;
-
   if(!username||!age||!gender||!location||!interest){
     errorProfile.innerText = "Please fill all fields!";
     return;
   }
-
-  db.ref('users/' + currentUser.uid).set({
-    username: username,
-    age: age,
-    gender: gender,
-    location: location,
-    interest: interest,
-    profilePic: profilePicData,
-    email: currentUser.email
-  }).then(()=>errorProfile.innerText="Profile saved!");
+  db.ref('users/' + currentUser.uid).set({username,age,gender,location,interest,profilePic:profilePicData,email:currentUser.email,online:true}).then(()=>errorProfile.innerText="Profile saved!");
 }
+
+// --- Live Status ---
+function setOnlineStatus(){if(!currentUser) return;db.ref('users/'+currentUser.uid+'/online').set(true);window.addEventListener("beforeunload", ()=>db.ref('users/'+currentUser.uid+'/online').set(false));}
 
 // --- People Profiles ---
-let demoProfiles = [];
-let currentIndex = 0;
-
-function loadPeopleProfiles(){
-  if(!currentUser) return;
-  db.ref('users').once('value').then(snapshot => {
-    const usersObj = snapshot.val() || {};
-    demoProfiles = [];
-    Object.keys(usersObj).forEach(uid => {
-      if(uid !== currentUser.uid){
-        demoProfiles.push({uid, ...usersObj[uid], liked:false});
-      }
-    });
-    currentIndex = 0;
-    showProfile();
-  });
-}
-
-function showProfile(){
-  if(currentIndex >= demoProfiles.length){
-    document.getElementById('swipe-container').innerHTML = "No more users!";
-    return;
-  }
-  const p = demoProfiles[currentIndex];
-  document.getElementById('swipe-container').innerHTML = `
-    <div class="card">
-      <img src="${p.profilePic || 'https://randomuser.me/api/portraits/lego/1.jpg'}">
-      <h3>${p.username}, ${p.age}</h3>
-      <p>${p.gender} | ${p.location}</p>
-      <p>Interest: ${p.interest}</p>
-      <button onclick="likeProfile()">💖 Like</button>
-      <button onclick="nextProfile()">❌ Ignore</button>
-      <button onclick="startChat(${currentIndex})">💬 Message</button>
-    </div>
-  `;
-}
-
+let demoProfiles = [];let currentIndex = 0;
+function loadPeopleProfiles(){if(!currentUser) return;db.ref('users').once('value').then(snapshot => {const usersObj = snapshot.val() || {};demoProfiles = [];Object.keys(usersObj).forEach(uid => {if(uid!==currentUser.uid){demoProfiles.push({...usersObj[uid],uid});}});currentIndex=0;showProfile();});}
+function showProfile(){if(currentIndex>=demoProfiles.length){document.getElementById('swipe-container').innerHTML="No more users!";return;}const p=demoProfiles[currentIndex];const onlineDot=p.online?'lime':'gray';document.getElementById('swipe-container').innerHTML=`<div class="card"><img src="${p.profilePic||'https://randomuser.me/api/portraits/lego/1.jpg'}"><div class="live-dot" style="background:${onlineDot}"></div><h3>${p.username}, ${p.age}</h3><p>${p.gender} | ${p.location}</p><p>Interest: ${p.interest}</p><button onclick="likeProfile()">💖 Like</button><button onclick="nextProfile()">❌ Ignore</button><button onclick="startChat(${currentIndex})">💬 Message</button></div>`;}
 function likeProfile(){demoProfiles[currentIndex].liked=true;addLike(demoProfiles[currentIndex]);nextProfile();}
 function nextProfile(){currentIndex++;showProfile();}
 function addLike(profile){const container=document.getElementById('liked-container');const div=document.createElement('div');div.innerText=profile.username+" 💖";container.appendChild(div);}
 
-// --- Real-time Chat ---
-let currentChatId = null;
-let currentChatUserName = null;
+// --- Chat ---
+let currentChatId=null;let currentChatUserName=null;
+function startChat(index){const user=demoProfiles[index];if(!currentUser) return;const ids=[currentUser.uid,user.uid].sort();currentChatId=ids.join("_");currentChatUserName=user.username;showTab('chat');updateChatHeader();loadMessages();}
+function updateChatHeader(){const box=document.getElementById('chat-box');box.innerHTML=`<p style="color:gold;font-weight:bold;">Chat with ${currentChatUserName}</p>`;}
+function loadMessages(){if(!currentChatId) return;const messagesRef=db.ref('chats/'+currentChatId+'/messages');messagesRef.off();messagesRef.on('child_added',snapshot=>{const msg=snapshot.val();appendMessage(msg.from===currentUser.uid?'You':currentChatUserName,msg.text,msg.from===currentUser.uid);});}
+function appendMessage(sender,text,isUser){const box=document.getElementById('chat-box');const div=document.createElement('div');div.className='message '+(isUser?'user':'other');div.innerHTML=`<strong>${sender}:</strong> ${text}`;box.appendChild(div);box.scrollTop=box.scrollHeight;}
+function sendMessage(){const input=document.getElementById('chat-input');const text=input.value.trim();if(!text||!currentChatId) return;db.ref('chats/'+currentChatId+'/messages').push({from:currentUser.uid,text:text,timestamp:Date.now()});input.value='';document.getElementById("chatBadge").innerText="";}
 
-function startChat(index){
-  const user = demoProfiles[index];
-  if(!currentUser) return;
-  const ids = [currentUser.uid, user.uid].sort();
-  currentChatId = ids.join("_");
-  currentChatUserName = user.username;
+// --- Agora Call ---
+let client=null,localStream=null,remoteStream=null;
+function startCallAgora(){if(!currentChatUserName) return alert("Select a chat first");document.getElementById("callWithName").innerText=currentChatUserName;document.getElementById("callArea").style.display="block";client=AgoraRTC.createClient({mode:'rtc',codec:'vp8'});client.init("YOUR_AGORA_APP_ID",()=>{console.log("Agora initialized");},err=>console.error(err));client.join(null,currentChatId,null,uid=>{localStream=AgoraRTC.createStream({audio:true,video:true});localStream.init(()=>{localStream.play('local-stream');client.publish(localStream);},err=>console.error(err));client.on('stream-added',evt=>{client.subscribe(evt.stream,err=>console.error(err));});client.on('stream-subscribed',evt=>{remoteStream=evt.stream;remoteStream.play('remote-stream');});});}
+function endCall(){if(localStream)localStream.close();if(client)client.leave();document.getElementById("callArea").style.display="none";}
 
-  showTab('chat');
-  updateChatHeader();
-  loadMessages();
-}
-
-function updateChatHeader(){
-  const box = document.getElementById('chat-box');
-  box.innerHTML = `<p style="color:gold;font-weight:bold;">Chat with ${currentChatUserName}</p>`;
-}
-
-function loadMessages(){
-  if(!currentChatId) return;
-  const messagesRef = db.ref('chats/' + currentChatId + '/messages');
-  messagesRef.off();
-  messagesRef.on('child_added', snapshot=>{
-    const msg = snapshot.val();
-    appendMessage(msg.from === currentUser.uid ? 'You' : currentChatUserName, msg.text, msg.from === currentUser.uid);
-  });
-}
-
-function appendMessage(sender,text,isUser){
-  const box = document.getElementById('chat-box');
-  const div = document.createElement('div');
-  div.className = 'message ' + (isUser ? 'user' : 'other');
-  div.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
-
-function sendMessage(){
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
-  if(!text || !currentChatId) return;
-  db.ref('chats/'+currentChatId+'/messages').push({from:currentUser.uid,text:text,timestamp:Date.now()});
-  input.value='';
-}
+// --- Unread badge ---
+function listenForUnreadMessages(){db.ref('chats').on('child_added',snap=>{const chat=snap.val();if(!chat.messages)return;const messages=Object.values(chat.messages);const lastMsg=messages[messages.length-1];if(lastMsg.from!==currentUser.uid){document.getElementById("chatBadge").innerText="●";}});}
 
 // --- Initialize ---
-auth.onAuthStateChanged(user => {
-  if(user){
-    currentUser = user;
-    loadProfile();
-    loadPeopleProfiles();
-    showTab('people');
-  } else {
-    window.location='login.html';
-  }
-});
+auth.onAuthStateChanged(user=>{if(user){currentUser=user;loadProfile();setOnlineStatus();loadPeopleProfiles();listenForUnreadMessages();showTab('people');}else{window.location='login.html';}});
 </script>
 </body>
 </html>
