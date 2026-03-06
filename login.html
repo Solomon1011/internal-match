@@ -2,59 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💘 Internal Match - Login</title>
   <style>
-    /* Your existing CSS styling */
+    /* Your custom CSS styling for login page */
+    body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
+    .card { background: #1c1c1c; padding: 20px; border-radius: 10px; margin: 20px; max-width: 400px; }
+    input, button { padding: 10px; margin: 10px; width: 90%; border-radius: 5px; }
+    button { background-color: gold; }
   </style>
 </head>
 <body>
 
   <div class="card">
     <h2>💘 Internal Match - Login</h2>
-
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-
     <button onclick="login()">Login</button>
-    <a href="#" onclick="forgotPassword()">Forgot Password?</a>
     <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
-
     <div id="errorMsg"></div>
   </div>
 
-  <!-- Firebase v9 SDK (Modular) -->
   <script type="module">
-    // Import the necessary Firebase SDK modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    // Firebase configuration
+    // Firebase Configuration (Use your own config)
     const firebaseConfig = {
-      apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg", 
-      authDomain: "internal-match.firebaseapp.com", 
-      projectId: "internal-match",
-      storageBucket: "internal-match.appspot.com", 
-      messagingSenderId: "129707008837", 
-      appId: "1:129707008837:web:f3f0033bbbe673107a542c"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Check if the user is already logged in (redirect if logged in)
+    // Check if the user is already logged in
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // If the user is logged in, redirect them to the dashboard
-        window.location = "dashboard.html";
+        window.location = "dashboard.html";  // Redirect to dashboard if logged in
       }
     });
 
     // Login function
     function login() {
       const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      const password = document.getElementById('password').value.trim();
 
       if (!email || !password) {
         alert("Please enter both email and password.");
@@ -66,11 +63,10 @@
           window.location = "dashboard.html";  // Redirect to dashboard after successful login
         })
         .catch((error) => {
-          console.error("Login failed: ", error.message);
-          alert("Login failed. Please try again.");
+          console.error("Login failed:", error.message);
+          alert("Login failed. Please check your email and password.");
         });
     }
   </script>
-
 </body>
 </html>
