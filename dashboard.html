@@ -13,7 +13,6 @@
 <h2>💘 Internal Match</h2>
 
 <div class="tab-content">
-
   <!-- PROFILE -->
   <div id="profile" class="tab">
     <div class="card">
@@ -43,7 +42,7 @@
   </div>
 
   <!-- Other tabs (People, Liked, etc.) -->
-  
+
 </div>
 
 <!-- Bottom navigation -->
@@ -80,16 +79,14 @@ const db = firebase.database();
 // --- Check if the user is logged in ---
 auth.onAuthStateChanged(user => {
   if (!user) {
-    // If the user is not logged in, redirect to the login page
-    window.location = "login.html";
+    window.location = "login.html"; // Redirect to login if not logged in
   } else {
-    // If logged in, proceed to load the dashboard
     currentUser = user;
     loadProfile();
     setOnlineStatus();
     loadPeopleProfiles();
     listenForUnreadMessages();
-    showTab('people'); // Show the first tab by default
+    showTab('people'); // Show the first tab
   }
 });
 
@@ -105,13 +102,9 @@ function loadProfile() {
     document.getElementById('location').value = data.location || '';
     document.getElementById('interest').value = data.interest || '';
     document.getElementById('profilePicPreview').src = data.profilePic || 'https://randomuser.me/api/portraits/lego/1.jpg';
+  }).catch(error => {
+    console.error("Error loading profile data: ", error);
   });
-}
-
-// --- Tab switching logic ---
-function showTab(tab) {
-  document.querySelectorAll(".tab").forEach(el => el.style.display = 'none');
-  document.getElementById(tab).style.display = 'block';
 }
 
 // --- Set online status ---
@@ -121,7 +114,12 @@ function setOnlineStatus() {
   window.addEventListener("beforeunload", () => db.ref('users/' + currentUser.uid + '/online').set(false));
 }
 
-// Add your remaining functions like saving profile, chat, etc.
+// --- Tab switching logic ---
+function showTab(tab) {
+  document.querySelectorAll(".tab").forEach(el => el.style.display = 'none');
+  document.getElementById(tab).style.display = 'block';
+}
+
 </script>
 
 </body>
