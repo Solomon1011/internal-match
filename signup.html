@@ -8,25 +8,29 @@
 </head>
 <body>
 <h2>Sign Up</h2>
+
 <form id="signupForm">
   <input type="text" id="name" placeholder="Full Name" required><br>
   <input type="email" id="email" placeholder="Email" required><br>
   <input type="password" id="password" placeholder="Password" required><br>
   <button type="submit">Sign Up</button>
 </form>
+
 <p>Already have an account? <a href="login.html">Login</a></p>
 
 <script type="module">
 import { signup, checkAuth } from "./app.js";
 
-document.getElementById("signupForm").addEventListener("submit", async e => {
-  e.preventDefault(); // prevent refresh
+const form = document.getElementById("signupForm");
 
-  const user = await signup(
-    document.getElementById("email").value.trim(),
-    document.getElementById("password").value,
-    document.getElementById("name").value.trim()
-  );
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const user = await signup(email, password, name);
 
   if (user) {
     checkAuth(u => {
