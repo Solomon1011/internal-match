@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>💘 Internal Match - Login</title>
   <style>
-    /* Your custom CSS styling for login page */
+    /* Your custom CSS styling */
     body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
     .card { background: #1c1c1c; padding: 20px; border-radius: 10px; margin: 20px; max-width: 400px; }
     input, button { padding: 10px; margin: 10px; width: 90%; border-radius: 5px; }
@@ -18,11 +18,12 @@
     <h2>💘 Internal Match - Login</h2>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <button id="loginBtn">Login</button>
     <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
     <div id="errorMsg"></div>
   </div>
 
+  <!-- Firebase SDK (Modular) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -49,7 +50,7 @@
     });
 
     // Login function
-    function login() {
+    document.getElementById('loginBtn').addEventListener('click', function() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
@@ -66,7 +67,8 @@
           console.error("Login failed:", error.message);
           alert("Login failed. Please check your email and password.");
         });
-    }
+    });
   </script>
+
 </body>
 </html>
