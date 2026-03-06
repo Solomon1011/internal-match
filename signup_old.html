@@ -1,155 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💘 Internal Match - Signup & Profile</title>
-<style>
-body{margin:0;font-family:Arial;background:#111;color:white;text-align:center;}
-.card{background:#1c1c1c;padding:20px;border-radius:20px;margin:20px auto;width:90%;max-width:400px;}
-input, select{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
-button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;width:95%;}
-a{color:gold;display:block;margin-top:10px;text-decoration:none;}
-img{border-radius:50%;width:120px;height:120px;margin-bottom:10px;}
-#errorMsg{color:#ff4c4c;margin-top:10px;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💘 Internal Match - Sign Up</title>
+  <style>
+    /* Your custom CSS styling for signup page */
+    body { font-family: Arial, sans-serif; background: #111; color: white; text-align: center; }
+    .card { background: #1c1c1c; padding: 20px; border-radius: 10px; margin: 20px; max-width: 400px; }
+    input, button { padding: 10px; margin: 10px; width: 90%; border-radius: 5px; }
+    button { background-color: gold; }
+  </style>
 </head>
 <body>
 
-<div class="card">
-<h2>💘 Internal Match - Signup & Profile</h2>
+  <div class="card">
+    <h2>💘 Internal Match - Sign Up</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="signup()">Create Account</button>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+    <div id="errorMsg"></div>
+  </div>
 
-<!-- Profile Picture -->
-<img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Profile Pic">
-<input type="file" id="profilePicInput" accept="image/*">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-<!-- Signup Info -->
-<input type="text" id="username" placeholder="Username">
-<input type="number" id="age" placeholder="Age">
+    // Firebase Configuration (Use your own config)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-<select id="gender">
-  <option value="">Select Gender</option>
-  <option value="Male">Male</option>
-  <option value="Female">Female</option>
-</select>
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-<select id="location">
-  <option value="">Select Country</option>
-</select>
+    // Signup function
+    function signup() {
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-<select id="interest">
-  <option value="">Select Interest</option>
-  <option value="Friends 💚">Friends 💚</option>
-  <option value="Hangout 🩵">Hangout 🩵</option>
-  <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-  <option value="Marriage 💘">Marriage 💘</option>
-</select>
-
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-
-<button onclick="signup()">💾 Create Account</button>
-<p>Already have an account? <a href="login.html">Login</a></p>
-<div id="errorMsg"></div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-// --- Firebase Config ---
-const firebaseConfig = {
-  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-  authDomain: "internal-match.firebaseapp.com",
-  projectId: "internal-match",
-  storageBucket: "internal-match.appspot.com",
-  messagingSenderId: "129707008837",
-  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-
-// --- Elements ---
-const profilePicInput = document.getElementById('profilePicInput');
-const profilePicPreview = document.getElementById('profilePicPreview');
-const usernameInput = document.getElementById('username');
-const ageInput = document.getElementById('age');
-const genderSelect = document.getElementById('gender');
-const locationSelect = document.getElementById('location');
-const interestSelect = document.getElementById('interest');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const errorMsg = document.getElementById('errorMsg');
-
-// --- Country List ---
-const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Bulgaria","Burundi","Cambodia","Cameroon","Canada","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Liberia","Libya","Lithuania","Luxembourg","Malaysia","Maldives","Malta","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Myanmar","Nepal","Netherlands","New Zealand","Nicaragua","Nigeria","Norway","Oman","Pakistan","Palestine","Panama","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saudi Arabia","Senegal","Serbia","Seychelles","Singapore","Slovakia","Slovenia","South Africa","South Korea","Spain","Sri Lanka","Sweden","Switzerland","Taiwan","Tanzania","Thailand","Turkey","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Zambia","Zimbabwe"];
-
-countries.forEach(c=>{
-  locationSelect.innerHTML += `<option value="${c}">${c}</option>`;
-});
-
-// --- Profile Pic Preview ---
-let profilePicData = profilePicPreview.src;
-profilePicInput.addEventListener('change', e=>{
-  const file = e.target.files[0];
-  if(file){
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      profilePicPreview.src = ev.target.result;
-      profilePicData = ev.target.result;
-    }
-    reader.readAsDataURL(file);
-  }
-});
-
-// --- Signup Function ---
-function signup(){
-  errorMsg.innerText = "";
-  const username = usernameInput.value.trim();
-  const age = ageInput.value.trim();
-  const gender = genderSelect.value;
-  const location = locationSelect.value;
-  const interest = interestSelect.value;
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
-
-  if(!username||!age||!gender||!location||!interest||!email||!password){
-    errorMsg.innerText = "Please fill all fields!";
-    return;
-  }
-
-  auth.createUserWithEmailAndPassword(email,password)
-    .then(userCredential=>{
-      const uid = userCredential.user.uid;
-      // Save profile info
-      db.ref('users/' + uid).set({
-        username: username,
-        age: age,
-        gender: gender,
-        location: location,
-        interest: interest,
-        profilePic: profilePicData,
-        email: email
-      }).then(()=>{
-        // Redirect silently
-        window.location = "dashboard.html";
-      });
-    })
-    .catch(error=>{
-      // Friendly error messages
-      if(error.code === "auth/email-already-in-use"){
-        errorMsg.innerText = "Email already in use!";
-      } else if(error.code === "auth/invalid-email"){
-        errorMsg.innerText = "Invalid email address!";
-      } else if(error.code === "auth/weak-password"){
-        errorMsg.innerText = "Password too weak! Use at least 6 characters.";
-      } else {
-        errorMsg.innerText = "Signup failed, try again!";
+      if (!username || !email || !password) {
+        alert("Please fill out all fields.");
+        return;
       }
-    });
-}
-</script>
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // User signed up successfully
+          window.location = "dashboard.html";  // Redirect to dashboard
+        })
+        .catch((error) => {
+          console.error("Signup failed:", error.message);
+          alert("Signup failed. Please try again.");
+        });
+    }
+  </script>
 </body>
 </html>
