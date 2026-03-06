@@ -83,13 +83,14 @@
     // --- Elements ---
     const errorMsg = document.getElementById('errorMsg');
 
-    // --- Ensure user stays logged in ---
+    // --- Ensure session persists across reloads ---
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .then(() => {
-        // --- Check if the user is already logged in on page load ---
+        // Check if the user is logged in
         firebase.auth().onAuthStateChanged(user => {
-          console.log("Auth State Changed:", user); // Log user info to see if they are signed in
+          console.log("Auth State Changed:", user);
           if (user) {
+            // If logged in, redirect to dashboard
             window.location = "dashboard.html";
           }
         });
