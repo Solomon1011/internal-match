@@ -3,47 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sign Up - Internal Match</title>
+<title>💘 Internal Match - Signup & Profile Setup</title>
 <style>
-body {margin:0;font-family:Arial;background:#111;color:white;display:flex;justify-content:center;align-items:center;min-height:100vh;}
-.card {background:#1c1c1c;padding:30px;border-radius:20px;width:90%;max-width:400px;text-align:center;}
-h2 {margin-bottom:20px;}
-input, select {width:90%;padding:12px;margin:10px 0;border-radius:10px;border:none;font-size:16px;}
-button {background:gold;border:none;padding:12px 25px;border-radius:20px;font-weight:bold;cursor:pointer;margin:5px;font-size:16px;}
-a {color:gold;cursor:pointer;text-decoration:underline;}
-#profilePicPreview {width:120px;height:120px;border-radius:50%;display:block;margin:auto;}
+body{margin:0;font-family:Arial;background:#111;color:white;text-align:center;}
+.card{background:#1c1c1c;padding:20px;border-radius:20px;margin:20px auto;width:90%;max-width:400px;}
+input,select{width:90%;padding:10px;margin:5px;border-radius:10px;border:none;}
+button{background:gold;border:none;padding:10px 20px;border-radius:20px;margin-top:10px;font-weight:bold;cursor:pointer;}
+img{width:120px;height:120px;border-radius:50%;margin:10px auto;display:block;}
 </style>
 </head>
 <body>
 
-<div class="card" id="signup-card">
-  <h2>💘 Internal Match - Sign Up</h2>
-  <input type="text" id="username" placeholder="Username">
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="signup()">Create Account</button>
-  <p>Already have an account? <a href="login.html">Login</a></p>
-</div>
+<div class="card">
+  <h1>💘 Internal Match - Signup & Profile</h1>
 
-<div class="card" id="profile-card" style="display:none;">
-  <h2>Setup Your Profile</h2>
-  <div style="text-align:center; margin-bottom:20px;">
-    <img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg">
-    <input type="file" id="profilePicInput" accept="image/*" style="margin-top:10px;">
-  </div>
-  <input type="number" id="age" placeholder="Age">
+  <!-- Profile Picture -->
+  <img id="profilePicPreview" src="https://randomuser.me/api/portraits/lego/1.jpg">
+  <input type="file" id="profilePicInput" accept="image/*">
+
+  <!-- Signup Info -->
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <input type="number" id="age" placeholder="Age"><br>
+
   <select id="gender">
     <option value="">Select Gender</option>
     <option value="Male">Male</option>
     <option value="Female">Female</option>
-  </select>
+  </select><br>
+
   <select id="location">
     <option value="">Select Country</option>
-  </select>
-  <button onclick="saveProfile()">Save Profile</button>
+  </select><br>
+
+  <select id="interest">
+    <option value="">Select Interest</option>
+    <option value="Friends 💚">Friends 💚</option>
+    <option value="Hangout 🩵">Hangout 🩵</option>
+    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+    <option value="Marriage 💘">Marriage 💘</option>
+  </select><br>
+
+  <button onclick="signup()">💾 Signup & Save Profile</button>
+  <p>Already have an account? <a href="index.html" style="color:gold;">Login</a></p>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -62,17 +67,11 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// --- Countries for Location ---
-const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Eswatini","Ethiopia","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kenya","Kuwait","Latvia","Lebanon","Lithuania","Luxembourg","Malaysia","Maldives","Malta","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nigeria","North Korea","Norway","Oman","Pakistan","Palestine","Panama","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saudi Arabia","Senegal","Serbia","Singapore","Slovakia","Slovenia","South Africa","South Korea","Spain","Sri Lanka","Sweden","Switzerland","Taiwan","Tanzania","Thailand","Turkey","Ukraine","United Arab Emirates","United Kingdom","United States","Vietnam","Zambia","Zimbabwe"];
-
-// Fill location dropdown
-const locationSelect = document.getElementById('location');
-countries.forEach(c => locationSelect.innerHTML += `<option value="${c}">${c}</option>`);
-
-// --- Image Upload Preview ---
-let profilePicData = "https://randomuser.me/api/portraits/lego/1.jpg";
+// --- Profile Picture Upload ---
 const profilePicInput = document.getElementById('profilePicInput');
 const profilePicPreview = document.getElementById('profilePicPreview');
+let profilePicData = profilePicPreview.src;
+
 profilePicInput.addEventListener('change', function(event){
   const file = event.target.files[0];
   if(file){
@@ -85,39 +84,45 @@ profilePicInput.addEventListener('change', function(event){
   }
 });
 
-// --- Sign Up Function ---
+// --- Countries Dropdown ---
+const locationSelect = document.getElementById('location');
+const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Lucia","Saudi Arabia","Senegal","Serbia","Seychelles","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tanzania","Thailand","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Zambia","Zimbabwe"];
+countries.forEach(c=>{ locationSelect.innerHTML+=`<option value="${c}">${c}</option>` });
+
+// --- Signup Function ---
 function signup(){
-  const username = document.getElementById("username").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  if(!username || !email || !password){ alert("Fill all fields"); return; }
-
-  auth.createUserWithEmailAndPassword(email,password)
-    .then(res=>{
-      const uid = res.user.uid;
-      // Temporarily save username and email, prompt for profile
-      db.ref('users/'+uid).set({username,email});
-      // Show profile setup
-      document.getElementById('signup-card').style.display='none';
-      document.getElementById('profile-card').style.display='block';
-      window.currentUserUid = uid;
-    })
-    .catch(err=> alert(err.message));
-}
-
-// --- Save Profile Setup ---
-function saveProfile(){
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
   const age = document.getElementById('age').value.trim();
   const gender = document.getElementById('gender').value;
-  const location = document.getElementById('location').value;
-  if(!age || !gender || !location){ alert("Fill all profile fields"); return; }
+  const location = locationSelect.value;
+  const interest = document.getElementById('interest').value;
 
-  const uid = window.currentUserUid;
-  db.ref('users/'+uid).update({
-    age, gender, location, profilePic: profilePicData
-  });
-  alert("Profile setup complete!");
-  window.location.href = "dashboard.html";
+  if(!username || !email || !password || !age || !gender || !location || !interest){
+    alert("Please fill all fields!");
+    return;
+  }
+
+  // Create user in Firebase Auth
+  auth.createUserWithEmailAndPassword(email,password)
+    .then(cred=>{
+      const uid = cred.user.uid;
+      // Save profile info in Firebase Realtime Database
+      db.ref('users/'+uid).set({
+        username,
+        email,
+        age,
+        gender,
+        location,
+        interest,
+        profilePic: profilePicData
+      }).then(()=>{
+        alert("Signup and Profile Setup Successful!");
+        window.location.href='dashboard.html';
+      });
+    })
+    .catch(err=>{ alert("Error: "+err.message); });
 }
 </script>
 
