@@ -1,41 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - 💘 Internal Match</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - 💘 Internal Match</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>Login</h2>
+  <h2>Login</h2>
 
-<form id="loginForm">
-  <input type="email" id="email" placeholder="Email" required><br>
-  <input type="password" id="password" placeholder="Password" required><br>
-  <button type="submit">Login</button>
-</form>
+  <form id="authForm" data-action="login">
+    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
 
-<p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+  <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 
-<script type="module">
-import { login, checkAuth } from "./app.js";
-
-const form = document.getElementById("loginForm");
-
-form.addEventListener("submit", async e => {
-  e.preventDefault();
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  const user = await login(email, password);
-
-  if (user) {
-    checkAuth(u => {
-      if (u) window.location.href = "dashboard.html";
-    });
-  }
-});
-</script>
+  <script type="module" src="auth.js"></script>
 </body>
 </html>
