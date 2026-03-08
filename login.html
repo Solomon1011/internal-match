@@ -17,6 +17,21 @@
 
   <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 
-  <script type="module" src="auth.js"></script>
+  <script type="module">
+    import { login } from './app.js';
+
+    const form = document.getElementById('authForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); // STOP the page from reloading
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const user = await login(email, password);
+      if (user) {
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
 </body>
 </html>
