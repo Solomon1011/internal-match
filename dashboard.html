@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Internal Match - Dashboard</title>
-<link rel="stylesheet" href="style.css">
 <style>
 body { font-family: Arial, sans-serif; margin:0; padding-bottom:70px; background:#fff0f6; }
-h2 { color:#ff4d6d; text-align:center; }
+h2 { color:#ff4d6d; text-align:center; margin:10px 0; }
+.section { display:none; padding:10px; }
+.section.active { display:block; }
 .profile-card { width:90%; max-width:350px; margin:20px auto; padding:10px; background:#fff; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.2); text-align:center; position:relative; }
 .profile-card img { width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:10px; }
 .profile-actions { display:flex; justify-content:space-around; margin-top:10px; }
@@ -17,15 +18,14 @@ h2 { color:#ff4d6d; text-align:center; }
 .profile-actions button.message { background:#4CAF50; color:white; }
 .bottom-tabs { position:fixed; bottom:0; left:0; width:100%; height:60px; background:#fff; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #ccc; }
 .bottom-tabs button { border:none; background:none; display:flex; flex-direction:column; align-items:center; font-size:12px; cursor:pointer; }
-.bottom-tabs img { width:24px; height:24px; margin-bottom:2px; }
-#profile-edit { display:none; text-align:center; padding:10px; }
+.bottom-tabs span { font-size:20px; }
 #profile-edit input, #profile-edit select { width:80%; padding:8px; margin:5px 0; border-radius:6px; border:1px solid #ccc; }
 #profile-edit img { width:80px; height:80px; margin:5px; border-radius:8px; object-fit:cover; }
-#chat-box { display:none; flex-direction:column; height:60vh; overflow-y:auto; padding:10px; }
+#chat-box { display:flex; flex-direction:column; height:60vh; overflow-y:auto; padding:10px; background:#fefefe; border-radius:10px; }
 .chat-message { display:flex; align-items:flex-start; margin:5px 0; }
-.chat-message.user img { order:2; margin-left:10px; }
-.chat-message.other img { margin-right:10px; }
-.chat-message p { max-width:70%; padding:8px; border-radius:10px; }
+.chat-message.user img { order:2; margin-left:10px; width:40px; height:40px; border-radius:50%; }
+.chat-message.other img { margin-right:10px; width:40px; height:40px; border-radius:50%; }
+.chat-message p { max-width:70%; padding:8px; border-radius:10px; margin:0; }
 .chat-message.user p { background:#ff4d6d; color:white; align-self:flex-end; }
 .chat-message.other p { background:#ccc; }
 </style>
@@ -34,43 +34,64 @@ h2 { color:#ff4d6d; text-align:center; }
 
 <h2>💘 Internal Match</h2>
 
-<!-- Swipe area -->
-<div id="swipe-area"></div>
-
-<!-- Profile edit -->
-<div id="profile-edit">
-  <h3>Edit Profile</h3>
-  <input type="text" id="myName" placeholder="Your Name">
-  <input type="number" id="myAge" placeholder="Age">
-  <select id="myCountry"></select>
-  <select id="myInterest">
-    <option value="Friend 💖">Friend 💖</option>
-    <option value="Hangout 💚">Hangout 💚</option>
-    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-    <option value="Marriage 💘">Marriage 💘</option>
-  </select>
-  <input type="file" id="photo1">
-  <input type="file" id="photo2">
-  <input type="file" id="photo3">
-  <div id="photo-preview"></div>
-  <button id="saveProfile">Save Profile</button>
+<!-- Sections -->
+<div id="section-swipe" class="section active">
+  <div id="swipe-area"></div>
 </div>
 
-<!-- Chat -->
-<div id="chat-box"></div>
-<input type="text" id="chat-input" placeholder="Type message..." style="width:80%; padding:8px;">
-<button id="send-chat">Send</button>
+<div id="section-like" class="section">
+  <p>❤️ People who liked you will appear here.</p>
+</div>
+
+<div id="section-message" class="section">
+  <div id="chat-box"></div>
+  <input type="text" id="chat-input" placeholder="Type message..." style="width:80%; padding:8px;">
+  <button id="send-chat">Send</button>
+</div>
+
+<div id="section-coins" class="section">
+  <p>💰 Coins store and purchases.</p>
+</div>
+
+<div id="section-profile" class="section">
+  <div id="profile-edit">
+    <h3>Edit Profile</h3>
+    <input type="text" id="myName" placeholder="Your Name">
+    <input type="number" id="myAge" placeholder="Age">
+    <select id="myCountry"></select>
+    <select id="myInterest">
+      <option value="Friend 💖">Friend 💖</option>
+      <option value="Hangout 💚">Hangout 💚</option>
+      <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+      <option value="Marriage 💘">Marriage 💘</option>
+    </select>
+    <input type="file" id="photo1">
+    <input type="file" id="photo2">
+    <input type="file" id="photo3">
+    <div id="photo-preview"></div>
+    <button id="saveProfile">Save Profile</button>
+  </div>
+</div>
 
 <!-- Bottom tabs -->
 <div class="bottom-tabs">
-  <button id="tab-swipe"><img src="assets/swipe.svg">Swipe</button>
-  <button id="tab-like"><img src="assets/like.svg">Like</button>
-  <button id="tab-message"><img src="assets/message.svg">Messages</button>
-  <button id="tab-coins"><img src="assets/shop.svg">Coins</button>
-  <button id="tab-profile"><img src="assets/user.svg">Profile</button>
+  <button data-tab="section-swipe"><span>💖</span>Swipe</button>
+  <button data-tab="section-like"><span>❤️</span>Like</button>
+  <button data-tab="section-message"><span>💬</span>Messages</button>
+  <button data-tab="section-coins"><span>💰</span>Coins</button>
+  <button data-tab="section-profile"><span>👤</span>Profile</button>
 </div>
 
 <script>
+// Tab switching
+const tabs = document.querySelectorAll('.bottom-tabs button');
+tabs.forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  }
+});
+
 // Populate countries dropdown
 const countries = ["United States","Canada","United Kingdom","Australia","Germany","France","India","Japan","Brazil","China","Italy","Spain","Russia","Mexico","Netherlands","Sweden","Norway","Denmark","Finland","Switzerland","Belgium","Austria","New Zealand","South Africa","Argentina","Colombia","Chile","Peru","Portugal","Greece","Poland","Turkey","Egypt","Saudi Arabia","United Arab Emirates","Israel","Singapore","Malaysia","Thailand","Vietnam","Indonesia","Philippines","South Korea","North Korea","Pakistan","Bangladesh","Sri Lanka","Nepal","Bhutan","Maldives","Kazakhstan","Uzbekistan","Kyrgyzstan","Tajikistan","Iraq","Iran","Afghanistan","Morocco","Algeria","Tunisia","Nigeria","Kenya","Ethiopia","Ghana","Cameroon","Uganda","Tanzania","Zimbabwe","Zambia","Botswana","Mozambique","Namibia","Angola","Sudan","Libya","Jordan","Lebanon","Syria","Iraq","Kuwait","Qatar","Bahrain","Oman","Yemen","Thailand","Philippines","Malaysia","Singapore","Indonesia","Vietnam","Cambodia","Laos","Myanmar","Brunei","Mongolia","Nepal","Bhutan","Maldives","Fiji","Papua New Guinea","Samoa","Tonga","Vanuatu","Kiribati","Marshall Islands","Palau","Micronesia","Solomon Islands","Tuvalu","Nauru","Canada","Mexico","Greenland"];
 const countrySelect = document.getElementById("myCountry");
@@ -116,18 +137,12 @@ function showProfile(){
 
   card.querySelector(".like").onclick=()=>{ currentProfileIndex++; showProfile(); };
   card.querySelector(".ignore").onclick=()=>{ currentProfileIndex++; showProfile(); };
-  card.querySelector(".message").onclick=()=>{ openChat(p); };
+  card.querySelector(".message").onclick=()=>{ alert(`Start chat with ${p.name}`); };
   card.onclick=()=>{ alert(`${p.name}'s Profile\nAge: ${p.age}\nCountry: ${p.country}\nInterest: ${p.interest}`); };
 }
 
 // Chat system
 const chatBox = document.getElementById("chat-box");
-function openChat(profile){
-  swipeArea.style.display='none';
-  chatBox.style.display='flex';
-  chatBox.innerHTML='';
-  const msg = document.createElement('p'); msg.textContent=`Chatting with ${profile.name}`; chatBox.appendChild(msg);
-}
 document.getElementById("send-chat").onclick=()=>{
   const input = document.getElementById("chat-input");
   if(!input.value) return;
@@ -138,7 +153,7 @@ document.getElementById("send-chat").onclick=()=>{
   input.value='';
 };
 
-// Profile edit
+// Profile edit photo preview
 const photoInputs = [document.getElementById("photo1"),document.getElementById("photo2"),document.getElementById("photo3")];
 const previewDiv = document.getElementById("photo-preview");
 photoInputs.forEach(input=>{
@@ -153,6 +168,7 @@ photoInputs.forEach(input=>{
     });
   };
 });
+
 document.getElementById("saveProfile").onclick=()=>{
   alert('Profile saved!');
 };
