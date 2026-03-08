@@ -2,50 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Dating App Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
 <style>
-body { margin:0; padding:0; font-family:Arial,sans-serif; background:#000; color:#fff; overflow:hidden; }
-.tabs { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; border-top:1px solid #333; }
-.tab { flex:1; text-align:center; padding:10px 0; cursor:pointer; color:#fff; }
-.tab.active { color:#FFD700; }
-#swipe-container { position:absolute; top:0; left:0; right:0; bottom:50px; overflow:hidden; display:flex; align-items:center; justify-content:center; touch-action: pan-x pan-y; user-select:none; }
-.card { position:absolute; width:300px; height:400px; background:#222; border-radius:10px; box-shadow:0 0 15px #000; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:10px; transition:0.3s; }
-.card img { width:100%; height:250px; border-radius:10px; object-fit:cover; }
-.card-info { margin-top:10px; text-align:center; }
-.card-info span { display:block; }
-.actions { display:flex; justify-content:space-around; width:100%; margin-top:10px; }
-.actions button { background:#333; border:none; color:#fff; padding:5px 10px; border-radius:5px; cursor:pointer; }
-.online-dot { position:absolute; top:10px; right:10px; width:15px; height:15px; border-radius:50%; border:2px solid #000; }
-#messages { display:none; padding:10px; overflow-y:auto; height:calc(100% - 50px); }
-.chat-user { display:flex; align-items:center; margin-bottom:10px; cursor:pointer; }
-.chat-user img { width:40px; height:40px; border-radius:50%; margin-right:10px; }
-.chat-box { display:none; flex-direction:column; height:calc(100% - 50px); padding:10px; }
-.chat-messages { flex:1; overflow-y:auto; margin-bottom:10px; }
-.message { margin:5px 0; display:flex; align-items:center; }
-.message img { width:30px; height:30px; border-radius:50%; margin-right:5px; }
-.message.you { justify-content:flex-end; }
-.message.you img { margin-left:5px; margin-right:0; }
-#profile { display:none; padding:10px; overflow-y:auto; height:calc(100% - 50px); }
-#profile img { width:100px; height:100px; border-radius:50%; display:block; margin-bottom:10px; }
-#profile input, #profile select { display:block; width:100%; margin-bottom:10px; padding:5px; border-radius:5px; border:none; }
-#photo-preview img { width:80px; height:80px; margin-right:5px; border-radius:5px; }
+body{margin:0;font-family:sans-serif;background:#000;color:#fff;overflow:hidden}
+#swipe-container,.tab-content{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;justify-content:center;align-items:center;flex-direction:column}
+.card{width:90%;max-width:400px;background:#111;border-radius:10px;padding:15px;box-shadow:0 4px 10px rgba(0,0,0,0.5);position:relative;text-align:center}
+.card img{width:100%;border-radius:10px}
+.card-info{margin-top:10px;text-align:left}
+.actions{display:flex;justify-content:space-around;margin-top:10px}
+button{cursor:pointer;font-size:18px}
+.online-dot{width:12px;height:12px;border-radius:50%;position:absolute;top:10px;right:10px;border:2px solid #fff}
+#profile,#chat-box,#tabs{display:none;position:absolute;width:100%;height:100%;top:0;left:0}
+#profile img,#chat-box img{width:100px;height:100px;border-radius:50%}
+input,select{width:100%;padding:5px;margin:5px 0;border-radius:5px;border:none}
+.tab-bar{position:absolute;bottom:0;width:100%;display:flex;background:#111;justify-content:space-around;padding:10px 0}
+.tab-bar button{flex:1;background:none;border:none;color:#fff;font-size:18px}
+.tab-bar button.active{color:#FFD700}
+.chat-message{display:flex;align-items:center;margin:5px}
+.chat-message img{width:40px;height:40px;border-radius:50%;margin-right:5px}
 </style>
 </head>
 <body>
 
+<!-- Swipe container -->
 <div id="swipe-container"></div>
 
-<div id="messages"><div id="chat-list"></div></div>
-<div id="chat-box" class="chat-box">
-  <div id="chat-messages" class="chat-messages"></div>
-  <input type="text" id="chat-input" placeholder="Type a message...">
-</div>
-
+<!-- Profile view -->
 <div id="profile">
-  <img id="profile-pic" src="https://i.pravatar.cc/150?img=1">
-  <input type="text" id="profile-name" placeholder="Name">
-  <input type="number" id="profile-age" placeholder="Age">
+  <img id="profile-pic" src="" alt="Profile">
+  <input id="profile-name" placeholder="Name">
+  <input id="profile-age" placeholder="Age">
   <select id="profile-country"></select>
   <select id="profile-interest">
     <option value="Friend 💖">Friend 💖</option>
@@ -56,65 +43,58 @@ body { margin:0; padding:0; font-family:Arial,sans-serif; background:#000; color
   <input type="file" id="photo1" accept="image/*">
   <input type="file" id="photo2" accept="image/*">
   <input type="file" id="photo3" accept="image/*">
-  <div id="photo-preview"></div>
 </div>
 
-<div class="tabs">
-  <div class="tab active" data-tab="swipe">🏠</div>
-  <div class="tab" data-tab="messages">💬</div>
-  <div class="tab" data-tab="profile">👤</div>
-  <div class="tab" data-tab="likes">💖</div>
-  <div class="tab" data-tab="coins">💰</div>
+<!-- Chat box -->
+<div id="chat-box">
+  <div id="chat-messages" style="overflow-y:auto;height:80%;width:90%;margin:auto"></div>
+  <input id="chat-input" placeholder="Type a message">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar" id="tabs">
+  <button class="active" onclick="showTab('swipe')">🏠</button>
+  <button onclick="showTab('likes')">💖</button>
+  <button onclick="showTab('messages')">💬</button>
+  <button onclick="showTab('profile-tab')">👤</button>
+  <button onclick="showTab('coins')">💰</button>
 </div>
 
 <script>
-// 152+ countries array
-const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Korea North","Korea South","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","USA","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
-
-const maleNames = ["Liam","Noah","Oliver","Elijah","James","William","Benjamin","Lucas","Henry","Alexander"];
-const femaleNames = ["Olivia","Emma","Ava","Sophia","Isabella","Charlotte","Amelia","Mia","Harper","Evelyn"];
-const interests = ["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"];
-const blackCountries = ["Nigeria","Kenya","South Africa","Ghana","Egypt","Morocco","Ethiopia"];
-const whiteCountries = ["USA","Canada","UK","Germany","France","Italy","Spain","Australia","Netherlands"];
-
+// 152+ countries (example, you can expand)
+const countries = ["United States","United Kingdom","Nigeria","South Africa","India","Canada","Brazil","France","Germany","China","Japan","Russia","Italy","Spain","Mexico","Australia","Egypt","Kenya","Ghana","Morocco","Algeria","Others"];
 const profileCountry = document.getElementById("profile-country");
-countries.forEach(c=>{let opt=document.createElement("option");opt.value=c;opt.textContent=c;profileCountry.appendChild(opt);});
+countries.forEach(c=>{let o=document.createElement("option");o.value=c;o.textContent=c;profileCountry.appendChild(o)});
 
-// Generate demo profiles with proper skin tones
+// Demo profiles
 const demoProfiles = [];
-for(let i=1;i<=5000;i++){
-  const country = countries[Math.floor(Math.random()*countries.length)];
-  const isMale = Math.random()<0.5;
-  let name = isMale ? maleNames[Math.floor(Math.random()*maleNames.length)] : femaleNames[Math.floor(Math.random()*femaleNames.length)];
-  let photoId;
-  if(blackCountries.includes(country)){
-    photoId = Math.floor(Math.random()*20)+50; // black faces
-  } else if(whiteCountries.includes(country)){
-    photoId = Math.floor(Math.random()*20)+1; // white faces
-  } else {
-    photoId = Math.floor(Math.random()*70)+1;
-  }
+const names = ["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
+const malePhotos = ["https://randomuser.me/api/portraits/men/1.jpg","https://randomuser.me/api/portraits/men/2.jpg"];
+const femalePhotos = ["https://randomuser.me/api/portraits/women/1.jpg","https://randomuser.me/api/portraits/women/2.jpg"];
+for(let i=0;i<5000;i++){
+  let gender = Math.random()>0.5?'male':'female';
   demoProfiles.push({
-    id:i,
-    name:name+i,
-    age:Math.floor(Math.random()*30)+18,
-    location:country,
-    interest:interests[Math.floor(Math.random()*interests.length)],
-    photo:`https://i.pravatar.cc/150?img=${photoId}`,
-    online:Math.random()<0.7,
-    chatHistory: []
+    name:names[Math.floor(Math.random()*names.length)] + i,
+    age:18+Math.floor(Math.random()*30),
+    location:countries[Math.floor(Math.random()*countries.length)],
+    interest:["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"][Math.floor(Math.random()*4)],
+    online:Math.random()>0.5,
+    photo:gender==='male'?malePhotos[Math.floor(Math.random()*malePhotos.length)]:femalePhotos[Math.floor(Math.random()*femalePhotos.length)]
   });
 }
 
 // Swipe logic
-let currentIndex=0;
-const swipeContainer=document.getElementById("swipe-container");
-function showProfile(i){
+let currentIndex = 0;
+const swipeContainer = document.getElementById("swipe-container");
+
+function showProfileCard(i){
   if(i>=demoProfiles.length) return;
   swipeContainer.innerHTML="";
-  const p=demoProfiles[i];
-  const card=document.createElement("div");
+  const p = demoProfiles[i];
+  const card = document.createElement("div");
   card.className="card";
+  card.addEventListener("click",()=>openUserProfile(p));
   card.innerHTML=`
     <div class="online-dot" style="background:${p.online?'lime':'gray'}"></div>
     <img src="${p.photo}">
@@ -124,94 +104,95 @@ function showProfile(i){
       <span>${p.interest}</span>
     </div>
     <div class="actions">
-      <button onclick="likeProfile(${i})">💖</button>
-      <button onclick="messageProfile(${i})">💬</button>
-      <button onclick="ignoreProfile(${i})">❌</button>
-    </div>
-  `;
+      <button onclick="event.stopPropagation(); likeProfile(${i})">💖</button>
+      <button onclick="event.stopPropagation(); openChat(demoProfiles[${i}])">💬</button>
+      <button onclick="event.stopPropagation(); ignoreProfile(${i})">❌</button>
+    </div>`;
   swipeContainer.appendChild(card);
 }
-function likeProfile(i){ alert("Liked "+demoProfiles[i].name); nextProfile(); }
-function ignoreProfile(i){ nextProfile(); }
-function messageProfile(i){ openChat(demoProfiles[i]); }
-function nextProfile(){ currentIndex++; showProfile(currentIndex); }
-showProfile(currentIndex);
+function likeProfile(i){nextProfile();}
+function ignoreProfile(i){nextProfile();}
+function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
+showProfileCard(currentIndex);
 
-// Tabs switching
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    tab.classList.add("active");
-    const tname=tab.getAttribute("data-tab");
-    swipeContainer.style.display=tname==="swipe"?"flex":"none";
-    document.getElementById("messages").style.display=tname==="messages"?"block":"none";
-    document.getElementById("profile").style.display=tname==="profile"?"block":"none";
-  });
-});
+// Open profile
+function openUserProfile(user){
+  document.getElementById("profile").style.display="block";
+  swipeContainer.style.display="none";
+  document.getElementById("profile-pic").src=user.photo;
+  document.getElementById("profile-name").value=user.name;
+  document.getElementById("profile-age").value=user.age;
+  document.getElementById("profile-country").value=user.location;
+  document.getElementById("profile-interest").value=user.interest;
 
-// Chat system with human-like replies
-const chatList=document.getElementById("chat-list");
-const chatBox=document.getElementById("chat-box");
-const chatMessages=document.getElementById("chat-messages");
-const chatInput=document.getElementById("chat-input");
+  const msgBtn = document.createElement("button");
+  msgBtn.textContent="Message 💬";
+  msgBtn.style.width="100%";msgBtn.style.padding="10px";
+  msgBtn.style.marginTop="10px";msgBtn.style.borderRadius="5px";
+  msgBtn.style.border="none";msgBtn.style.background="#FFD700";msgBtn.style.color="#000";
+  msgBtn.onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";document.getElementById("chat-box").style.display="flex";};
+  const oldBtn = document.getElementById("profile").querySelector("button");
+  if(oldBtn) oldBtn.remove();
+  document.getElementById("profile").appendChild(msgBtn);
+}
+
+// Chat
 let currentChatUser=null;
-
-const demoReplies=[
-  "Hi there! 😊","How are you today? 💖","You're amazing! 💘","Tell me more about yourself 💚","Haha that's funny 😄",
-  "I like your profile! 💖","Wow, really? 😍","Can't wait to hear from you 💘","You're so interesting! 💚"
-];
-
 function openChat(user){
   currentChatUser=user;
-  chatBox.style.display="flex";
-  chatMessages.innerHTML="";
-  user.chatHistory.forEach(m=>{
-    addMessage(m.photo,m.text,m.you);
+  document.getElementById("chat-box").style.display="flex";
+  document.getElementById("swipe-container").style.display="none";
+  loadChatMessages();
+}
+
+function loadChatMessages(){
+  const container=document.getElementById("chat-messages");
+  container.innerHTML="";
+  if(!currentChatUser) return;
+  currentChatUser.messages=currentChatUser.messages||[];
+  currentChatUser.messages.forEach(msg=>{
+    const div=document.createElement("div");
+    div.className="chat-message";
+    div.innerHTML=`<img src="${msg.sender==='me'?demoProfiles[0].photo:currentChatUser.photo}"> <span>${msg.text}</span>`;
+    container.appendChild(div);
   });
+  container.scrollTop=container.scrollHeight;
 }
 
-function addMessage(photo,msg,you=false){
-  const div=document.createElement("div");
-  div.className="message"+(you?" you":"");
-  div.innerHTML=`<img src="${photo}"><span>${msg}</span>`;
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop=chatMessages.scrollHeight;
-  if(currentChatUser && !you){
-    currentChatUser.chatHistory.push({photo,msg,you:false});
-  }
+function sendMessage(){
+  const input=document.getElementById("chat-input");
+  if(!input.value) return;
+  currentChatUser.messages=currentChatUser.messages||[];
+  currentChatUser.messages.push({sender:'me',text:input.value});
+  // Auto-reply
+  currentChatUser.messages.push({sender:'them',text:"Hi! I am "+currentChatUser.name});
+  input.value="";
+  loadChatMessages();
 }
 
-chatInput.addEventListener("keypress",e=>{
-  if(e.key==="Enter" && currentChatUser){
-    const msg=chatInput.value;
-    addMessage("https://i.pravatar.cc/150?img=1",msg,true);
-    currentChatUser.chatHistory.push({photo:currentChatUser.photo,msg, you:true});
-    chatInput.value="";
-    // Demo human-like reply
-    setTimeout(()=>{
-      const reply = demoReplies[Math.floor(Math.random()*demoReplies.length)];
-      addMessage(currentChatUser.photo,reply,false);
-    },Math.floor(Math.random()*4000)+1000);
-  }
-});
+// Tabs
+function showTab(tab){
+  document.getElementById("swipe-container").style.display="none";
+  document.getElementById("chat-box").style.display="none";
+  document.getElementById("profile").style.display="none";
+  if(tab==='swipe') swipeContainer.style.display="flex";
+  if(tab==='messages') document.getElementById("chat-box").style.display="flex";
+  if(tab==='profile-tab') document.getElementById("profile").style.display="block";
+  document.querySelectorAll(".tab-bar button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+}
 
-// Profile photo preview
-document.querySelectorAll("#photo1,#photo2,#photo3").forEach(input=>{
-  input.addEventListener("change",e=>{
-    const files=e.target.files;
-    const preview=document.getElementById("photo-preview");
-    preview.innerHTML="";
-    Array.from(files).forEach(f=>{
+// Photo preview
+['photo1','photo2','photo3'].forEach(id=>{
+  document.getElementById(id).addEventListener("change",function(e){
+    if(e.target.files[0]){
       const reader=new FileReader();
-      reader.onload=(ev)=>{
-        const img=document.createElement("img");
-        img.src=ev.target.result;
-        preview.appendChild(img);
-      };
-      reader.readAsDataURL(f);
-    });
+      reader.onload=function(ev){document.getElementById("profile-pic").src=ev.target.result;}
+      reader.readAsDataURL(e.target.files[0]);
+    }
   });
 });
+
 </script>
 </body>
 </html>
