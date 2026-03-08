@@ -26,8 +26,6 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
 .profile-container{background:#111;padding:15px;border-radius:15px;width:90%;max-width:400px;text-align:center;overflow-y:auto;height:90%}
 .profile-fields{display:flex;flex-direction:column;margin-top:10px}
 .profile-fields label{margin-top:10px;font-weight:bold}
-.profile-photos{display:flex;justify-content:center;margin-top:10px}
-.profile-photos img{width:50%;border-radius:10px;object-fit:cover;height:150px}
 #chat-box input{width:80%;margin:10px auto;border-radius:8px;padding:8px;background:#222;color:#fff;border:none}
 #chat-box button{width:80%;margin:0 auto;padding:8px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold}
 </style>
@@ -67,7 +65,6 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
     <input type="file" id="photo1" accept="image/*">
 
     <button id="save-profile" style="margin-top:10px;background:#FFD700;color:#000;font-weight:bold">Save Profile 💾</button>
-    <button id="message-btn" style="margin-top:15px;background:#FFD700;color:#000;font-weight:bold">Message 💬</button>
   </div>
 </div>
 
@@ -125,7 +122,7 @@ function showProfileCard(i){
   const p=demoProfiles[i];
   const card=document.createElement("div");
   card.className="card";
-  card.addEventListener("click",()=>openUserProfile(p,true)); // second param: editable false for others
+  card.addEventListener("click",()=>openUserProfile(p,false)); // others not editable
   card.innerHTML=`
     <div class="online-dot-small" style="background:${p.online?'lime':'gray'}"></div>
     <img src="${p.photo}">
@@ -147,7 +144,7 @@ function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
 showProfileCard(currentIndex);
 
 // Profile
-let currentUser=demoProfiles[0]; // assume first demo profile is "my profile"
+let currentUser=demoProfiles[0]; // my profile
 function openUserProfile(user,isEditable=false){
   document.getElementById("profile").style.display="flex";
   swipeContainer.style.display="none";
@@ -157,14 +154,12 @@ function openUserProfile(user,isEditable=false){
   document.getElementById("profile-country").value=user.location;
   document.getElementById("profile-interest").value=user.interest;
   document.getElementById("profile-online").style.background=user.online?'lime':'gray';
-  document.getElementById("save-profile").style.display = isEditable ? "block":"none";
-  document.getElementById("photo1").style.display = isEditable ? "block":"none";
-  document.getElementById("message-btn").onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";};
+  document.getElementById("save-profile").style.display = (user===currentUser) ? "block":"none";
+  document.getElementById("photo1").style.display = (user===currentUser) ? "block":"none";
 }
 
 // Save profile
 document.getElementById("save-profile").addEventListener("click",()=>{
-  if(!currentUser) return;
   currentUser.name=document.getElementById("profile-name").value;
   currentUser.age=document.getElementById("profile-age").value;
   currentUser.location=document.getElementById("profile-country").value;
@@ -179,6 +174,7 @@ document.getElementById('photo1').addEventListener("change",function(e){
     reader.onload=function(ev){
       document.getElementById('photo-preview1').src=ev.target.result;
       document.getElementById('profile-pic').src=ev.target.result;
+      currentUser.photo=ev.target.result;
     }
     reader.readAsDataURL(e.target.files[0]);
   }
@@ -209,7 +205,6 @@ function sendMessage(){
   const input=document.getElementById("chat-input");
   if(!input.value || !currentChatUser) return;
   currentChatUser.messages.push({sender:'me',text:input.value});
-  currentChatUser.messages.push({sender:'them',text:"Hi! I am "+currentChatUser.name});
   input.value="";
   loadChatMessages();
 }
@@ -222,7 +217,7 @@ function showTab(tab,event){
 
   if(tab==='swipe') swipeContainer.style.display="flex";
   if(tab==='messages') document.getElementById("chat-box").style.display="flex";
-  if(tab==='profile-tab') openUserProfile(currentUser,true); // only my profile editable
+  if(tab==='profile-tab') openUserProfile(currentUser,true);
   if(tab==='likes'){
     swipeContainer.innerHTML="";
     demoProfiles.filter(p=>p.likesMe||p.viewedMe).forEach((p,i)=>{
