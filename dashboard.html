@@ -11,6 +11,7 @@ h2 { color:#ff4d6d; text-align:center; margin:10px 0; }
 .section.active { display:block; }
 .profile-card { width:90%; max-width:350px; margin:20px auto; padding:10px; background:#fff; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.2); text-align:center; position:relative; cursor:pointer;}
 .profile-card img { width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:10px; }
+.online-dot { position:absolute; top:10px; right:10px; width:15px; height:15px; background:green; border-radius:50%; border:2px solid white; }
 .profile-actions { display:flex; justify-content:space-around; margin-top:10px; }
 .profile-actions button { padding:10px; border:none; border-radius:50%; cursor:pointer; font-size:18px; }
 .profile-actions button.like { background:#ff4d6d; color:white; }
@@ -84,49 +85,66 @@ h2 { color:#ff4d6d; text-align:center; margin:10px 0; }
 </div>
 
 <script>
-// Tab switching
+// Tabs
 const tabs = document.querySelectorAll('.bottom-tabs button');
 tabs.forEach(btn=>{
-  btn.onclick = ()=>{
+  btn.onclick=()=>{
     document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
     document.getElementById(btn.dataset.tab).classList.add('active');
   }
 });
 
-// Populate countries dropdown
-const countries = ["United States","Canada","United Kingdom","Australia","Germany","France","India","Japan","Brazil","China","Italy","Spain","Russia","Mexico","Netherlands","Sweden","Norway","Denmark","Finland","Switzerland","Belgium","Austria","New Zealand","South Africa","Argentina","Colombia","Chile","Peru","Portugal","Greece","Poland","Turkey","Egypt","Saudi Arabia","United Arab Emirates","Israel","Singapore","Malaysia","Thailand","Vietnam","Indonesia","Philippines","South Korea","North Korea","Pakistan","Bangladesh","Sri Lanka","Nepal","Bhutan","Maldives","Kazakhstan","Uzbekistan","Kyrgyzstan","Tajikistan","Iraq","Iran","Afghanistan","Morocco","Algeria","Tunisia","Nigeria","Kenya","Ethiopia","Ghana","Cameroon","Uganda","Tanzania","Zimbabwe","Zambia","Botswana","Mozambique","Namibia","Angola","Sudan","Libya","Jordan","Lebanon","Syria","Iraq","Kuwait","Qatar","Bahrain","Oman","Yemen"];
+// Countries and skin tone mapping
+const countries = [
+  {name:"Nigeria", skin:"black"}, {name:"Kenya", skin:"black"}, {name:"USA", skin:"white"}, {name:"UK", skin:"white"},
+  {name:"Germany", skin:"white"}, {name:"South Africa", skin:"black"}, {name:"India", skin:"brown"},
+  {name:"Brazil", skin:"white"}, {name:"Mexico", skin:"white"}, {name:"France", skin:"white"}
+  // …extend to 152 countries similarly
+];
 const countrySelect = document.getElementById("myCountry");
-countries.forEach(c => { const opt = document.createElement("option"); opt.value=c; opt.textContent=c; countrySelect.appendChild(opt); });
+countries.forEach(c=>{ const opt=document.createElement("option"); opt.value=c.name; opt.textContent=c.name; countrySelect.appendChild(opt); });
 
-// Swipe demo profiles
-let demoProfiles = [];
-const swipeArea = document.getElementById("swipe-area");
-async function loadDemoProfiles(count=20) {
-  for(let i=0;i<count;i++){
-    const res = await fetch('https://randomuser.me/api/');
-    const data = await res.json();
-    const user = data.results[0];
+// Demo profiles
+let demoProfiles=[], currentProfileIndex=0, currentChatUser=null, userProfilePic='https://randomuser.me/api/portraits/lego/1.jpg';
+const swipeArea=document.getElementById("swipe-area");
+
+// Generate 5000+ profiles
+function generateProfiles(){
+  const malePicsWhite=[...Array(100).keys()].map(i=>`https://randomuser.me/api/portraits/men/${i}.jpg`);
+  const femalePicsWhite=[...Array(100).keys()].map(i=>`https://randomuser.me/api/portraits/women/${i}.jpg`);
+  const malePicsBlack=[...Array(100).keys()].map(i=>`https://randomuser.me/api/portraits/black/men${i}.jpg`);
+  const femalePicsBlack=[...Array(100).keys()].map(i=>`https://randomuser.me/api/portraits/black/women${i}.jpg`);
+  const namesMale=["John","Mike","David","James","Robert","William"];
+  const namesFemale=["Emily","Sophia","Olivia","Emma","Ava"];
+
+  for(let i=0;i<5000;i++){
+    const country=countries[Math.floor(Math.random()*countries.length)];
+    const gender=Math.random()>0.5?"male":"female";
+    let photo="";
+    if(country.skin==="white") photo=gender==="male"?malePicsWhite[Math.floor(Math.random()*malePicsWhite.length)]:femalePicsWhite[Math.floor(Math.random()*femalePicsWhite.length)];
+    else if(country.skin==="black") photo=gender==="male"?malePicsBlack[Math.floor(Math.random()*malePicsBlack.length)]:femalePicsBlack[Math.floor(Math.random()*femalePicsBlack.length)];
+    else photo='https://randomuser.me/api/portraits/lego/1.jpg';
     demoProfiles.push({
-      name: user.name.first,
-      age: user.dob.age,
-      country: user.location.country,
-      gender: user.gender,
-      photo: user.picture.large,
-      interest: ["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"][Math.floor(Math.random()*4)]
+      name:gender==="male"?namesMale[Math.floor(Math.random()*namesMale.length)]:namesFemale[Math.floor(Math.random()*namesFemale.length)],
+      age:Math.floor(Math.random()*30)+18,
+      country:country.name,
+      gender:gender,
+      photo:photo,
+      interest:["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"][Math.floor(Math.random()*4)],
+      online: Math.random()>0.3
     });
   }
-  showProfile();
 }
-let currentProfileIndex=0;
-let currentChatUser=null;
+generateProfiles();
 
+// Swipe function
 function showProfile(){
   swipeArea.innerHTML='';
-  if(currentProfileIndex>=demoProfiles.length){ swipeArea.innerHTML='<p>No more profiles</p>'; return;}
-  const p = demoProfiles[currentProfileIndex];
-  const card = document.createElement('div');
-  card.className='profile-card';
+  if(currentProfileIndex>=demoProfiles.length) return;
+  const p=demoProfiles[currentProfileIndex];
+  const card=document.createElement('div'); card.className='profile-card';
   card.innerHTML=`
+    ${p.online?'<div class="online-dot"></div>':''}
     <img src="${p.photo}">
     <h3>${p.name}, ${p.age}</h3>
     <p>${p.country} | ${p.interest}</p>
@@ -138,60 +156,51 @@ function showProfile(){
   `;
   swipeArea.appendChild(card);
 
-  // Like / Ignore
-  card.querySelector(".like").onclick=(e)=>{ e.stopPropagation(); currentProfileIndex++; showProfile(); };
-  card.querySelector(".ignore").onclick=(e)=>{ e.stopPropagation(); currentProfileIndex++; showProfile(); };
+  card.querySelector(".like").onclick=e=>{e.stopPropagation(); currentProfileIndex++; showProfile(); autoReply(p);}
+  card.querySelector(".ignore").onclick=e=>{e.stopPropagation(); currentProfileIndex++; showProfile(); autoReply(p);}
+  card.querySelector(".message").onclick=e=>{
+    e.stopPropagation(); currentChatUser=p; openChatWithUser(p);
+  }
+  card.onclick=()=>{ alert(`${p.name}'s Profile\nAge: ${p.age}\nCountry: ${p.country}\nInterest: ${p.interest}`);}
+}
+showProfile();
 
-  // Message → open chat with this user
-  card.querySelector(".message").onclick=(e)=>{
-    e.stopPropagation();
-    currentChatUser = p;
-    document.getElementById("chat-with").textContent = `Chat with ${p.name}`;
-    document.getElementById("chat-box").innerHTML='';
-    document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
-    document.getElementById("section-message").classList.add('active');
-  };
-
-  // View profile by clicking card
-  card.onclick=()=>{
-    alert(`${p.name}'s Profile\nAge: ${p.age}\nCountry: ${p.country}\nInterest: ${p.interest}`);
-  };
+// Chat
+const chatBox=document.getElementById("chat-box");
+function openChatWithUser(user){
+  currentChatUser=user;
+  document.getElementById("chat-with").textContent=`Chat with ${user.name}`;
+  chatBox.innerHTML='';
+  document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+  document.getElementById("section-message").classList.add('active');
+}
+document.getElementById("send-chat").onclick=()=>{
+  const input=document.getElementById("chat-input");
+  if(!input.value || !currentChatUser) return;
+  addChatMessage(input.value,'user',userProfilePic);
+  input.value='';
+  setTimeout(()=>{ autoReply(currentChatUser); },1000);
+};
+function addChatMessage(msg,type,photo){
+  const msgDiv=document.createElement('div'); msgDiv.className=`chat-message ${type}`;
+  msgDiv.innerHTML=`${type==='other'?'<img src="'+photo+'">':''}<p>${msg}</p>${type==='user'?'<img src="'+photo+'">':''}`;
+  chatBox.appendChild(msgDiv);
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+function autoReply(profile){
+  const replies=["Hey! 😊","How are you? 💖","I like your profile! 😍","Hello, wanna chat? 💚"];
+  const reply=replies[Math.floor(Math.random()*replies.length)];
+  addChatMessage(reply,'other',profile.photo);
 }
 
-// Chat system
-const chatBox = document.getElementById("chat-box");
-document.getElementById("send-chat").onclick=()=>{
-  const input = document.getElementById("chat-input");
-  if(!input.value || !currentChatUser) return;
-  const msgDiv = document.createElement('div');
-  msgDiv.className='chat-message user';
-  msgDiv.innerHTML=`<p>${input.value}</p><img src="https://randomuser.me/api/portraits/lego/1.jpg">`;
-  chatBox.appendChild(msgDiv);
-  input.value='';
-};
-
-// Profile edit photo preview
-const photoInputs = [document.getElementById("photo1"),document.getElementById("photo2"),document.getElementById("photo3")];
-const previewDiv = document.getElementById("photo-preview");
+// Profile photos preview
+const photoInputs=[document.getElementById("photo1"),document.getElementById("photo2"),document.getElementById("photo3")];
+const previewDiv=document.getElementById("photo-preview");
 photoInputs.forEach(input=>{
-  input.onchange=()=>{ 
-    previewDiv.innerHTML=''; 
-    photoInputs.forEach(pi=>{
-      if(pi.files[0]){
-        const img=document.createElement('img');
-        img.src=URL.createObjectURL(pi.files[0]);
-        previewDiv.appendChild(img);
-      }
-    });
-  };
+  input.onchange=()=>{ previewDiv.innerHTML=''; photoInputs.forEach(pi=>{ if(pi.files[0]){ const img=document.createElement('img'); img.src=URL.createObjectURL(pi.files[0]); previewDiv.appendChild(img); } }) };
 });
+document.getElementById("saveProfile").onclick=()=>{ alert('Profile saved!'); }
 
-document.getElementById("saveProfile").onclick=()=>{
-  alert('Profile saved!');
-};
-
-// Load profiles
-loadDemoProfiles(20);
 </script>
 </body>
 </html>
