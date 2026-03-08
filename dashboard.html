@@ -9,7 +9,7 @@ body { font-family: Arial, sans-serif; margin:0; padding-bottom:70px; background
 h2 { color:#ff4d6d; text-align:center; margin:10px 0; }
 .section { display:none; padding:10px; }
 .section.active { display:block; }
-.profile-card { width:90%; max-width:350px; margin:20px auto; padding:10px; background:#fff; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.2); text-align:center; position:relative; }
+.profile-card { width:90%; max-width:350px; margin:20px auto; padding:10px; background:#fff; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.2); text-align:center; position:relative; cursor:pointer;}
 .profile-card img { width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:10px; }
 .profile-actions { display:flex; justify-content:space-around; margin-top:10px; }
 .profile-actions button { padding:10px; border:none; border-radius:50%; cursor:pointer; font-size:18px; }
@@ -44,6 +44,7 @@ h2 { color:#ff4d6d; text-align:center; margin:10px 0; }
 </div>
 
 <div id="section-message" class="section">
+  <h3 id="chat-with"></h3>
   <div id="chat-box"></div>
   <input type="text" id="chat-input" placeholder="Type message..." style="width:80%; padding:8px;">
   <button id="send-chat">Send</button>
@@ -93,7 +94,7 @@ tabs.forEach(btn=>{
 });
 
 // Populate countries dropdown
-const countries = ["United States","Canada","United Kingdom","Australia","Germany","France","India","Japan","Brazil","China","Italy","Spain","Russia","Mexico","Netherlands","Sweden","Norway","Denmark","Finland","Switzerland","Belgium","Austria","New Zealand","South Africa","Argentina","Colombia","Chile","Peru","Portugal","Greece","Poland","Turkey","Egypt","Saudi Arabia","United Arab Emirates","Israel","Singapore","Malaysia","Thailand","Vietnam","Indonesia","Philippines","South Korea","North Korea","Pakistan","Bangladesh","Sri Lanka","Nepal","Bhutan","Maldives","Kazakhstan","Uzbekistan","Kyrgyzstan","Tajikistan","Iraq","Iran","Afghanistan","Morocco","Algeria","Tunisia","Nigeria","Kenya","Ethiopia","Ghana","Cameroon","Uganda","Tanzania","Zimbabwe","Zambia","Botswana","Mozambique","Namibia","Angola","Sudan","Libya","Jordan","Lebanon","Syria","Iraq","Kuwait","Qatar","Bahrain","Oman","Yemen","Thailand","Philippines","Malaysia","Singapore","Indonesia","Vietnam","Cambodia","Laos","Myanmar","Brunei","Mongolia","Nepal","Bhutan","Maldives","Fiji","Papua New Guinea","Samoa","Tonga","Vanuatu","Kiribati","Marshall Islands","Palau","Micronesia","Solomon Islands","Tuvalu","Nauru","Canada","Mexico","Greenland"];
+const countries = ["United States","Canada","United Kingdom","Australia","Germany","France","India","Japan","Brazil","China","Italy","Spain","Russia","Mexico","Netherlands","Sweden","Norway","Denmark","Finland","Switzerland","Belgium","Austria","New Zealand","South Africa","Argentina","Colombia","Chile","Peru","Portugal","Greece","Poland","Turkey","Egypt","Saudi Arabia","United Arab Emirates","Israel","Singapore","Malaysia","Thailand","Vietnam","Indonesia","Philippines","South Korea","North Korea","Pakistan","Bangladesh","Sri Lanka","Nepal","Bhutan","Maldives","Kazakhstan","Uzbekistan","Kyrgyzstan","Tajikistan","Iraq","Iran","Afghanistan","Morocco","Algeria","Tunisia","Nigeria","Kenya","Ethiopia","Ghana","Cameroon","Uganda","Tanzania","Zimbabwe","Zambia","Botswana","Mozambique","Namibia","Angola","Sudan","Libya","Jordan","Lebanon","Syria","Iraq","Kuwait","Qatar","Bahrain","Oman","Yemen"];
 const countrySelect = document.getElementById("myCountry");
 countries.forEach(c => { const opt = document.createElement("option"); opt.value=c; opt.textContent=c; countrySelect.appendChild(opt); });
 
@@ -117,6 +118,8 @@ async function loadDemoProfiles(count=20) {
   showProfile();
 }
 let currentProfileIndex=0;
+let currentChatUser=null;
+
 function showProfile(){
   swipeArea.innerHTML='';
   if(currentProfileIndex>=demoProfiles.length){ swipeArea.innerHTML='<p>No more profiles</p>'; return;}
@@ -135,17 +138,31 @@ function showProfile(){
   `;
   swipeArea.appendChild(card);
 
-  card.querySelector(".like").onclick=()=>{ currentProfileIndex++; showProfile(); };
-  card.querySelector(".ignore").onclick=()=>{ currentProfileIndex++; showProfile(); };
-  card.querySelector(".message").onclick=()=>{ alert(`Start chat with ${p.name}`); };
-  card.onclick=()=>{ alert(`${p.name}'s Profile\nAge: ${p.age}\nCountry: ${p.country}\nInterest: ${p.interest}`); };
+  // Like / Ignore
+  card.querySelector(".like").onclick=(e)=>{ e.stopPropagation(); currentProfileIndex++; showProfile(); };
+  card.querySelector(".ignore").onclick=(e)=>{ e.stopPropagation(); currentProfileIndex++; showProfile(); };
+
+  // Message → open chat with this user
+  card.querySelector(".message").onclick=(e)=>{
+    e.stopPropagation();
+    currentChatUser = p;
+    document.getElementById("chat-with").textContent = `Chat with ${p.name}`;
+    document.getElementById("chat-box").innerHTML='';
+    document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById("section-message").classList.add('active');
+  };
+
+  // View profile by clicking card
+  card.onclick=()=>{
+    alert(`${p.name}'s Profile\nAge: ${p.age}\nCountry: ${p.country}\nInterest: ${p.interest}`);
+  };
 }
 
 // Chat system
 const chatBox = document.getElementById("chat-box");
 document.getElementById("send-chat").onclick=()=>{
   const input = document.getElementById("chat-input");
-  if(!input.value) return;
+  if(!input.value || !currentChatUser) return;
   const msgDiv = document.createElement('div');
   msgDiv.className='chat-message user';
   msgDiv.innerHTML=`<p>${input.value}</p><img src="https://randomuser.me/api/portraits/lego/1.jpg">`;
