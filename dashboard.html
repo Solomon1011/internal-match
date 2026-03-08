@@ -8,7 +8,7 @@
 body { font-family: Arial, sans-serif; margin:0; background:#fff0f6; text-align:center; }
 h2 { color:#ff4d6d; margin-top:10px; }
 .card { width:90%; max-width:350px; margin:20px auto; background:#fff; border-radius:15px; box-shadow:0 4px 6px rgba(0,0,0,0.1); position:relative; overflow:hidden; touch-action: pan-y; }
-.card img { width:100%; height:300px; object-fit:cover; border-top-left-radius:15px; border-top-right-radius:15px; }
+.card img { width:100%; height:200px; object-fit:cover; border-top-left-radius:15px; border-top-right-radius:15px; }
 .card-content { padding:10px; text-align:left; }
 .card-content h3 { margin:0; font-size:18px; }
 .card-content p { margin:5px 0; font-size:14px; color:#555; }
@@ -33,6 +33,7 @@ h2 { color:#ff4d6d; margin-top:10px; }
 #chatInputRow input { flex:1; padding:10px; border-radius:10px; border:1px solid #ccc; }
 #chatInputRow button { padding:10px; background:#ff4d6d; color:#fff; border:none; border-radius:10px; margin-left:5px; cursor:pointer; }
 input, select { margin:5px 0; padding:8px; width:100%; border-radius:10px; border:1px solid #ccc; }
+#profilePreview img { width:80px; height:80px; object-fit:cover; margin:5px; border-radius:10px; }
 </style>
 </head>
 <body>
@@ -57,7 +58,8 @@ input, select { margin:5px 0; padding:8px; width:100%; border-radius:10px; borde
     <option value="Serious Relationship 💖">Serious Relationship 💖</option>
     <option value="Marriage 💘">Marriage 💘</option>
   </select>
-  <input type="file" id="profilePhotos" multiple accept="image/*">
+  <input type="file" id="profilePhotos" multiple accept="image/*" onchange="previewPhotos(this)">
+  <div id="profilePreview"></div>
   <button onclick="saveProfile()">Save Profile</button>
 </div>
 
@@ -99,30 +101,34 @@ input, select { margin:5px 0; padding:8px; width:100%; border-radius:10px; borde
 <script>
 // 152 countries
 const countries=["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua & Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo, Democratic Republic","Congo, Republic","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
-
 const countrySelect=document.getElementById("profileCountry");
-countries.forEach(c=>{ let o=document.createElement("option"); o.value=c;o.innerText=c; countrySelect.appendChild(o) });
+countries.forEach(c=>{ let o=document.createElement("option"); o.value=c;o.innerText=c; countrySelect.appendChild(o); });
 
-// Demo profiles
+// Demo human names
+const namesMen=["John","Michael","David","James","Robert","William","Daniel","Matthew","Joseph","Christopher","Joshua","Andrew"];
+const namesWomen=["Emma","Olivia","Sophia","Ava","Isabella","Mia","Charlotte","Amelia","Harper"];
+function randomName(){ return Math.random()<0.5 ? namesMen[Math.floor(Math.random()*namesMen.length)] : namesWomen[Math.floor(Math.random()*namesWomen.length)]; }
+
+// Demo profiles 5000
 const demoProfiles=[]
 for(let i=1;i<=5000;i++){
   demoProfiles.push({
     id:i,
-    name:'User'+i,
+    name: randomName(),
     age:18+Math.floor(Math.random()*12),
     country:countries[i%152],
     interest:['Friend 💖','Hangout 💚','Serious Relationship 💖','Marriage 💘'][Math.floor(Math.random()*4)],
-    photos:['https://picsum.photos/400/300?random='+i],
+    photos:[`https://randomuser.me/api/portraits/${i%2===0?'men':'women'}/${i%100}.jpg`,`https://picsum.photos/400/301?random=${i}`,'https://picsum.photos/400/302?random='+i],
     online: Math.random()<0.6
-  })
+  });
 }
 
-let currentIndex=0
-const swipeContainer=document.getElementById("swipe")
+let currentIndex=0;
+const swipeContainer=document.getElementById("swipe");
 
 function showProfile(index){
   if(index>=demoProfiles.length){ swipeContainer.innerHTML="<p>No more profiles</p>"; return; }
-  let profile=demoProfiles[index]
+  let profile=demoProfiles[index];
   swipeContainer.innerHTML=`
   <div class="card" id="card${profile.id}" onclick="openProfile(${profile.id})">
     <img src="${profile.photos[0]}">
@@ -137,86 +143,101 @@ function showProfile(index){
         <button class="message" onclick="openChat(event,${profile.id})">💬</button>
       </div>
     </div>
-  </div>`
-  addSwipeEvents(document.getElementById(`card${profile.id}`))
+  </div>`;
+  addSwipeEvents(document.getElementById(`card${profile.id}`));
 }
 
-// Swipe gestures
 function addSwipeEvents(card){
-  let startX=null
-  card.addEventListener('touchstart', e=>{ startX=e.touches[0].clientX })
+  let startX=null;
+  card.addEventListener('touchstart', e=>{ startX=e.touches[0].clientX; });
   card.addEventListener('touchend', e=>{
-    let endX=e.changedTouches[0].clientX
-    if(startX-endX>50){ nextProfile() } // swipe left
-    if(endX-startX>50){ likeProfile({stopPropagation:()=>{}},demoProfiles[currentIndex].id) } // swipe right
-  })
+    let endX=e.changedTouches[0].clientX;
+    if(startX-endX>50){ nextProfile(); }
+    if(endX-startX>50){ likeProfile({stopPropagation:()=>{}},demoProfiles[currentIndex].id); }
+  });
 }
 
-function nextProfile(){ currentIndex++; showProfile(currentIndex) }
-let likedProfiles=[]
-function likeProfile(e,id){ e.stopPropagation(); likedProfiles.push(demoProfiles.find(p=>p.id===id)); nextProfile(); updateLikeTab() }
-function ignoreProfile(e,id){ e.stopPropagation(); nextProfile() }
-let currentChatId=null
-function openChat(e,id){ e.stopPropagation(); currentChatId=id; openChatModal(id) }
-function openProfile(id){ 
-  const profile=demoProfiles.find(p=>p.id===id)
-  document.getElementById("modalProfileImg").src=profile.photos[0]
-  document.getElementById("modalProfileName").innerText=profile.name
-  document.getElementById("modalProfileAge").innerText="Age: "+profile.age
-  document.getElementById("modalProfileCountry").innerText="Country: "+profile.country
-  document.getElementById("modalProfileInterest").innerText="Interest: "+profile.interest
-  document.getElementById("profileModal").style.display="flex"
+function nextProfile(){ currentIndex++; showProfile(currentIndex); }
+let likedProfiles=[];
+function likeProfile(e,id){ e.stopPropagation(); likedProfiles.push(demoProfiles.find(p=>p.id===id)); nextProfile(); updateLikeTab(); }
+function ignoreProfile(e,id){ e.stopPropagation(); nextProfile(); }
+let currentChatId=null;
+function openChat(e,id){ e.stopPropagation(); currentChatId=id; openChatModal(id); }
+function openProfile(id){
+  const profile=demoProfiles.find(p=>p.id===id);
+  document.getElementById("modalProfileImg").src=profile.photos[0];
+  document.getElementById("modalProfileName").innerText=profile.name;
+  document.getElementById("modalProfileAge").innerText="Age: "+profile.age;
+  document.getElementById("modalProfileCountry").innerText="Country: "+profile.country;
+  document.getElementById("modalProfileInterest").innerText="Interest: "+profile.interest;
+  document.getElementById("profileModal").style.display="flex";
 }
-function closeProfile(){ document.getElementById("profileModal").style.display="none" }
+function closeProfile(){ document.getElementById("profileModal").style.display="none"; }
 
 function openChatModal(id){
-  const profile=demoProfiles.find(p=>p.id===id)
-  document.getElementById("chatProfileImg").src=profile.photos[0]
-  document.getElementById("chatProfileName").innerText=profile.name
-  document.getElementById("chatMessages").innerHTML=""
-  document.getElementById("chatModal").style.display="flex"
+  const profile=demoProfiles.find(p=>p.id===id);
+  document.getElementById("chatProfileImg").src=profile.photos[0];
+  document.getElementById("chatProfileName").innerText=profile.name;
+  document.getElementById("chatMessages").innerHTML="";
+  document.getElementById("chatModal").style.display="flex";
 }
-function closeChat(){ document.getElementById("chatModal").style.display="none" }
+function closeChat(){ document.getElementById("chatModal").style.display="none"; }
 
 function aiReply(message){
-  message=message.toLowerCase()
-  if(message.includes("hi")||message.includes("hello")) return "Hi 😊 nice to meet you!"
-  if(message.includes("how are you")) return "I'm good 💕 what about you?"
-  let replies=["You seem interesting 😊","Tell me more about yourself","I enjoy chatting with you","What are your hobbies?","You seem kind"]
-  return replies[Math.floor(Math.random()*replies.length)]
+  message=message.toLowerCase();
+  if(message.includes("hi")||message.includes("hello")) return "Hi 😊 nice to meet you!";
+  if(message.includes("how are you")) return "I'm good 💕 what about you?";
+  let replies=["You seem interesting 😊","Tell me more about yourself","I enjoy chatting with you","What are your hobbies?","You seem kind"];
+  return replies[Math.floor(Math.random()*replies.length)];
 }
 
 function sendMessage(){
-  let input=document.getElementById("chatInput")
-  let text=input.value
-  if(!text) return
-  let chat=document.getElementById("chatMessages")
-  chat.innerHTML+=`<p><b>You:</b> ${text}</p>`
-  input.value=""
+  let input=document.getElementById("chatInput");
+  let text=input.value;
+  if(!text) return;
+  let chat=document.getElementById("chatMessages");
+  chat.innerHTML+=`<p><b>You:</b> ${text}</p>`;
+  input.value="";
   setTimeout(()=>{
-    chat.innerHTML+=`<p><b>${demoProfiles.find(p=>p.id===currentChatId).name}:</b> ${aiReply(text)}</p>`
-    chat.scrollTop=chat.scrollHeight
-  },1000)
+    const profile=demoProfiles.find(p=>p.id===currentChatId);
+    chat.innerHTML+=`<p><b>${profile.name}:</b> ${aiReply(text)}</p>`;
+    chat.scrollTop=chat.scrollHeight;
+  },1000);
 }
 
 function showTab(tab){
-  document.querySelectorAll('.tab-content').forEach(c=>c.style.display='none')
-  document.getElementById(tab).style.display='block'
+  document.querySelectorAll('.tab-content').forEach(c=>c.style.display='none');
+  document.getElementById(tab).style.display='block';
 }
 
-// Profile tab saving
+// Profile tab save
 function saveProfile(){
   const profile={name:document.getElementById("profileName").value,
                  age:document.getElementById("profileAge").value,
                  country:document.getElementById("profileCountry").value,
-                 interest:document.getElementById("profileInterest").value}
-  alert("Profile Saved! "+JSON.stringify(profile))
+                 interest:document.getElementById("profileInterest").value,
+                 photos:profilePhotosArr};
+  alert("Profile Saved! "+JSON.stringify(profile));
 }
 
-// Update like tab
+let profilePhotosArr=[];
+function previewPhotos(input){
+  profilePhotosArr=[];
+  const previewDiv=document.getElementById("profilePreview");
+  previewDiv.innerHTML="";
+  for(let f of input.files){
+    const url=URL.createObjectURL(f);
+    profilePhotosArr.push(url);
+    let img=document.createElement("img");
+    img.src=url;
+    previewDiv.appendChild(img);
+  }
+}
+
+// Like tab update
 function updateLikeTab(){
-  const container=document.getElementById("like")
-  container.innerHTML=""
+  const container=document.getElementById("like");
+  container.innerHTML="";
   likedProfiles.forEach(p=>{
     container.innerHTML+=`<div class="card" onclick="openProfile(${p.id})">
       <img src="${p.photos[0]}">
@@ -226,13 +247,13 @@ function updateLikeTab(){
         <p>Country: ${p.country}</p>
         <p>Interest: ${p.interest}</p>
       </div>
-    </div>`
-  })
+    </div>`;
+  });
 }
 
-// Initialize
-showProfile(currentIndex)
-showTab('swipe')
+// Init
+showProfile(currentIndex);
+showTab('swipe');
 </script>
 </body>
 </html>
