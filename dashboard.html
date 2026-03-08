@@ -5,94 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Dating App Dashboard</title>
 <style>
-  body {
-    margin:0; padding:0; font-family: Arial, sans-serif; background:#000; color:#fff;
-    overflow:hidden; /* disable scrolling */
-  }
-  /* Tabs */
-  .tabs {
-    position: fixed; bottom:0; width:100%; display:flex; justify-content:space-around;
-    background:#111; border-top:1px solid #333;
-  }
-  .tab {
-    flex:1; text-align:center; padding:10px 0; cursor:pointer; color:#fff;
-  }
-  .tab.active { color:#FFD700; }
-
-  /* Swipe container */
-  #swipe-container {
-    position: absolute; top:0; left:0; right:0; bottom:50px;
-    overflow:hidden;
-    display:flex; align-items:center; justify-content:center;
-    touch-action: pan-x pan-y; user-select:none;
-  }
-
-  .card {
-    position:absolute; width:300px; height:400px; background:#222; border-radius:10px; box-shadow:0 0 15px #000;
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-    padding:10px; transition:0.3s;
-  }
-
-  .card img {
-    width:100%; height:250px; border-radius:10px; object-fit:cover;
-  }
-
-  .card-info {
-    margin-top:10px; text-align:center;
-  }
-
-  .card-info span { display:block; }
-
-  .actions {
-    display:flex; justify-content:space-around; width:100%; margin-top:10px;
-  }
-
-  .actions button {
-    background:#333; border:none; color:#fff; padding:5px 10px; border-radius:5px;
-    cursor:pointer;
-  }
-
-  .online-dot {
-    position:absolute; top:10px; right:10px; width:15px; height:15px; border-radius:50%; background:lime;
-    border:2px solid #000;
-  }
-
-  /* Message tab */
-  #messages { display:none; padding:10px; overflow-y:auto; height:calc(100% - 50px); }
-  .chat-user { display:flex; align-items:center; margin-bottom:10px; cursor:pointer; }
-  .chat-user img { width:40px; height:40px; border-radius:50%; margin-right:10px; }
-  .chat-box { display:none; flex-direction:column; height:calc(100% - 50px); padding:10px; }
-  .chat-messages { flex:1; overflow-y:auto; margin-bottom:10px; }
-  .message { margin:5px 0; display:flex; align-items:center; }
-  .message img { width:30px; height:30px; border-radius:50%; margin-right:5px; }
-  .message.you { justify-content:flex-end; }
-  .message.you img { margin-left:5px; margin-right:0; }
-
-  /* Profile tab */
-  #profile { display:none; padding:10px; overflow-y:auto; height:calc(100% - 50px); }
-  #profile img { width:100px; height:100px; border-radius:50%; display:block; margin-bottom:10px; }
-  #profile input, #profile select { display:block; width:100%; margin-bottom:10px; padding:5px; border-radius:5px; border:none; }
+body { margin:0; padding:0; font-family:Arial,sans-serif; background:#000; color:#fff; overflow:hidden; }
+.tabs { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; border-top:1px solid #333; }
+.tab { flex:1; text-align:center; padding:10px 0; cursor:pointer; color:#fff; }
+.tab.active { color:#FFD700; }
+#swipe-container { position:absolute; top:0; left:0; right:0; bottom:50px; overflow:hidden; display:flex; align-items:center; justify-content:center; touch-action: pan-x pan-y; user-select:none; }
+.card { position:absolute; width:300px; height:400px; background:#222; border-radius:10px; box-shadow:0 0 15px #000; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:10px; transition:0.3s; }
+.card img { width:100%; height:250px; border-radius:10px; object-fit:cover; }
+.card-info { margin-top:10px; text-align:center; }
+.card-info span { display:block; }
+.actions { display:flex; justify-content:space-around; width:100%; margin-top:10px; }
+.actions button { background:#333; border:none; color:#fff; padding:5px 10px; border-radius:5px; cursor:pointer; }
+.online-dot { position:absolute; top:10px; right:10px; width:15px; height:15px; border-radius:50%; border:2px solid #000; }
+#messages { display:none; padding:10px; overflow-y:auto; height:calc(100% - 50px); }
+.chat-user { display:flex; align-items:center; margin-bottom:10px; cursor:pointer; }
+.chat-user img { width:40px; height:40px; border-radius:50%; margin-right:10px; }
+.chat-box { display:none; flex-direction:column; height:calc(100% - 50px); padding:10px; }
+.chat-messages { flex:1; overflow-y:auto; margin-bottom:10px; }
+.message { margin:5px 0; display:flex; align-items:center; }
+.message img { width:30px; height:30px; border-radius:50%; margin-right:5px; }
+.message.you { justify-content:flex-end; }
+.message.you img { margin-left:5px; margin-right:0; }
+#profile { display:none; padding:10px; overflow-y:auto; height:calc(100% - 50px); }
+#profile img { width:100px; height:100px; border-radius:50%; display:block; margin-bottom:10px; }
+#profile input, #profile select { display:block; width:100%; margin-bottom:10px; padding:5px; border-radius:5px; border:none; }
+#photo-preview img { width:80px; height:80px; margin-right:5px; border-radius:5px; }
 </style>
 </head>
 <body>
 
-<!-- Swipe Container -->
 <div id="swipe-container"></div>
 
-<!-- Messages -->
-<div id="messages">
-  <div id="chat-list"></div>
-</div>
-
-<!-- Chat Box -->
+<div id="messages"><div id="chat-list"></div></div>
 <div id="chat-box" class="chat-box">
   <div id="chat-messages" class="chat-messages"></div>
-  <input type="text" id="chat-input" placeholder="Type a message..." />
+  <input type="text" id="chat-input" placeholder="Type a message...">
 </div>
 
-<!-- Profile Tab -->
 <div id="profile">
-  <img id="profile-pic" src="https://i.pravatar.cc/150?img=1" alt="Profile">
+  <img id="profile-pic" src="https://i.pravatar.cc/150?img=1">
   <input type="text" id="profile-name" placeholder="Name">
   <input type="number" id="profile-age" placeholder="Age">
   <select id="profile-country"></select>
@@ -108,7 +59,6 @@
   <div id="photo-preview"></div>
 </div>
 
-<!-- Tabs -->
 <div class="tabs">
   <div class="tab active" data-tab="swipe">🏠</div>
   <div class="tab" data-tab="messages">💬</div>
@@ -118,40 +68,54 @@
 </div>
 
 <script>
-const countries = ["USA","Canada","UK","Germany","France","Italy","Spain","Australia","Brazil","India","Japan","China","Nigeria","South Africa","Egypt","Kenya","Morocco","Mexico","Argentina","Chile","Colombia"]; // Add up to 152
+// 152+ countries array
+const countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Korea North","Korea South","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","USA","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+
 const maleNames = ["Liam","Noah","Oliver","Elijah","James","William","Benjamin","Lucas","Henry","Alexander"];
 const femaleNames = ["Olivia","Emma","Ava","Sophia","Isabella","Charlotte","Amelia","Mia","Harper","Evelyn"];
+const interests = ["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"];
+const blackCountries = ["Nigeria","Kenya","South Africa","Ghana","Egypt","Morocco","Ethiopia"];
+const whiteCountries = ["USA","Canada","UK","Germany","France","Italy","Spain","Australia","Netherlands"];
 
-// Populate country dropdown
 const profileCountry = document.getElementById("profile-country");
-countries.forEach(c=>{ let opt = document.createElement("option"); opt.value=c; opt.textContent=c; profileCountry.appendChild(opt); });
+countries.forEach(c=>{let opt=document.createElement("option");opt.value=c;opt.textContent=c;profileCountry.appendChild(opt);});
 
-// Generate demo profiles
+// Generate demo profiles with proper skin tones
 const demoProfiles = [];
 for(let i=1;i<=5000;i++){
+  const country = countries[Math.floor(Math.random()*countries.length)];
   const isMale = Math.random()<0.5;
-  const name = isMale ? maleNames[Math.floor(Math.random()*maleNames.length)] : femaleNames[Math.floor(Math.random()*femaleNames.length)];
+  let name = isMale ? maleNames[Math.floor(Math.random()*maleNames.length)] : femaleNames[Math.floor(Math.random()*femaleNames.length)];
+  let photoId;
+  if(blackCountries.includes(country)){
+    photoId = Math.floor(Math.random()*20)+50; // black faces
+  } else if(whiteCountries.includes(country)){
+    photoId = Math.floor(Math.random()*20)+1; // white faces
+  } else {
+    photoId = Math.floor(Math.random()*70)+1;
+  }
   demoProfiles.push({
     id:i,
     name:name+i,
     age:Math.floor(Math.random()*30)+18,
-    location:countries[Math.floor(Math.random()*countries.length)],
-    interest:["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"][Math.floor(Math.random()*4)],
-    photo:`https://i.pravatar.cc/150?img=${Math.floor(Math.random()*70)+1}`,
-    online: Math.random()<0.7
+    location:country,
+    interest:interests[Math.floor(Math.random()*interests.length)],
+    photo:`https://i.pravatar.cc/150?img=${photoId}`,
+    online:Math.random()<0.7,
+    chatHistory: []
   });
 }
 
-let currentIndex = 0;
-const swipeContainer = document.getElementById("swipe-container");
-
+// Swipe logic
+let currentIndex=0;
+const swipeContainer=document.getElementById("swipe-container");
 function showProfile(i){
   if(i>=demoProfiles.length) return;
-  swipeContainer.innerHTML = "";
-  const p = demoProfiles[i];
-  const card = document.createElement("div");
+  swipeContainer.innerHTML="";
+  const p=demoProfiles[i];
+  const card=document.createElement("div");
   card.className="card";
-  card.innerHTML = `
+  card.innerHTML=`
     <div class="online-dot" style="background:${p.online?'lime':'gray'}"></div>
     <img src="${p.photo}">
     <div class="card-info">
@@ -167,69 +131,81 @@ function showProfile(i){
   `;
   swipeContainer.appendChild(card);
 }
-
 function likeProfile(i){ alert("Liked "+demoProfiles[i].name); nextProfile(); }
 function ignoreProfile(i){ nextProfile(); }
 function messageProfile(i){ openChat(demoProfiles[i]); }
-
 function nextProfile(){ currentIndex++; showProfile(currentIndex); }
-
-// Initial display
 showProfile(currentIndex);
 
 // Tabs switching
 document.querySelectorAll(".tab").forEach(tab=>{
-  tab.addEventListener("click", ()=>{
+  tab.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
     tab.classList.add("active");
-    const tname = tab.getAttribute("data-tab");
-    swipeContainer.style.display = tname==="swipe"?"flex":"none";
-    document.getElementById("messages").style.display = tname==="messages"?"block":"none";
-    document.getElementById("profile").style.display = tname==="profile"?"block":"none";
+    const tname=tab.getAttribute("data-tab");
+    swipeContainer.style.display=tname==="swipe"?"flex":"none";
+    document.getElementById("messages").style.display=tname==="messages"?"block":"none";
+    document.getElementById("profile").style.display=tname==="profile"?"block":"none";
   });
 });
 
-// Chat system
-const chatList = document.getElementById("chat-list");
-const chatBox = document.getElementById("chat-box");
-const chatMessages = document.getElementById("chat-messages");
-const chatInput = document.getElementById("chat-input");
-let currentChatUser = null;
+// Chat system with human-like replies
+const chatList=document.getElementById("chat-list");
+const chatBox=document.getElementById("chat-box");
+const chatMessages=document.getElementById("chat-messages");
+const chatInput=document.getElementById("chat-input");
+let currentChatUser=null;
+
+const demoReplies=[
+  "Hi there! 😊","How are you today? 💖","You're amazing! 💘","Tell me more about yourself 💚","Haha that's funny 😄",
+  "I like your profile! 💖","Wow, really? 😍","Can't wait to hear from you 💘","You're so interesting! 💚"
+];
+
 function openChat(user){
   currentChatUser=user;
   chatBox.style.display="flex";
   chatMessages.innerHTML="";
-  addMessage(user.photo,user.name+" says hi!");
+  user.chatHistory.forEach(m=>{
+    addMessage(m.photo,m.text,m.you);
+  });
 }
-function addMessage(photo,msg,me=false){
-  const div = document.createElement("div");
-  div.className="message"+(me?" you":"");
+
+function addMessage(photo,msg,you=false){
+  const div=document.createElement("div");
+  div.className="message"+(you?" you":"");
   div.innerHTML=`<img src="${photo}"><span>${msg}</span>`;
   chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+  if(currentChatUser && !you){
+    currentChatUser.chatHistory.push({photo,msg,you:false});
+  }
 }
+
 chatInput.addEventListener("keypress",e=>{
   if(e.key==="Enter" && currentChatUser){
-    addMessage("https://i.pravatar.cc/150?img=1",chatInput.value,true);
-    setTimeout(()=> addMessage(currentChatUser.photo,"Demo reply 💖"),1000);
+    const msg=chatInput.value;
+    addMessage("https://i.pravatar.cc/150?img=1",msg,true);
+    currentChatUser.chatHistory.push({photo:currentChatUser.photo,msg, you:true});
     chatInput.value="";
+    // Demo human-like reply
+    setTimeout(()=>{
+      const reply = demoReplies[Math.floor(Math.random()*demoReplies.length)];
+      addMessage(currentChatUser.photo,reply,false);
+    },Math.floor(Math.random()*4000)+1000);
   }
 });
 
 // Profile photo preview
 document.querySelectorAll("#photo1,#photo2,#photo3").forEach(input=>{
   input.addEventListener("change",e=>{
-    const files = e.target.files;
-    const preview = document.getElementById("photo-preview");
+    const files=e.target.files;
+    const preview=document.getElementById("photo-preview");
     preview.innerHTML="";
     Array.from(files).forEach(f=>{
-      const reader = new FileReader();
+      const reader=new FileReader();
       reader.onload=(ev)=>{
         const img=document.createElement("img");
         img.src=ev.target.result;
-        img.style.width="80px";
-        img.style.height="80px";
-        img.style.marginRight="5px";
         preview.appendChild(img);
       };
       reader.readAsDataURL(f);
