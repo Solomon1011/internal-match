@@ -14,23 +14,7 @@
   <a href="#"><img src="assets/like.svg" alt="Like"><span>Like</span></a>
   <a href="#"><img src="assets/message.svg" alt="Message"><span>Message</span></a>
   <a href="#"><img src="assets/shop.svg" alt="Shop"><span>Shop</span></a>
-  <a href="profile_setup.html"><img src="assets/user.svg" alt="Profile"><span>Profile</span></a>
-  <a href="#" id="logoutBtn"><img src="assets/logout.svg" alt="Logout"><span>Logout</span></a>
+  <a href="#"><img src="assets/user.svg" alt="Profile"><span>Profile</span></a>
 </div>
-
-<script type="module">
-import { checkAuth, logout } from './app.js';
-
-checkAuth(user => {
-  if (!user) {
-    window.location.href = "login.html";
-  }
-});
-
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await logout();
-  window.location.href = "login.html";
-});
-</script>
 </body>
 </html>
