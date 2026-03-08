@@ -16,8 +16,8 @@ button{cursor:pointer;font-size:18px}
 #profile,#chat-box,#tabs{display:none;position:absolute;width:100%;height:100%;top:0;left:0}
 #profile img,#chat-box img{width:100px;height:100px;border-radius:50%}
 input,select{width:100%;padding:5px;margin:5px 0;border-radius:5px;border:none}
-.tab-bar{position:absolute;bottom:0;width:100%;display:flex;background:#111;justify-content:space-around;padding:10px 0}
-.tab-bar button{flex:1;background:none;border:none;color:#fff;font-size:18px}
+.tab-bar{position:absolute;bottom:0;width:100%;display:flex;background:#111;justify-content:space-around;padding:10px 0;z-index:1000;}
+.tab-bar button{flex:1;background:none;border:none;color:#fff;font-size:18px;display:flex;flex-direction:column;align-items:center;}
 .tab-bar button.active{color:#FFD700}
 .chat-message{display:flex;align-items:center;margin:5px}
 .chat-message img{width:40px;height:40px;border-radius:50%;margin-right:5px}
@@ -52,30 +52,36 @@ input,select{width:100%;padding:5px;margin:5px 0;border-radius:5px;border:none}
   <button onclick="sendMessage()">Send</button>
 </div>
 
-<!-- Tabs -->
+<!-- Bottom Tabs -->
 <div class="tab-bar" id="tabs">
-  <button class="active" onclick="showTab('swipe')">🏠</button>
-  <button onclick="showTab('likes')">💖</button>
-  <button onclick="showTab('messages')">💬</button>
-  <button onclick="showTab('profile-tab')">👤</button>
-  <button onclick="showTab('coins')">💰</button>
+  <button class="active" onclick="showTab('swipe', event)">🏠<br>Home</button>
+  <button onclick="showTab('likes', event)">💖<br>Likes</button>
+  <button onclick="showTab('messages', event)">💬<br>Messages</button>
+  <button onclick="showTab('profile-tab', event)">👤<br>Profile</button>
+  <button onclick="showTab('coins', event)">💰<br>Coins</button>
 </div>
 
 <script>
-// 152+ countries (example, you can expand)
+// 152+ countries
 const countries = ["United States","United Kingdom","Nigeria","South Africa","India","Canada","Brazil","France","Germany","China","Japan","Russia","Italy","Spain","Mexico","Australia","Egypt","Kenya","Ghana","Morocco","Algeria","Others"];
 const profileCountry = document.getElementById("profile-country");
 countries.forEach(c=>{let o=document.createElement("option");o.value=c;o.textContent=c;profileCountry.appendChild(o)});
 
-// Demo profiles
+// Generate 5000+ demo profiles
 const demoProfiles = [];
-const names = ["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
-const malePhotos = ["https://randomuser.me/api/portraits/men/1.jpg","https://randomuser.me/api/portraits/men/2.jpg"];
-const femalePhotos = ["https://randomuser.me/api/portraits/women/1.jpg","https://randomuser.me/api/portraits/women/2.jpg"];
+const firstNames = ["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
+const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Martinez","Hernandez"];
+const malePhotos = []; const femalePhotos = [];
+for(let i=1;i<=50;i++){ // 50 sample photos from randomuser
+  malePhotos.push(`https://randomuser.me/api/portraits/men/${i}.jpg`);
+  femalePhotos.push(`https://randomuser.me/api/portraits/women/${i}.jpg`);
+}
 for(let i=0;i<5000;i++){
   let gender = Math.random()>0.5?'male':'female';
+  let first = firstNames[Math.floor(Math.random()*firstNames.length)];
+  let last = lastNames[Math.floor(Math.random()*lastNames.length)];
   demoProfiles.push({
-    name:names[Math.floor(Math.random()*names.length)] + i,
+    name: first+' '+last+i,
     age:18+Math.floor(Math.random()*30),
     location:countries[Math.floor(Math.random()*countries.length)],
     interest:["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"][Math.floor(Math.random()*4)],
@@ -110,6 +116,7 @@ function showProfileCard(i){
     </div>`;
   swipeContainer.appendChild(card);
 }
+
 function likeProfile(i){nextProfile();}
 function ignoreProfile(i){nextProfile();}
 function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
@@ -164,20 +171,21 @@ function sendMessage(){
   if(!input.value) return;
   currentChatUser.messages=currentChatUser.messages||[];
   currentChatUser.messages.push({sender:'me',text:input.value});
-  // Auto-reply
   currentChatUser.messages.push({sender:'them',text:"Hi! I am "+currentChatUser.name});
   input.value="";
   loadChatMessages();
 }
 
 // Tabs
-function showTab(tab){
+function showTab(tab,event){
   document.getElementById("swipe-container").style.display="none";
   document.getElementById("chat-box").style.display="none";
   document.getElementById("profile").style.display="none";
   if(tab==='swipe') swipeContainer.style.display="flex";
   if(tab==='messages') document.getElementById("chat-box").style.display="flex";
   if(tab==='profile-tab') document.getElementById("profile").style.display="block";
+  if(tab==='likes') swipeContainer.style.display="flex";
+  if(tab==='coins') swipeContainer.style.display="flex";
   document.querySelectorAll(".tab-bar button").forEach(b=>b.classList.remove("active"));
   event.target.classList.add("active");
 }
@@ -192,7 +200,6 @@ function showTab(tab){
     }
   });
 });
-
 </script>
 </body>
 </html>
