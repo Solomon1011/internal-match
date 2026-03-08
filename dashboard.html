@@ -14,6 +14,7 @@ body { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 .actions{display:flex;justify-content:space-around;margin-top:10px}
 button{cursor:pointer;font-size:18px;border:none;border-radius:8px;padding:5px 10px}
 .online-dot{width:14px;height:14px;border-radius:50%;position:absolute;top:10px;right:10px;border:2px solid #fff}
+.online-dot-small{width:12px;height:12px;border-radius:50%;position:absolute;top:8px;right:8px;border:2px solid #fff; z-index:10;}
 #profile,#chat-box{display:none;position:absolute;width:100%;height:100%;top:0;left:0;flex-direction:column;align-items:center}
 #profile img,#chat-box img{width:120px;height:120px;border-radius:50%;object-fit:cover}
 input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;background:#222;color:#fff}
@@ -21,7 +22,7 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
 .tab-bar button{flex:1;background:none;color:#fff;font-size:16px;display:flex;flex-direction:column;align-items:center;}
 .tab-bar button.active{color:#FFD700}
 .chat-message{display:flex;align-items:center;margin:5px}
-.chat-message img{width:40px;height:40px;border-radius:50%;margin-right:8px}
+.chat-message img{width:40px;height:40px;border-radius:50%;margin-right:8px;border:2px solid lime}
 .profile-container{background:#111;padding:15px;border-radius:15px;width:90%;max-width:400px;text-align:center;overflow-y:auto;height:90%}
 .profile-fields{display:flex;flex-direction:column;margin-top:10px}
 .profile-fields label{margin-top:10px;font-weight:bold}
@@ -36,13 +37,14 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
 <!-- Swipe container -->
 <div id="swipe-container"></div>
 
-<!-- Profile view -->
+<!-- User Profile Tab -->
 <div id="profile">
   <div class="profile-container">
     <div style="position:relative">
       <img id="profile-pic" src="" alt="Profile">
       <div class="online-dot" id="profile-online"></div>
     </div>
+
     <div class="profile-fields">
       <label>Name</label>
       <input id="profile-name" placeholder="Name">
@@ -59,7 +61,6 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
       </select>
     </div>
 
-    <!-- Single profile photo -->
     <div class="profile-photos">
       <img id="photo-preview1" src="">
     </div>
@@ -87,24 +88,23 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
 </div>
 
 <script>
-// 152+ countries
+// Countries
 const countries = ["United States","United Kingdom","Nigeria","South Africa","India","Canada","Brazil","France","Germany","China","Japan","Russia","Italy","Spain","Mexico","Australia","Egypt","Kenya","Ghana","Morocco","Algeria","Others"];
 const profileCountry = document.getElementById("profile-country");
 countries.forEach(c=>{let o=document.createElement("option");o.value=c;o.textContent=c;profileCountry.appendChild(o)});
 
-// Demo profiles
-const demoProfiles = [];
-const firstNames = ["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
-const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Martinez","Hernandez"];
-const malePhotos = []; const femalePhotos = [];
-for(let i=1;i<=50;i++){ malePhotos.push(`https://randomuser.me/api/portraits/men/${i}.jpg`);
-femalePhotos.push(`https://randomuser.me/api/portraits/women/${i}.jpg`);}
+// Demo Profiles
+const demoProfiles=[];
+const firstNames=["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
+const lastNames=["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Martinez","Hernandez"];
+const malePhotos=[]; const femalePhotos=[];
+for(let i=1;i<=50;i++){ malePhotos.push(`https://randomuser.me/api/portraits/men/${i}.jpg`); femalePhotos.push(`https://randomuser.me/api/portraits/women/${i}.jpg`);}
 for(let i=0;i<5000;i++){
-  let gender = Math.random()>0.5?'male':'female';
-  let first = firstNames[Math.floor(Math.random()*firstNames.length)];
-  let last = lastNames[Math.floor(Math.random()*lastNames.length)];
+  let gender=Math.random()>0.5?'male':'female';
+  let first=firstNames[Math.floor(Math.random()*firstNames.length)];
+  let last=lastNames[Math.floor(Math.random()*lastNames.length)];
   demoProfiles.push({
-    name: first+' '+last+i,
+    name:first+' '+last+i,
     age:18+Math.floor(Math.random()*30),
     location:countries[Math.floor(Math.random()*countries.length)],
     interest:["Friend 💖","Hangout 💚","Serious Relationship 💖","Marriage 💘"][Math.floor(Math.random()*4)],
@@ -116,18 +116,18 @@ for(let i=0;i<5000;i++){
   });
 }
 
-// Swipe logic
-let currentIndex = 0;
-const swipeContainer = document.getElementById("swipe-container");
+// Swipe
+let currentIndex=0;
+const swipeContainer=document.getElementById("swipe-container");
 function showProfileCard(i){
   if(i>=demoProfiles.length) return;
   swipeContainer.innerHTML="";
-  const p = demoProfiles[i];
-  const card = document.createElement("div");
+  const p=demoProfiles[i];
+  const card=document.createElement("div");
   card.className="card";
   card.addEventListener("click",()=>openUserProfile(p));
   card.innerHTML=`
-    <div class="online-dot" style="background:${p.online?'lime':'gray'}"></div>
+    <div class="online-dot-small" style="background:${p.online?'lime':'gray'}"></div>
     <img src="${p.photo}">
     <div class="card-info">
       <span><b>${p.name}</b>, ${p.age}</span>
@@ -141,12 +141,12 @@ function showProfileCard(i){
     </div>`;
   swipeContainer.appendChild(card);
 }
-function likeProfile(i){ demoProfiles[i].likesMe=true; nextProfile();}
-function ignoreProfile(i){ nextProfile();}
+function likeProfile(i){demoProfiles[i].likesMe=true; nextProfile();}
+function ignoreProfile(i){nextProfile();}
 function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
 showProfileCard(currentIndex);
 
-// Open profile
+// Profile
 let currentUser=null;
 function openUserProfile(user){
   currentUser=user;
@@ -158,11 +158,10 @@ function openUserProfile(user){
   document.getElementById("profile-country").value=user.location;
   document.getElementById("profile-interest").value=user.interest;
   document.getElementById("profile-online").style.background=user.online?'lime':'gray';
-  const msgBtn = document.getElementById("message-btn");
-  msgBtn.onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";};
+  document.getElementById("message-btn").onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";};
 }
 
-// Save editable profile
+// Save profile
 document.getElementById("save-profile").addEventListener("click",()=>{
   if(!currentUser) return;
   currentUser.name=document.getElementById("profile-name").value;
@@ -170,6 +169,18 @@ document.getElementById("save-profile").addEventListener("click",()=>{
   currentUser.location=document.getElementById("profile-country").value;
   currentUser.interest=document.getElementById("profile-interest").value;
   alert("Profile saved!");
+});
+
+// Photo preview
+document.getElementById('photo1').addEventListener("change",function(e){
+  if(e.target.files[0]){
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      document.getElementById('photo-preview1').src=ev.target.result;
+      document.getElementById('profile-pic').src=ev.target.result;
+    }
+    reader.readAsDataURL(e.target.files[0]);
+  }
 });
 
 // Chat
@@ -191,12 +202,12 @@ function loadChatMessages(){
     container.appendChild(div);
   });
   container.scrollTop=container.scrollHeight;
+  refreshOnlineDots();
 }
 function sendMessage(){
   const input=document.getElementById("chat-input");
   if(!input.value || !currentChatUser) return;
   currentChatUser.messages.push({sender:'me',text:input.value});
-  // Auto reply simulation
   currentChatUser.messages.push({sender:'them',text:"Hi! I am "+currentChatUser.name});
   input.value="";
   loadChatMessages();
@@ -211,41 +222,49 @@ function showTab(tab,event){
   if(tab==='swipe') swipeContainer.style.display="flex";
   if(tab==='messages') document.getElementById("chat-box").style.display="flex";
   if(tab==='profile-tab') document.getElementById("profile").style.display="flex";
-  if(tab==='likes') {
+  if(tab==='likes'){
     swipeContainer.innerHTML="";
-    demoProfiles.filter(p=>p.likesMe || p.viewedMe).forEach((p,i)=>{
+    demoProfiles.filter(p=>p.likesMe||p.viewedMe).forEach((p,i)=>{
       const card=document.createElement("div");
       card.className="card";
       card.addEventListener("click",()=>openUserProfile(p));
-      card.innerHTML=`
-        <img src="${p.photo}">
-        <div class="card-info"><b>${p.name}</b>, ${p.age}, ${p.location}, ${p.interest}</div>
-        <div class="actions">
-          <button onclick="event.stopPropagation(); openChat(demoProfiles[${i}])">💬</button>
-        </div>`;
+      card.innerHTML=`<div class="online-dot-small" style="background:${p.online?'lime':'gray'}"></div>
+      <img src="${p.photo}">
+      <div class="card-info"><b>${p.name}</b>, ${p.age}, ${p.location}, ${p.interest}</div>
+      <div class="actions"><button onclick="event.stopPropagation(); openChat(demoProfiles[${i}])">💬</button></div>`;
       swipeContainer.appendChild(card);
     });
     swipeContainer.style.display="flex";
   }
-  if(tab==='coins') {
+  if(tab==='coins'){
     swipeContainer.innerHTML="<h2 style='color:#FFD700'>Coming Soon 💰</h2>";
     swipeContainer.style.display="flex";
   }
   document.querySelectorAll(".tab-bar button").forEach(b=>b.classList.remove("active"));
   event.currentTarget.classList.add("active");
+  refreshOnlineDots();
 }
 
-// Photo preview for single profile picture
-document.getElementById('photo1').addEventListener("change", function(e){
-  if(e.target.files[0]){
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      document.getElementById('photo-preview1').src = ev.target.result;
-      document.getElementById('profile-pic').src = ev.target.result; // also update main profile pic
-    }
-    reader.readAsDataURL(e.target.files[0]);
-  }
-});
+// Live online dot
+function refreshOnlineDots(){
+  document.querySelectorAll(".online-dot-small").forEach((dot,i)=>{
+    if(demoProfiles[currentIndex])
+      dot.style.background = demoProfiles[currentIndex].online ? 'lime':'gray';
+  });
+  if(currentUser)
+    document.getElementById("profile-online").style.background=currentUser.online?'lime':'gray';
+  document.querySelectorAll(".chat-message img").forEach((img,i)=>{
+    if(currentChatUser)
+      img.style.border=currentChatUser.online?'2px solid lime':'2px solid gray';
+  });
+}
+
+// Update online status randomly to simulate live users
+setInterval(()=>{
+  demoProfiles.forEach(p=>p.online=Math.random()>0.3);
+  refreshOnlineDots();
+},5000);
+
 </script>
 </body>
 </html>
