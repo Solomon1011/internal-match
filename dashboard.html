@@ -6,11 +6,10 @@
 <title>💘 Internal Match - Dashboard</title>
 <style>
 body { font-family: Arial, sans-serif; margin:0; padding-bottom:60px; background:#fff0f6; text-align:center;}
-h2 { color:#ff4d6d; }
-.tab-buttons { display:flex; justify-content:space-around; background:#fff; border-bottom:1px solid #ccc; position:fixed; top:0; width:100%; z-index:100; }
-.tab-buttons button { flex:1; padding:10px; border:none; background:#fff; color:#333; font-size:14px; cursor:pointer; }
-.tab-buttons button.active { color:#ff4d6d; border-bottom:2px solid #ff4d6d; }
-.tab-content { display:none; padding-top:60px; min-height:80vh; }
+h2 { color:#ff4d6d; margin-top:20px; }
+
+/* Tab content */
+.tab-content { display:none; padding-top:20px; min-height:80vh; }
 .tab-content.active { display:block; }
 
 /* Swipe Cards */
@@ -36,20 +35,18 @@ h2 { color:#ff4d6d; }
 /* Profile Tab */
 .profile-form input, .profile-form select { width:80%; padding:8px; margin:8px 0; border-radius:6px; border:1px solid #ccc; }
 .profile-form button { background:#ff4d6d; color:#fff; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; }
+.profile-form label { display:block; text-align:left; margin-left:10%; }
+
+/* Bottom Tabs */
+.bottom-tabs { position:fixed; bottom:0; left:0; width:100%; height:60px; background:#fff; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #ccc; z-index:100; }
+.bottom-tabs button { flex:1; border:none; background:#fff; color:#333; font-size:12px; display:flex; flex-direction:column; align-items:center; cursor:pointer; }
+.bottom-tabs button.active { color:#ff4d6d; }
+.bottom-tabs img { width:24px; height:24px; margin-bottom:2px; }
 </style>
 </head>
 <body>
 
 <h2>💘 Internal Match Dashboard</h2>
-
-<!-- Tab Buttons -->
-<div class="tab-buttons">
-  <button class="tab-btn active" data-tab="swipeTab">Swipe</button>
-  <button class="tab-btn" data-tab="likeTab">Like</button>
-  <button class="tab-btn" data-tab="messageTab">Message</button>
-  <button class="tab-btn" data-tab="profileTab">Profile</button>
-  <button class="tab-btn" data-tab="coinsTab">Coins</button>
-</div>
 
 <!-- Swipe Tab -->
 <div id="swipeTab" class="tab-content active">
@@ -77,23 +74,20 @@ h2 { color:#ff4d6d; }
     <input type="text" id="username" placeholder="Username" required><br>
     <input type="number" id="age" placeholder="Age" min="13"><br>
     <input type="file" id="photo" accept="image/*"><br>
-    <select id="country">
+    <select id="country" required>
       <option value="">Select Country</option>
       <option value="USA">USA</option>
       <option value="UK">UK</option>
       <option value="Canada">Canada</option>
       <option value="France">France</option>
       <option value="Germany">Germany</option>
-      <!-- add more countries up to 152+ -->
+      <!-- Add the remaining 152+ countries -->
     </select><br>
-    <select id="interest" multiple>
-      <option value="Music">Music</option>
-      <option value="Travel">Travel</option>
-      <option value="Sports">Sports</option>
-      <option value="Movies">Movies</option>
-      <option value="Reading">Reading</option>
-      <option value="Cooking">Cooking</option>
-    </select><br>
+    <label>Interest:</label>
+    <label><input type="checkbox" value="Friend 💖" class="interest"> Friend 💖</label>
+    <label><input type="checkbox" value="Hangout 💚" class="interest"> Hangout 💚</label>
+    <label><input type="checkbox" value="Serious Relationship 💖" class="interest"> Serious Relationship 💖</label>
+    <label><input type="checkbox" value="Marriage 💘" class="interest"> Marriage 💘</label><br>
     <button type="submit">Save Profile</button>
   </form>
 </div>
@@ -102,6 +96,15 @@ h2 { color:#ff4d6d; }
 <div id="coinsTab" class="tab-content">
   <h3>Your Coins</h3>
   <p>You have <span id="coinCount">100</span> coins.</p>
+</div>
+
+<!-- Bottom Tab Buttons -->
+<div class="bottom-tabs">
+  <button class="tab-btn active" data-tab="swipeTab"><img src="https://img.icons8.com/ios/50/000000/swipe-right.png"/><span>Swipe</span></button>
+  <button class="tab-btn" data-tab="likeTab"><img src="https://img.icons8.com/ios/50/000000/like--v1.png"/><span>Like</span></button>
+  <button class="tab-btn" data-tab="messageTab"><img src="https://img.icons8.com/ios/50/000000/chat.png"/><span>Message</span></button>
+  <button class="tab-btn" data-tab="profileTab"><img src="https://img.icons8.com/ios/50/000000/user.png"/><span>Profile</span></button>
+  <button class="tab-btn" data-tab="coinsTab"><img src="https://img.icons8.com/ios/50/000000/coin.png"/><span>Coins</span></button>
 </div>
 
 <script>
@@ -117,9 +120,9 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
 
 // Demo swipe profiles
 const demoProfiles = [
-  {id:1, name:"Alice", age:24, photo:"https://randomuser.me/api/portraits/women/65.jpg", location:"USA", interests:["Music","Travel"]},
-  {id:2, name:"Bob", age:27, photo:"https://randomuser.me/api/portraits/men/12.jpg", location:"UK", interests:["Sports","Movies"]},
-  {id:3, name:"Clara", age:22, photo:"https://randomuser.me/api/portraits/women/43.jpg", location:"Canada", interests:["Reading","Cooking"]},
+  {id:1, name:"Alice", age:24, photo:"https://randomuser.me/api/portraits/women/65.jpg", location:"USA", interests:["Friend 💖","Hangout 💚"]},
+  {id:2, name:"Bob", age:27, photo:"https://randomuser.me/api/portraits/men/12.jpg", location:"UK", interests:["Serious Relationship 💖"]},
+  {id:3, name:"Clara", age:22, photo:"https://randomuser.me/api/portraits/women/43.jpg", location:"Canada", interests:["Marriage 💘","Friend 💖"]},
 ];
 let likedProfiles = [];
 let messages = [];
@@ -199,8 +202,8 @@ function saveProfile(e){
   const username=document.getElementById("username").value;
   const age=document.getElementById("age").value;
   const country=document.getElementById("country").value;
-  const interest=Array.from(document.getElementById("interest").selectedOptions).map(o=>o.value);
-  alert(`Profile saved!\nName: ${username}\nAge: ${age}\nCountry: ${country}\nInterests: ${interest.join(", ")}`);
+  const interests=Array.from(document.querySelectorAll(".interest:checked")).map(i=>i.value);
+  alert(`Profile saved!\nName: ${username}\nAge: ${age}\nCountry: ${country}\nInterests: ${interests.join(", ")}`);
 }
 
 // Initialize
