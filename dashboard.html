@@ -2,127 +2,145 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Internal Match</title>
+
+<title>Dating App Dashboard</title>
 
 <style>
 
 body{
-font-family:Arial;
 margin:0;
-background:#fff0f5;
-text-align:center;
+font-family:Arial;
+background:#f5f5f5;
+}
+
+.tab{
+display:none;
 padding-bottom:80px;
 }
 
-h2{color:#ff2a6d;}
+.active{
+display:block;
+}
 
-.tab{display:none;padding:20px;}
-.active{display:block;}
-
-.card-container{
-width:90%;
-max-width:350px;
-margin:auto;
+.swipe-container{
+height:70vh;
+display:flex;
+justify-content:center;
+align-items:center;
+position:relative;
+overflow:hidden;
+touch-action:none;
 }
 
 .card{
+position:absolute;
+width:90%;
+max-width:350px;
 background:white;
-border-radius:12px;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
+border-radius:15px;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
 overflow:hidden;
-margin-bottom:20px;
-cursor:pointer;
+touch-action:none;
 }
 
 .card img{
 width:100%;
-height:260px;
+height:320px;
 object-fit:cover;
 }
 
-.actions{
-display:flex;
-justify-content:space-around;
-padding:10px;
+.card-info{
+padding:15px;
+text-align:center;
 }
 
-.actions button{
+.buttons{
+display:flex;
+justify-content:space-around;
+margin-top:10px;
+}
+
+.buttons button{
 border:none;
-padding:8px 12px;
+padding:10px;
 border-radius:8px;
-color:white;
 cursor:pointer;
 }
 
-.like{background:#28a745;}
-.ignore{background:#dc3545;}
-.msg{background:#007bff;}
+.like{background:#ff4d6d;color:white;}
+.ignore{background:#ccc;}
+.message{background:#4CAF50;color:white;}
 
-.nav{
+.bottom-nav{
 position:fixed;
 bottom:0;
 width:100%;
 background:white;
-border-top:1px solid #ddd;
 display:flex;
 justify-content:space-around;
-height:65px;
+border-top:1px solid #ddd;
 }
 
-.nav button{
-background:none;
+.bottom-nav button{
+flex:1;
+padding:15px;
 border:none;
-font-size:12px;
+background:white;
+font-size:16px;
+}
+
+.chat-user{
 display:flex;
-flex-direction:column;
 align-items:center;
+gap:10px;
+padding:12px;
+border-bottom:1px solid #eee;
 cursor:pointer;
 }
 
-.message{
-display:flex;
-align-items:center;
-gap:10px;
-background:white;
-padding:8px;
-margin:6px;
-border-radius:8px;
-}
-
-.message img{
-width:35px;
-height:35px;
+.chat-user img{
+width:40px;
+height:40px;
 border-radius:50%;
 }
 
-form input,form select{
-width:80%;
-padding:10px;
-margin:6px;
-border-radius:8px;
-border:1px solid #ccc;
-}
-
-.save{
-background:#ff2a6d;
-color:white;
-border:none;
-padding:10px 20px;
-border-radius:8px;
-}
-
-.photo-preview{
-display:flex;
+.profile-viewer{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
 justify-content:center;
-gap:10px;
-margin:10px;
+align-items:center;
 }
 
-.photo-preview img{
-width:70px;
-height:70px;
+.profile-box{
+background:white;
+padding:20px;
 border-radius:10px;
+width:90%;
+max-width:350px;
+text-align:center;
+}
+
+.profile-box img{
+width:120px;
+height:120px;
+border-radius:50%;
 object-fit:cover;
+}
+
+.close{
+float:right;
+cursor:pointer;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:5px 0;
 }
 
 </style>
@@ -130,365 +148,256 @@ object-fit:cover;
 
 <body>
 
-<h2>💘 Internal Match</h2>
+<!-- SWIPE TAB -->
+<div id="swipeTab" class="tab active">
 
-<!-- SWIPE -->
-
-<div id="swipe" class="tab active">
-<div class="card-container" id="cards"></div>
-</div>
-
-<!-- LIKES -->
-
-<div id="likes" class="tab">
-<h3>People You Liked</h3>
-<div id="likedList"></div>
-</div>
-
-<!-- MESSAGES -->
-
-<div id="messages" class="tab">
-
-<h3 id="chatTitle">Messages</h3>
-
-<div id="chatBox"></div>
-
-<input id="msgInput" placeholder="Type message">
-
-<button onclick="sendMessage()">Send</button>
+<div class="swipe-container" id="cardStack"></div>
 
 </div>
 
-<!-- PROFILE -->
+<!-- LIKES TAB -->
+<div id="likesTab" class="tab">
 
-<div id="profile" class="tab">
+<h2 style="padding:15px">People Who Liked You</h2>
 
-<h3>Edit Profile</h3>
+<div id="likesList"></div>
 
-<form onsubmit="saveProfile(event)">
+</div>
 
-<input id="username" placeholder="Username" required>
+<!-- MESSAGE TAB -->
+<div id="messagesTab" class="tab">
+
+<h2 style="padding:15px">Messages</h2>
+
+<div id="messagesList"></div>
+
+</div>
+
+<!-- PROFILE TAB -->
+<div id="profileTab" class="tab">
+
+<h2 style="padding:15px">Edit Profile</h2>
+
+<div style="padding:15px">
+
+<input id="username" placeholder="Username">
 
 <input id="age" type="number" placeholder="Age">
 
 <select id="country">
-
 <option>Nigeria</option>
 <option>United States</option>
 <option>United Kingdom</option>
 <option>Canada</option>
-<option>Australia</option>
-<option>Germany</option>
 <option>France</option>
+<option>Germany</option>
 <option>Italy</option>
 <option>Spain</option>
 <option>Brazil</option>
 <option>India</option>
 <option>China</option>
 <option>Japan</option>
-<option>South Korea</option>
+<option>South Africa</option>
 <option>Mexico</option>
 <option>Argentina</option>
-<option>South Africa</option>
-<option>Kenya</option>
-<option>Ghana</option>
-<option>Egypt</option>
-<option>Morocco</option>
 <option>Turkey</option>
-<option>Saudi Arabia</option>
-<option>UAE</option>
-<option>Qatar</option>
 <option>Indonesia</option>
-<option>Malaysia</option>
-<option>Thailand</option>
-<option>Vietnam</option>
 <option>Philippines</option>
-<option>Singapore</option>
-<option>Netherlands</option>
-<option>Belgium</option>
-<option>Sweden</option>
-<option>Norway</option>
-<option>Finland</option>
-<option>Denmark</option>
-<option>Poland</option>
-<option>Portugal</option>
-<option>Switzerland</option>
-<option>Austria</option>
-<option>New Zealand</option>
-<option>Ukraine</option>
-<option>Romania</option>
-<option>Hungary</option>
-<option>Greece</option>
-<option>Israel</option>
-<option>Pakistan</option>
-<option>Bangladesh</option>
-<option>Sri Lanka</option>
-<option>Nepal</option>
-<option>Chile</option>
-<option>Peru</option>
-<option>Colombia</option>
-<option>Venezuela</option>
-<option>Costa Rica</option>
-<option>Panama</option>
-<option>Dominican Republic</option>
-<option>Jamaica</option>
-<option>Cuba</option>
-
+<option>Thailand</option>
+<option>Australia</option>
 </select>
 
 <select id="interest">
-
 <option>Friend 💖</option>
 <option>Hangout 💚</option>
 <option>Serious Relationship 💖</option>
 <option>Marriage 💘</option>
-
 </select>
 
-<p>Upload up to 3 Photos</p>
+<input type="file" multiple>
 
-<input type="file" id="photos" multiple accept="image/*">
-
-<div class="photo-preview" id="preview"></div>
-
-<button class="save">Save Profile</button>
-
-</form>
+<button onclick="saveProfile()">Save Profile</button>
 
 </div>
 
-<!-- COINS -->
-
-<div id="coins" class="tab">
-<h3>Your Coins</h3>
-<h1>100</h1>
 </div>
 
-<!-- PROFILE VIEW -->
+<!-- COINS TAB -->
+<div id="coinsTab" class="tab">
 
-<div id="viewProfile" class="tab">
+<h2 style="padding:20px">Coins</h2>
+
+<p style="padding:20px">You have 0 coins</p>
+
+<button style="margin:20px">Buy Coins</button>
+
+</div>
+
+<!-- PROFILE VIEWER -->
+<div class="profile-viewer" id="profileViewer">
+
+<div class="profile-box">
+
+<span class="close" onclick="closeProfile()">✖</span>
+
+<img id="viewPhoto">
 
 <h3 id="viewName"></h3>
 
-<img id="viewImg" width="200">
+<p id="viewAge"></p>
+
+<p id="viewInterest"></p>
 
 <p id="viewCountry"></p>
 
 </div>
 
-<!-- NAV -->
+</div>
 
-<div class="nav">
+<!-- NAVIGATION -->
+<div class="bottom-nav">
 
-<button onclick="showTab('swipe')">🔥 Swipe</button>
-<button onclick="showTab('likes')">❤️ Likes</button>
-<button onclick="showTab('messages')">💬 Messages</button>
-<button onclick="showTab('profile')">👤 Profile</button>
-<button onclick="showTab('coins')">🪙 Coins</button>
+<button onclick="openTab('swipeTab')">🔥</button>
+
+<button onclick="openTab('likesTab')">❤️</button>
+
+<button onclick="openTab('messagesTab')">💬</button>
+
+<button onclick="openTab('profileTab')">👤</button>
+
+<button onclick="openTab('coinsTab')">💰</button>
 
 </div>
 
 <script>
 
-let users=[
-
-{
-id:1,
-name:"Alice",
-age:24,
-interest:"Friend 💖",
-country:"USA",
-photo:"https://randomuser.me/api/portraits/women/65.jpg"
-},
-
-{
-id:2,
-name:"Bob",
-age:27,
-interest:"Serious Relationship 💖",
-country:"UK",
-photo:"https://randomuser.me/api/portraits/men/32.jpg"
-}
-
+let profiles=[
+{name:"Linda",age:24,interest:"Friend 💖",country:"USA",photo:"https://randomuser.me/api/portraits/women/65.jpg"},
+{name:"Anna",age:22,interest:"Hangout 💚",country:"Canada",photo:"https://randomuser.me/api/portraits/women/44.jpg"},
+{name:"Sophia",age:26,interest:"Marriage 💘",country:"UK",photo:"https://randomuser.me/api/portraits/women/68.jpg"}
 ]
 
-let liked=[]
-let messages=[]
-let currentChat=null
+function loadCards(){
 
-function showTab(id){
+let container=document.getElementById("cardStack")
 
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-document.getElementById(id).classList.add("active")
-
-}
-
-function renderCards(){
-
-const container=document.getElementById("cards")
 container.innerHTML=""
 
-users.forEach(u=>{
+profiles.forEach((p,i)=>{
 
-container.innerHTML+=`
+let card=document.createElement("div")
 
-<div class="card" onclick="viewProfile(${u.id})">
+card.className="card"
 
-<img src="${u.photo}">
+card.innerHTML=`
 
-<h3>${u.name}, ${u.age} • ${u.interest}</h3>
+<img src="${p.photo}">
 
-<p>${u.country}</p>
+<div class="card-info" onclick="viewProfile(${i})">
 
-<div class="actions">
+<h3>${p.name}, ${p.age}</h3>
 
-<button class="like" onclick="event.stopPropagation();likeUser(${u.id})">Like</button>
-
-<button class="msg" onclick="event.stopPropagation();openChat(${u.id})">Message</button>
-
-<button class="ignore" onclick="event.stopPropagation();ignoreUser(${u.id})">Ignore</button>
+<p>${p.interest}</p>
 
 </div>
 
-</div>
+<div class="buttons">
 
-`
+<button class="ignore" onclick="ignoreUser(${i})">❌</button>
 
-})
+<button class="message" onclick="openChat(${i})">💬</button>
 
-}
-
-function likeUser(id){
-
-let u=users.find(x=>x.id==id)
-
-liked.push(u)
-
-users=users.filter(x=>x.id!=id)
-
-renderCards()
-
-renderLikes()
-
-}
-
-function ignoreUser(id){
-
-users=users.filter(x=>x.id!=id)
-
-renderCards()
-
-}
-
-function renderLikes(){
-
-const list=document.getElementById("likedList")
-
-list.innerHTML=""
-
-liked.forEach(u=>{
-
-list.innerHTML+=`
-
-<div class="message">
-
-<img src="${u.photo}">
-
-${u.name}, ${u.age} • ${u.interest}
+<button class="like" onclick="likeUser(${i})">❤️</button>
 
 </div>
 
 `
 
+container.appendChild(card)
+
 })
 
 }
 
-function openChat(id){
+function likeUser(i){
 
-let u=liked.find(x=>x.id==id) || users.find(x=>x.id==id)
+let likes=JSON.parse(localStorage.getItem("likes"))||[]
 
-currentChat=u
+likes.push(profiles[i])
 
-document.getElementById("chatTitle").innerHTML=`<img src="${u.photo}" width="30" style="border-radius:50%"> Chat with ${u.name}`
+localStorage.setItem("likes",JSON.stringify(likes))
 
-showTab("messages")
-
-}
-
-function sendMessage(){
-
-let text=document.getElementById("msgInput").value
-
-if(!text)return
-
-messages.push({user:currentChat.name,text,photo:currentChat.photo})
-
-renderMessages()
-
-document.getElementById("msgInput").value=""
+alert("You liked "+profiles[i].name)
 
 }
 
-function renderMessages(){
+function ignoreUser(i){
 
-const box=document.getElementById("chatBox")
+alert("Ignored")
 
-box.innerHTML=""
+}
 
-messages.forEach(m=>{
+function viewProfile(i){
 
-box.innerHTML+=`
+let p=profiles[i]
 
-<div class="message">
+document.getElementById("viewPhoto").src=p.photo
 
-<img src="${m.photo}">
+document.getElementById("viewName").innerText=p.name
 
-${m.user}: ${m.text}
+document.getElementById("viewAge").innerText="Age: "+p.age
+
+document.getElementById("viewInterest").innerText=p.interest
+
+document.getElementById("viewCountry").innerText=p.country
+
+document.getElementById("profileViewer").style.display="flex"
+
+}
+
+function closeProfile(){
+
+document.getElementById("profileViewer").style.display="none"
+
+}
+
+function openChat(i){
+
+let p=profiles[i]
+
+let messages=document.getElementById("messagesList")
+
+messages.innerHTML+=`
+
+<div class="chat-user" onclick="viewProfile(${i})">
+
+<img src="${p.photo}">
+
+<span>${p.name}</span>
 
 </div>
 
 `
 
-})
+openTab("messagesTab")
 
 }
 
-function viewProfile(id){
+function openTab(tab){
 
-let u=users.find(x=>x.id==id) || liked.find(x=>x.id==id)
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
 
-document.getElementById("viewName").innerText=u.name+", "+u.age+" • "+u.interest
-
-document.getElementById("viewImg").src=u.photo
-
-document.getElementById("viewCountry").innerText=u.country
-
-showTab("viewProfile")
+document.getElementById(tab).classList.add("active")
 
 }
 
-document.getElementById("photos").addEventListener("change",function(){
+function saveProfile(){
 
-const preview=document.getElementById("preview")
+alert("Profile Saved")
 
-preview.innerHTML=""
+}
 
-const files=[...this.files].slice(0,3)
-
-files.forEach(file=>{
-
-const img=document.createElement("img")
-
-img.src=URL.createObjectURL(file)
-
-preview.appendChild(img)
-
-})
-
-})
-
-renderCards()
+loadCards()
 
 </script>
 
