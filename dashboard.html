@@ -13,19 +13,21 @@ body{margin:0;font-family:sans-serif;background:#000;color:#fff;overflow:hidden}
 .actions{display:flex;justify-content:space-around;margin-top:10px}
 button{cursor:pointer;font-size:18px;border:none;border-radius:8px;padding:5px 10px}
 .online-dot{width:14px;height:14px;border-radius:50%;position:absolute;top:10px;right:10px;border:2px solid #fff}
-#profile,#chat-box,#tabs{display:none;position:absolute;width:100%;height:100%;top:0;left:0}
+#profile,#chat-box{display:none;position:absolute;width:100%;height:100%;top:0;left:0;flex-direction:column;align-items:center}
 #profile img,#chat-box img{width:120px;height:120px;border-radius:50%;object-fit:cover}
 input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;background:#222;color:#fff}
-.tab-bar{position:absolute;bottom:0;width:100%;display:flex;background:#111;justify-content:space-around;padding:10px 0;z-index:1000;}
+.tab-bar{position:fixed;bottom:0;width:100%;display:flex;background:#111;justify-content:space-around;padding:10px 0;z-index:1000;border-top:1px solid #333;}
 .tab-bar button{flex:1;background:none;color:#fff;font-size:16px;display:flex;flex-direction:column;align-items:center;}
 .tab-bar button.active{color:#FFD700}
 .chat-message{display:flex;align-items:center;margin:5px}
 .chat-message img{width:40px;height:40px;border-radius:50%;margin-right:8px}
-.profile-container{background:#111;padding:15px;border-radius:15px;width:90%;max-width:400px;text-align:center}
+.profile-container{background:#111;padding:15px;border-radius:15px;width:90%;max-width:400px;text-align:center;overflow-y:auto;height:90%}
 .profile-fields{display:flex;flex-direction:column;margin-top:10px}
 .profile-fields label{margin-top:10px;font-weight:bold}
 .profile-photos{display:flex;justify-content:space-between;margin-top:10px}
 .profile-photos img{width:30%;border-radius:10px;object-fit:cover;height:100px}
+#chat-box input{width:80%;margin:10px auto;border-radius:8px;padding:8px;background:#222;color:#fff;border:none}
+#chat-box button{width:80%;margin:0 auto;padding:8px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold}
 </style>
 </head>
 <body>
@@ -89,7 +91,7 @@ const countries = ["United States","United Kingdom","Nigeria","South Africa","In
 const profileCountry = document.getElementById("profile-country");
 countries.forEach(c=>{let o=document.createElement("option");o.value=c;o.textContent=c;profileCountry.appendChild(o)});
 
-// Demo profiles remain unchanged
+// Demo profiles
 const demoProfiles = [];
 const firstNames = ["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
 const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Martinez","Hernandez"];
@@ -143,7 +145,7 @@ showProfileCard(currentIndex);
 
 // Open profile
 function openUserProfile(user){
-  document.getElementById("profile").style.display="block";
+  document.getElementById("profile").style.display="flex";
   swipeContainer.style.display="none";
   document.getElementById("profile-pic").src=user.photo;
   document.getElementById("profile-name").value=user.name;
@@ -152,7 +154,7 @@ function openUserProfile(user){
   document.getElementById("profile-interest").value=user.interest;
   document.getElementById("profile-online").style.background=user.online?'lime':'gray';
   const msgBtn = document.getElementById("message-btn");
-  msgBtn.onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";document.getElementById("chat-box").style.display="flex";};
+  msgBtn.onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";};
 }
 
 // Chat
@@ -193,11 +195,11 @@ function showTab(tab,event){
   document.getElementById("profile").style.display="none";
   if(tab==='swipe') swipeContainer.style.display="flex";
   if(tab==='messages') document.getElementById("chat-box").style.display="flex";
-  if(tab==='profile-tab') document.getElementById("profile").style.display="block";
+  if(tab==='profile-tab') document.getElementById("profile").style.display="flex";
   if(tab==='likes') swipeContainer.style.display="flex";
   if(tab==='coins') swipeContainer.style.display="flex";
   document.querySelectorAll(".tab-bar button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
+  event.currentTarget.classList.add("active");
 }
 
 // Photo preview
