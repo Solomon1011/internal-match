@@ -7,20 +7,25 @@
 <style>
 body{margin:0;font-family:sans-serif;background:#000;color:#fff;overflow:hidden}
 #swipe-container,.tab-content{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;justify-content:center;align-items:center;flex-direction:column}
-.card{width:90%;max-width:400px;background:#111;border-radius:10px;padding:15px;box-shadow:0 4px 10px rgba(0,0,0,0.5);position:relative;text-align:center}
-.card img{width:100%;border-radius:10px}
+.card{width:90%;max-width:400px;background:#111;border-radius:15px;padding:15px;box-shadow:0 4px 10px rgba(0,0,0,0.5);position:relative;text-align:center}
+.card img{width:100%;border-radius:15px}
 .card-info{margin-top:10px;text-align:left}
 .actions{display:flex;justify-content:space-around;margin-top:10px}
-button{cursor:pointer;font-size:18px}
-.online-dot{width:12px;height:12px;border-radius:50%;position:absolute;top:10px;right:10px;border:2px solid #fff}
+button{cursor:pointer;font-size:18px;border:none;border-radius:8px;padding:5px 10px}
+.online-dot{width:14px;height:14px;border-radius:50%;position:absolute;top:10px;right:10px;border:2px solid #fff}
 #profile,#chat-box,#tabs{display:none;position:absolute;width:100%;height:100%;top:0;left:0}
-#profile img,#chat-box img{width:100px;height:100px;border-radius:50%}
-input,select{width:100%;padding:5px;margin:5px 0;border-radius:5px;border:none}
+#profile img,#chat-box img{width:120px;height:120px;border-radius:50%;object-fit:cover}
+input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;background:#222;color:#fff}
 .tab-bar{position:absolute;bottom:0;width:100%;display:flex;background:#111;justify-content:space-around;padding:10px 0;z-index:1000;}
-.tab-bar button{flex:1;background:none;border:none;color:#fff;font-size:18px;display:flex;flex-direction:column;align-items:center;}
+.tab-bar button{flex:1;background:none;color:#fff;font-size:16px;display:flex;flex-direction:column;align-items:center;}
 .tab-bar button.active{color:#FFD700}
 .chat-message{display:flex;align-items:center;margin:5px}
-.chat-message img{width:40px;height:40px;border-radius:50%;margin-right:5px}
+.chat-message img{width:40px;height:40px;border-radius:50%;margin-right:8px}
+.profile-container{background:#111;padding:15px;border-radius:15px;width:90%;max-width:400px;text-align:center}
+.profile-fields{display:flex;flex-direction:column;margin-top:10px}
+.profile-fields label{margin-top:10px;font-weight:bold}
+.profile-photos{display:flex;justify-content:space-between;margin-top:10px}
+.profile-photos img{width:30%;border-radius:10px;object-fit:cover;height:100px}
 </style>
 </head>
 <body>
@@ -30,19 +35,36 @@ input,select{width:100%;padding:5px;margin:5px 0;border-radius:5px;border:none}
 
 <!-- Profile view -->
 <div id="profile">
-  <img id="profile-pic" src="" alt="Profile">
-  <input id="profile-name" placeholder="Name">
-  <input id="profile-age" placeholder="Age">
-  <select id="profile-country"></select>
-  <select id="profile-interest">
-    <option value="Friend 💖">Friend 💖</option>
-    <option value="Hangout 💚">Hangout 💚</option>
-    <option value="Serious Relationship 💖">Serious Relationship 💖</option>
-    <option value="Marriage 💘">Marriage 💘</option>
-  </select>
-  <input type="file" id="photo1" accept="image/*">
-  <input type="file" id="photo2" accept="image/*">
-  <input type="file" id="photo3" accept="image/*">
+  <div class="profile-container">
+    <div style="position:relative">
+      <img id="profile-pic" src="" alt="Profile">
+      <div class="online-dot" id="profile-online"></div>
+    </div>
+    <div class="profile-fields">
+      <label>Name</label>
+      <input id="profile-name" placeholder="Name">
+      <label>Age</label>
+      <input id="profile-age" type="number" placeholder="Age">
+      <label>Country</label>
+      <select id="profile-country"></select>
+      <label>Interest</label>
+      <select id="profile-interest">
+        <option value="Friend 💖">Friend 💖</option>
+        <option value="Hangout 💚">Hangout 💚</option>
+        <option value="Serious Relationship 💖">Serious Relationship 💖</option>
+        <option value="Marriage 💘">Marriage 💘</option>
+      </select>
+    </div>
+    <div class="profile-photos">
+      <img id="photo-preview1" src="">
+      <img id="photo-preview2" src="">
+      <img id="photo-preview3" src="">
+    </div>
+    <input type="file" id="photo1" accept="image/*">
+    <input type="file" id="photo2" accept="image/*">
+    <input type="file" id="photo3" accept="image/*">
+    <button id="message-btn" style="margin-top:15px;background:#FFD700;color:#000;font-weight:bold">Message 💬</button>
+  </div>
 </div>
 
 <!-- Chat box -->
@@ -67,15 +89,13 @@ const countries = ["United States","United Kingdom","Nigeria","South Africa","In
 const profileCountry = document.getElementById("profile-country");
 countries.forEach(c=>{let o=document.createElement("option");o.value=c;o.textContent=c;profileCountry.appendChild(o)});
 
-// Generate 5000+ demo profiles
+// Demo profiles remain unchanged
 const demoProfiles = [];
 const firstNames = ["Alice","Bob","Charlie","Diana","Eve","Frank","Grace","Hank","Ivy","Jack","Kathy","Leo","Mona","Nate","Olivia","Paul","Quincy","Rachel","Steve","Tina","Uma","Victor","Wendy","Xander","Yara","Zane"];
 const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Martinez","Hernandez"];
 const malePhotos = []; const femalePhotos = [];
-for(let i=1;i<=50;i++){ // 50 sample photos from randomuser
-  malePhotos.push(`https://randomuser.me/api/portraits/men/${i}.jpg`);
-  femalePhotos.push(`https://randomuser.me/api/portraits/women/${i}.jpg`);
-}
+for(let i=1;i<=50;i++){ malePhotos.push(`https://randomuser.me/api/portraits/men/${i}.jpg`);
+femalePhotos.push(`https://randomuser.me/api/portraits/women/${i}.jpg`);}
 for(let i=0;i<5000;i++){
   let gender = Math.random()>0.5?'male':'female';
   let first = firstNames[Math.floor(Math.random()*firstNames.length)];
@@ -116,7 +136,6 @@ function showProfileCard(i){
     </div>`;
   swipeContainer.appendChild(card);
 }
-
 function likeProfile(i){nextProfile();}
 function ignoreProfile(i){nextProfile();}
 function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
@@ -131,16 +150,9 @@ function openUserProfile(user){
   document.getElementById("profile-age").value=user.age;
   document.getElementById("profile-country").value=user.location;
   document.getElementById("profile-interest").value=user.interest;
-
-  const msgBtn = document.createElement("button");
-  msgBtn.textContent="Message 💬";
-  msgBtn.style.width="100%";msgBtn.style.padding="10px";
-  msgBtn.style.marginTop="10px";msgBtn.style.borderRadius="5px";
-  msgBtn.style.border="none";msgBtn.style.background="#FFD700";msgBtn.style.color="#000";
+  document.getElementById("profile-online").style.background=user.online?'lime':'gray';
+  const msgBtn = document.getElementById("message-btn");
   msgBtn.onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";document.getElementById("chat-box").style.display="flex";};
-  const oldBtn = document.getElementById("profile").querySelector("button");
-  if(oldBtn) oldBtn.remove();
-  document.getElementById("profile").appendChild(msgBtn);
 }
 
 // Chat
@@ -151,7 +163,6 @@ function openChat(user){
   document.getElementById("swipe-container").style.display="none";
   loadChatMessages();
 }
-
 function loadChatMessages(){
   const container=document.getElementById("chat-messages");
   container.innerHTML="";
@@ -165,7 +176,6 @@ function loadChatMessages(){
   });
   container.scrollTop=container.scrollHeight;
 }
-
 function sendMessage(){
   const input=document.getElementById("chat-input");
   if(!input.value) return;
@@ -191,15 +201,16 @@ function showTab(tab,event){
 }
 
 // Photo preview
-['photo1','photo2','photo3'].forEach(id=>{
+['photo1','photo2','photo3'].forEach((id,i)=>{
   document.getElementById(id).addEventListener("change",function(e){
     if(e.target.files[0]){
       const reader=new FileReader();
-      reader.onload=function(ev){document.getElementById("profile-pic").src=ev.target.result;}
+      reader.onload=function(ev){document.getElementById(`photo-preview${i+1}`).src=ev.target.result;}
       reader.readAsDataURL(e.target.files[0]);
     }
   });
 });
 </script>
+<script>document.getElementById("tabs").style.display="flex";</script>
 </body>
 </html>
