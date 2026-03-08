@@ -1,107 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profile Setup - 💘 Internal Match</title>
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <h2>Profile Setup</h2>
 
 <form id="profileForm">
-
-<input type="text" id="displayName" placeholder="Your Name" required>
-
-<input type="text" id="bio" placeholder="Short Bio" required>
-
-<button type="submit">Save Profile</button>
-
+  <input type="text" id="displayName" placeholder="Your Name" required><br>
+  <input type="text" id="bio" placeholder="Short Bio"><br>
+  <button type="submit">Save Profile</button>
 </form>
 
 <script type="module">
-
-import { checkAuth } from "./app.js";
-
+import { getAuth, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
 
-import {
-getFirestore,
-doc,
-setDoc
-} from "https://www.gstatic.com/firebasejs/10.6.1/firebase-firestore.js";
-
-
-// Firebase config
+// Firebase config - same as auth.js
 const firebaseConfig = {
-
-apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-
-authDomain: "internal-match.firebaseapp.com",
-
-projectId: "internal-match",
-
-storageBucket: "internal-match.appspot.com",
-
-messagingSenderId: "129707008837",
-
-appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-
+  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
+  authDomain: "internal-match.firebaseapp.com",
+  projectId: "internal-match",
+  storageBucket: "internal-match.appspot.com",
+  messagingSenderId: "129707008837",
+  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
 };
 
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-const db = getFirestore(app);
-
-
-// Protect page (must be logged in)
-checkAuth((user)=>{
-
-if(!user){
-
-window.location.href="login.html";
-
-}
-
+// Make sure user is logged in
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    // Redirect to login if not logged in
+    window.location.href = "login.html";
+  } else {
+    // Fill displayName if exists
+    document.getElementById("displayName").value = user.displayName || "";
+  }
 });
 
+// Handle profile form submit
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = auth.currentUser;
+  if (!user) return alert("You must be logged in");
 
-// Save profile
-document.getElementById("profileForm").addEventListener("submit", async (e)=>{
+  const displayName = document.getElementById("displayName").value.trim();
+  const bio = document.getElementById("bio").value.trim();
 
-e.preventDefault();
-
-const name = document.getElementById("displayName").value;
-
-const bio = document.getElementById("bio").value;
-
-checkAuth(async (user)=>{
-
-if(user){
-
-await setDoc(doc(db,"users",user.uid),{
-
-name:name,
-
-bio:bio,
-
-email:user.email
-
+  await updateProfile(user, { displayName });
+  alert(`Profile saved!\nName: ${displayName}\nBio: ${bio}`);
+  window.location.href = "dashboard.html"; // redirect to dashboard
 });
-
-alert("Profile saved!");
-
-window.location.href="dashboard.html";
-
-}
-
-});
-
-});
-
 </script>
 
 </body>
