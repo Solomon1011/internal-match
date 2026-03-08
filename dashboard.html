@@ -125,7 +125,7 @@ function showProfileCard(i){
   const p=demoProfiles[i];
   const card=document.createElement("div");
   card.className="card";
-  card.addEventListener("click",()=>openUserProfile(p));
+  card.addEventListener("click",()=>openUserProfile(p,true)); // second param: editable false for others
   card.innerHTML=`
     <div class="online-dot-small" style="background:${p.online?'lime':'gray'}"></div>
     <img src="${p.photo}">
@@ -147,9 +147,8 @@ function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
 showProfileCard(currentIndex);
 
 // Profile
-let currentUser=null;
-function openUserProfile(user){
-  currentUser=user;
+let currentUser=demoProfiles[0]; // assume first demo profile is "my profile"
+function openUserProfile(user,isEditable=false){
   document.getElementById("profile").style.display="flex";
   swipeContainer.style.display="none";
   document.getElementById("profile-pic").src=user.photo;
@@ -158,6 +157,8 @@ function openUserProfile(user){
   document.getElementById("profile-country").value=user.location;
   document.getElementById("profile-interest").value=user.interest;
   document.getElementById("profile-online").style.background=user.online?'lime':'gray';
+  document.getElementById("save-profile").style.display = isEditable ? "block":"none";
+  document.getElementById("photo1").style.display = isEditable ? "block":"none";
   document.getElementById("message-btn").onclick=()=>{openChat(user);document.getElementById("profile").style.display="none";};
 }
 
@@ -198,7 +199,7 @@ function loadChatMessages(){
   currentChatUser.messages.forEach(msg=>{
     const div=document.createElement("div");
     div.className="chat-message";
-    div.innerHTML=`<img src="${msg.sender==='me'?demoProfiles[0].photo:currentChatUser.photo}"> <span>${msg.text}</span>`;
+    div.innerHTML=`<img src="${msg.sender==='me'?currentUser.photo:currentChatUser.photo}"> <span>${msg.text}</span>`;
     container.appendChild(div);
   });
   container.scrollTop=container.scrollHeight;
@@ -221,13 +222,13 @@ function showTab(tab,event){
 
   if(tab==='swipe') swipeContainer.style.display="flex";
   if(tab==='messages') document.getElementById("chat-box").style.display="flex";
-  if(tab==='profile-tab') document.getElementById("profile").style.display="flex";
+  if(tab==='profile-tab') openUserProfile(currentUser,true); // only my profile editable
   if(tab==='likes'){
     swipeContainer.innerHTML="";
     demoProfiles.filter(p=>p.likesMe||p.viewedMe).forEach((p,i)=>{
       const card=document.createElement("div");
       card.className="card";
-      card.addEventListener("click",()=>openUserProfile(p));
+      card.addEventListener("click",()=>openUserProfile(p,false));
       card.innerHTML=`<div class="online-dot-small" style="background:${p.online?'lime':'gray'}"></div>
       <img src="${p.photo}">
       <div class="card-info"><b>${p.name}</b>, ${p.age}, ${p.location}, ${p.interest}</div>
