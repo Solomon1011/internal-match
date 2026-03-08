@@ -1,23 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💘 Internal Match - Dashboard</title>
+<title>Dashboard</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h2>Welcome to 💘 Internal Match!</h2>
+<h2>Welcome to 💘 Internal Match</h2>
 
-<!-- Bottom Tabs -->
-<div class="bottom-tabs">
-  <a href="#"><img src="assets/swipe.svg" alt="Swipe"><span>Swipe</span></a>
-  <a href="#"><img src="assets/like.svg" alt="Like"><span>Like</span></a>
-  <a href="#"><img src="assets/message.svg" alt="Message"><span>Message</span></a>
-  <a href="#"><img src="assets/shop.svg" alt="Shop"><span>Shop</span></a>
-  <a href="profile_setup.html"><img src="assets/user.svg" alt="Profile"><span>Profile</span></a>
-</div>
+<button id="logoutBtn">Logout</button>
+
+<script type="module">
+
+import { logout, checkAuth } from "./app.js";
+
+checkAuth(user => {
+
+if(!user){
+
+window.location.href = "login.html";
+
+}
+
+});
+
+document.getElementById("logoutBtn").onclick = async () => {
+
+await logout();
+
+window.location.href = "login.html";
+
+};
+
+</script>
 
 </body>
 </html>
