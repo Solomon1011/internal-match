@@ -7,57 +7,31 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <h2>Profile Setup</h2>
 
 <form id="profileForm">
-  <input type="text" id="displayName" placeholder="Your Name" required><br>
+  <input type="text" id="displayName" placeholder="Your Name"><br>
   <input type="text" id="bio" placeholder="Short Bio"><br>
   <button type="submit">Save Profile</button>
 </form>
 
 <script type="module">
-import { getAuth, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-auth.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+import { checkAuth } from './app.js';
 
-// Firebase config - same as auth.js
-const firebaseConfig = {
-  apiKey: "AIzaSyDIZnZjeCROX5UmcqUQIfTdt6oRU6AmvOg",
-  authDomain: "internal-match.firebaseapp.com",
-  projectId: "internal-match",
-  storageBucket: "internal-match.appspot.com",
-  messagingSenderId: "129707008837",
-  appId: "1:129707008837:web:f3f0033bbbe673107a542c"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-// Make sure user is logged in
-onAuthStateChanged(auth, user => {
+checkAuth(user => {
   if (!user) {
-    // Redirect to login if not logged in
     window.location.href = "login.html";
-  } else {
-    // Fill displayName if exists
-    document.getElementById("displayName").value = user.displayName || "";
   }
 });
 
-// Handle profile form submit
-document.getElementById("profileForm").addEventListener("submit", async (e) => {
+document.getElementById("profileForm").addEventListener("submit", function(e) {
   e.preventDefault();
-  const user = auth.currentUser;
-  if (!user) return alert("You must be logged in");
-
-  const displayName = document.getElementById("displayName").value.trim();
+  const name = document.getElementById("displayName").value.trim();
   const bio = document.getElementById("bio").value.trim();
-
-  await updateProfile(user, { displayName });
-  alert(`Profile saved!\nName: ${displayName}\nBio: ${bio}`);
-  window.location.href = "dashboard.html"; // redirect to dashboard
+  alert(`Profile saved!\nName: ${name}\nBio: ${bio}`);
+  // Redirect to dashboard
+  window.location.href = "dashboard.html";
 });
 </script>
-
 </body>
 </html>
