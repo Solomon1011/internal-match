@@ -1,404 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Dating App Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💘 Internal Match - Dashboard</title>
+<link rel="stylesheet" href="style.css">
 
 <style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#f5f5f5;
-}
-
-.tab{
-display:none;
-padding-bottom:80px;
-}
-
-.active{
-display:block;
-}
-
-.swipe-container{
-height:70vh;
-display:flex;
-justify-content:center;
-align-items:center;
-position:relative;
-overflow:hidden;
-touch-action:none;
-}
-
-.card{
-position:absolute;
-width:90%;
-max-width:350px;
-background:white;
-border-radius:15px;
-box-shadow:0 10px 20px rgba(0,0,0,0.2);
-overflow:hidden;
-touch-action:none;
-}
-
-.card img{
-width:100%;
-height:320px;
-object-fit:cover;
-}
-
-.card-info{
-padding:15px;
-text-align:center;
-}
-
-.buttons{
-display:flex;
-justify-content:space-around;
-margin-top:10px;
-}
-
-.buttons button{
-border:none;
-padding:10px;
-border-radius:8px;
-cursor:pointer;
-}
-
-.like{background:#ff4d6d;color:white;}
-.ignore{background:#ccc;}
-.message{background:#4CAF50;color:white;}
-
-.bottom-nav{
-position:fixed;
-bottom:0;
-width:100%;
-background:white;
-display:flex;
-justify-content:space-around;
-border-top:1px solid #ddd;
-}
-
-.bottom-nav button{
-flex:1;
-padding:15px;
-border:none;
-background:white;
-font-size:16px;
-}
-
-.chat-user{
-display:flex;
-align-items:center;
-gap:10px;
-padding:12px;
-border-bottom:1px solid #eee;
-cursor:pointer;
-}
-
-.chat-user img{
-width:40px;
-height:40px;
-border-radius:50%;
-}
-
-.profile-viewer{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-display:none;
-justify-content:center;
-align-items:center;
-}
-
-.profile-box{
-background:white;
-padding:20px;
-border-radius:10px;
-width:90%;
-max-width:350px;
-text-align:center;
-}
-
-.profile-box img{
-width:120px;
-height:120px;
-border-radius:50%;
-object-fit:cover;
-}
-
-.close{
-float:right;
-cursor:pointer;
-}
-
-input,select{
-width:100%;
-padding:10px;
-margin:5px 0;
-}
-
+body { font-family: Arial, sans-serif; margin:0; background:#fff0f6; text-align:center; }
+h2 { color:#ff4d6d; margin-top:10px; }
+.card { width:90%; max-width:350px; margin:20px auto; background:#fff; border-radius:15px; box-shadow:0 4px 6px rgba(0,0,0,0.1); position:relative; overflow:hidden; }
+.card img { width:100%; height:300px; object-fit:cover; border-top-left-radius:15px; border-top-right-radius:15px; }
+.card-content { padding:10px; text-align:left; }
+.card-content h3 { margin:0; font-size:18px; }
+.card-content p { margin:5px 0; font-size:14px; color:#555; }
+.button-row { display:flex; justify-content:space-around; margin-top:10px; }
+.button-row button { width:60px; height:60px; border-radius:50%; border:none; cursor:pointer; font-size:24px; color:#fff; }
+.like { background:#ff4d6d; }
+.ignore { background:#888; }
+.message { background:#4caf50; }
+.online-dot { width:12px; height:12px; border-radius:50%; background:#00ff00; display:inline-block; margin-left:5px; }
+.bottom-tabs { position:fixed; bottom:0; left:0; width:100%; height:60px; background:#fff; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #ccc; }
+.bottom-tabs button { background:none; border:none; display:flex; flex-direction:column; align-items:center; font-size:12px; color:#333; cursor:pointer; }
+.bottom-tabs img { width:24px; height:24px; margin-bottom:2px; }
+#profileModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; }
+#profileModal .modal-content { width:90%; max-width:400px; background:#fff; border-radius:15px; padding:20px; text-align:left; position:relative; }
+#profileModal img { width:100%; height:250px; object-fit:cover; border-radius:10px; }
+#profileModal .close { position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer; }
+#chatModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; }
+#chatModal .modal-content { width:90%; max-width:400px; background:#fff; border-radius:15px; padding:20px; text-align:left; display:flex; flex-direction:column; height:80%; }
+#chatMessages { flex:1; overflow-y:auto; margin-bottom:10px; }
+#chatMessages p { margin:5px 0; }
+#chatInputRow { display:flex; }
+#chatInputRow input { flex:1; padding:10px; border-radius:10px; border:1px solid #ccc; }
+#chatInputRow button { padding:10px; background:#ff4d6d; color:#fff; border:none; border-radius:10px; margin-left:5px; cursor:pointer; }
 </style>
 </head>
-
 <body>
 
-<!-- SWIPE TAB -->
-<div id="swipeTab" class="tab active">
+<h2>💘 Internal Match</h2>
 
-<div class="swipe-container" id="cardStack"></div>
-
+<div id="swipeContainer">
+  <!-- Profile cards dynamically inserted here -->
 </div>
 
-<!-- LIKES TAB -->
-<div id="likesTab" class="tab">
-
-<h2 style="padding:15px">People Who Liked You</h2>
-
-<div id="likesList"></div>
-
+<!-- Profile Modal -->
+<div id="profileModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeProfile()">×</span>
+    <img id="modalProfileImg" src="">
+    <h3 id="modalProfileName"></h3>
+    <p id="modalProfileAge"></p>
+    <p id="modalProfileCountry"></p>
+    <p id="modalProfileInterest"></p>
+  </div>
 </div>
 
-<!-- MESSAGE TAB -->
-<div id="messagesTab" class="tab">
-
-<h2 style="padding:15px">Messages</h2>
-
-<div id="messagesList"></div>
-
+<!-- Chat Modal -->
+<div id="chatModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeChat()">×</span>
+    <h3 id="chatProfileName"></h3>
+    <div id="chatMessages"></div>
+    <div id="chatInputRow">
+      <input type="text" id="chatInput" placeholder="Type a message">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
 </div>
 
-<!-- PROFILE TAB -->
-<div id="profileTab" class="tab">
-
-<h2 style="padding:15px">Edit Profile</h2>
-
-<div style="padding:15px">
-
-<input id="username" placeholder="Username">
-
-<input id="age" type="number" placeholder="Age">
-
-<select id="country">
-<option>Nigeria</option>
-<option>United States</option>
-<option>United Kingdom</option>
-<option>Canada</option>
-<option>France</option>
-<option>Germany</option>
-<option>Italy</option>
-<option>Spain</option>
-<option>Brazil</option>
-<option>India</option>
-<option>China</option>
-<option>Japan</option>
-<option>South Africa</option>
-<option>Mexico</option>
-<option>Argentina</option>
-<option>Turkey</option>
-<option>Indonesia</option>
-<option>Philippines</option>
-<option>Thailand</option>
-<option>Australia</option>
-</select>
-
-<select id="interest">
-<option>Friend 💖</option>
-<option>Hangout 💚</option>
-<option>Serious Relationship 💖</option>
-<option>Marriage 💘</option>
-</select>
-
-<input type="file" multiple>
-
-<button onclick="saveProfile()">Save Profile</button>
-
-</div>
-
-</div>
-
-<!-- COINS TAB -->
-<div id="coinsTab" class="tab">
-
-<h2 style="padding:20px">Coins</h2>
-
-<p style="padding:20px">You have 0 coins</p>
-
-<button style="margin:20px">Buy Coins</button>
-
-</div>
-
-<!-- PROFILE VIEWER -->
-<div class="profile-viewer" id="profileViewer">
-
-<div class="profile-box">
-
-<span class="close" onclick="closeProfile()">✖</span>
-
-<img id="viewPhoto">
-
-<h3 id="viewName"></h3>
-
-<p id="viewAge"></p>
-
-<p id="viewInterest"></p>
-
-<p id="viewCountry"></p>
-
-</div>
-
-</div>
-
-<!-- NAVIGATION -->
-<div class="bottom-nav">
-
-<button onclick="openTab('swipeTab')">🔥</button>
-
-<button onclick="openTab('likesTab')">❤️</button>
-
-<button onclick="openTab('messagesTab')">💬</button>
-
-<button onclick="openTab('profileTab')">👤</button>
-
-<button onclick="openTab('coinsTab')">💰</button>
-
+<!-- Bottom Tabs -->
+<div class="bottom-tabs">
+  <button onclick="showTab('swipe')"><img src="assets/swipe.svg">Swipe</button>
+  <button onclick="showTab('like')"><img src="assets/like.svg">Like</button>
+  <button onclick="showTab('message')"><img src="assets/message.svg">Message</button>
+  <button onclick="showTab('coins')"><img src="assets/coins.svg">Coins</button>
+  <button onclick="showTab('profile')"><img src="assets/user.svg">Profile</button>
 </div>
 
 <script>
-
-let profiles=[
-{name:"Linda",age:24,interest:"Friend 💖",country:"USA",photo:"https://randomuser.me/api/portraits/women/65.jpg"},
-{name:"Anna",age:22,interest:"Hangout 💚",country:"Canada",photo:"https://randomuser.me/api/portraits/women/44.jpg"},
-{name:"Sophia",age:26,interest:"Marriage 💘",country:"UK",photo:"https://randomuser.me/api/portraits/women/68.jpg"}
-]
-
-function loadCards(){
-
-let container=document.getElementById("cardStack")
-
-container.innerHTML=""
-
-profiles.forEach((p,i)=>{
-
-let card=document.createElement("div")
-
-card.className="card"
-
-card.innerHTML=`
-
-<img src="${p.photo}">
-
-<div class="card-info" onclick="viewProfile(${i})">
-
-<h3>${p.name}, ${p.age}</h3>
-
-<p>${p.interest}</p>
-
-</div>
-
-<div class="buttons">
-
-<button class="ignore" onclick="ignoreUser(${i})">❌</button>
-
-<button class="message" onclick="openChat(${i})">💬</button>
-
-<button class="like" onclick="likeUser(${i})">❤️</button>
-
-</div>
-
-`
-
-container.appendChild(card)
-
+const demoProfiles = []
+for(let i=1;i<=5000;i++){
+demoProfiles.push({
+id:i,
+name:'User'+i,
+age:18+Math.floor(Math.random()*12),
+country:'Country'+((i%152)+1),
+interest:['Friend 💖','Hangout 💚','Serious Relationship 💖','Marriage 💘'][Math.floor(Math.random()*4)],
+photos:['https://picsum.photos/400/300?random='+i],
+online: Math.random()<0.6
 })
-
 }
 
-function likeUser(i){
+let currentIndex = 0
+const swipeContainer = document.getElementById("swipeContainer")
 
-let likes=JSON.parse(localStorage.getItem("likes"))||[]
-
-likes.push(profiles[i])
-
-localStorage.setItem("likes",JSON.stringify(likes))
-
-alert("You liked "+profiles[i].name)
-
+function showProfile(index){
+if(index>=demoProfiles.length){
+swipeContainer.innerHTML="<p>No more profiles</p>"
+return
 }
-
-function ignoreUser(i){
-
-alert("Ignored")
-
-}
-
-function viewProfile(i){
-
-let p=profiles[i]
-
-document.getElementById("viewPhoto").src=p.photo
-
-document.getElementById("viewName").innerText=p.name
-
-document.getElementById("viewAge").innerText="Age: "+p.age
-
-document.getElementById("viewInterest").innerText=p.interest
-
-document.getElementById("viewCountry").innerText=p.country
-
-document.getElementById("profileViewer").style.display="flex"
-
-}
-
-function closeProfile(){
-
-document.getElementById("profileViewer").style.display="none"
-
-}
-
-function openChat(i){
-
-let p=profiles[i]
-
-let messages=document.getElementById("messagesList")
-
-messages.innerHTML+=`
-
-<div class="chat-user" onclick="viewProfile(${i})">
-
-<img src="${p.photo}">
-
-<span>${p.name}</span>
-
+let profile=demoProfiles[index]
+swipeContainer.innerHTML=`
+<div class="card" onclick="openProfile(${profile.id})">
+<img src="${profile.photos[0]}">
+<div class="card-content">
+<h3>${profile.name} ${profile.online?'<span class="online-dot"></span>':''}</h3>
+<p>Age: ${profile.age}</p>
+<p>Country: ${profile.country}</p>
+<p>Interest: ${profile.interest}</p>
+<div class="button-row">
+<button class="like" onclick="likeProfile(event,${profile.id})">❤</button>
+<button class="ignore" onclick="ignoreProfile(event,${profile.id})">✖</button>
+<button class="message" onclick="openChat(event,${profile.id})">💬</button>
 </div>
-
+</div>
+</div>
 `
-
-openTab("messagesTab")
-
 }
 
-function openTab(tab){
+function nextProfile(){ currentIndex++; showProfile(currentIndex) }
 
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+function likeProfile(e,id){ e.stopPropagation(); alert('Liked '+id); nextProfile() }
+function ignoreProfile(e,id){ e.stopPropagation(); nextProfile() }
+function openChat(e,id){ e.stopPropagation(); currentChatId=id; openChatModal(id) }
+function openProfile(id){ const profile=demoProfiles.find(p=>p.id===id); document.getElementById("modalProfileImg").src=profile.photos[0]; document.getElementById("modalProfileName").innerText=profile.name; document.getElementById("modalProfileAge").innerText="Age: "+profile.age; document.getElementById("modalProfileCountry").innerText="Country: "+profile.country; document.getElementById("modalProfileInterest").innerText="Interest: "+profile.interest; document.getElementById("profileModal").style.display="flex"; }
+function closeProfile(){ document.getElementById("profileModal").style.display="none" }
 
-document.getElementById(tab).classList.add("active")
+let currentChatId=null
+function openChatModal(id){
+const profile=demoProfiles.find(p=>p.id===id)
+document.getElementById("chatProfileName").innerText=profile.name
+document.getElementById("chatMessages").innerHTML=""
+document.getElementById("chatModal").style.display="flex"
+}
+function closeChat(){ document.getElementById("chatModal").style.display="none" }
 
+function aiReply(message){
+message = message.toLowerCase()
+if(message.includes("hi") || message.includes("hello")) return "Hi 😊 nice to meet you!"
+if(message.includes("how are you")) return "I'm good 💕 what about you?"
+let replies=["You seem interesting 😊","Tell me more about yourself","I enjoy chatting with you","What are your hobbies?","You seem kind"]
+return replies[Math.floor(Math.random()*replies.length)]
 }
 
-function saveProfile(){
-
-alert("Profile Saved")
-
+function sendMessage(){
+let input=document.getElementById("chatInput")
+let text=input.value
+if(!text) return
+let chat=document.getElementById("chatMessages")
+chat.innerHTML+=`<p><b>You:</b> ${text}</p>`
+input.value=""
+setTimeout(()=>{
+chat.innerHTML+=`<p><b>${demoProfiles.find(p=>p.id===currentChatId).name}:</b> ${aiReply(text)}</p>`
+chat.scrollTop=chat.scrollHeight
+},1000)
 }
 
-loadCards()
+function showTab(tab){
+if(tab==='swipe'){ swipeContainer.style.display='block' }
+else{ swipeContainer.style.display='none'; }
+alert(tab+' tab clicked')
+}
 
+// Initialize
+showProfile(currentIndex)
 </script>
 
 </body>
