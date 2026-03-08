@@ -5,56 +5,203 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Internal Match - Dashboard</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding-bottom: 60px;
-    text-align: center;
-    background: #fff0f6;
-  }
-  h2 { color: #ff4d6d; }
+  body { font-family: Arial,sans-serif; margin:0; background:#fff0f6; }
+  h2 { color:#ff4d6d; text-align:center; margin-top:20px; }
 
-  /* Bottom Tabs */
-  .bottom-tabs {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background: #fff;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #ccc;
-  }
-  .bottom-tabs a {
-    text-decoration: none;
-    color: #333;
-    font-size: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .bottom-tabs a:hover { color: #ff2a5c; }
-  .bottom-tabs img {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 3px;
-  }
+  /* Tabs */
+  .bottom-tabs { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background:#fff; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #ccc; }
+  .bottom-tabs a { text-decoration:none; color:#333; font-size:12px; display:flex; flex-direction:column; align-items:center; }
+  .bottom-tabs a:hover { color:#ff2a5c; }
+  .bottom-tabs img { width: 30px; height:30px; margin-bottom:3px; }
+
+  /* Card */
+  .card-container { display:flex; justify-content:center; align-items:center; flex-direction:column; margin-top:20px; }
+  .card { width:300px; height:400px; background:#fff; border-radius:12px; box-shadow:0 5px 10px rgba(0,0,0,0.2); margin-bottom:20px; padding:15px; position:relative; }
+  .card img { width:100%; height:60%; border-radius:12px; object-fit:cover; }
+  .card h3 { margin:10px 0 5px 0; }
+  .card p { font-size:14px; color:#555; }
+  .card-actions { display:flex; justify-content:space-around; margin-top:10px; }
+  .card-actions button { padding:8px 12px; border:none; border-radius:8px; cursor:pointer; }
+  .like-btn { background:#ff4d6d; color:#fff; }
+  .ignore-btn { background:#ccc; }
+  .message-btn { background:#ffa500; color:#fff; }
+
+  /* Tabs content */
+  .tab-content { display:none; padding: 20px; margin-bottom:60px; }
+  .active { display:block; }
+
+  /* Like tab */
+  .liked-list { display:flex; flex-wrap:wrap; justify-content:center; }
+  .liked-card { width:120px; margin:10px; text-align:center; }
+  .liked-card img { width:100%; height:100px; border-radius:12px; object-fit:cover; }
+
+  /* Message tab */
+  .chat-box { border:1px solid #ccc; height:300px; overflow-y:auto; padding:10px; margin-bottom:10px; }
+  .chat-input { display:flex; }
+  .chat-input input { flex:1; padding:8px; border-radius:8px; border:1px solid #ccc; }
+  .chat-input button { padding:8px 12px; background:#ff4d6d; color:#fff; border:none; border-radius:8px; cursor:pointer; }
+
+  /* Profile tab */
+  .profile-form input, .profile-form select, .profile-form textarea { width:100%; padding:8px; margin:5px 0; border-radius:8px; border:1px solid #ccc; }
+  .profile-form button { background:#ff4d6d; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-top:10px; }
+
 </style>
 </head>
 <body>
 
-<h2>Welcome to 💘 Internal Match!</h2>
+<h2>💘 Internal Match Dashboard</h2>
+
+<!-- Swipe Tab -->
+<div id="swipeTab" class="tab-content active">
+  <div class="card-container" id="cards"></div>
+</div>
+
+<!-- Like Tab -->
+<div id="likeTab" class="tab-content">
+  <h3>People Who Like You</h3>
+  <div class="liked-list" id="likedList"></div>
+</div>
+
+<!-- Message Tab -->
+<div id="messageTab" class="tab-content">
+  <div class="chat-box" id="chatBox"></div>
+  <div class="chat-input">
+    <input type="text" id="chatMessage" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Profile Tab -->
+<div id="profileTab" class="tab-content">
+  <h3>Edit Profile</h3>
+  <form class="profile-form" onsubmit="saveProfile(event)">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="number" id="age" placeholder="Age" required>
+    <input type="file" id="profilePhoto" accept="image/*">
+    <select id="location" required></select>
+    <select id="interests" multiple size="5"></select>
+    <button type="submit">Save Profile</button>
+  </form>
+</div>
 
 <!-- Bottom Tabs -->
 <div class="bottom-tabs">
-  <a href="#"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGNUQ2RCI+PHBhdGggZD0iTTEyIDJsMiA3aDdMMTMuNSA5bDIgN0gxMi41TDcgMTd6Ii8+PC9zdmc+" alt="Swipe"><span>Swipe</span></a>
-  <a href="#"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGNUQ2RCI+PHBhdGggZD0iTTEyIDIxLjM1bC0xLjQ1LTEuMzJDNS40IDE1LjM2IDIgMTIuMjggMiA4LjVDMiA1LjQyIDQuNDIgMyA3LjUgM2MxLjc0IDAgMy40MS44MSA0LjUgMi4wOUMxMy4wOSA0LjgxIDE0Ljc2IDMgMTYuNSAzQzE5LjU4IDMgMjIgNS40MiAyMiA4LjVjMCAzLjc4LTMuNCA2Ljg2LTguNTUgMTEuNTRMMTIgMjEuMzV6Ii8+PC9zdmc+" alt="Like"><span>Like</span></a>
-  <a href="#"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGNUQ2RCI+PHBhdGggZD0iTTIwIDJINC4wYy0xLjEgMC0yIC45LTIgMnYxOGw0LTRoMTRjMS4xIDAgMi0uOSAyLTJWNEMyMiA0LjkgMjEuMSAyIDIwIDJ6Ii8+PC9zdmc+" alt="Message"><span>Message</span></a>
-  <a href="#"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGNUQ2RCI+PHBhdGggZD0iTTE2IDZWNkg4djJINnYyTjYuNTkgMTRoOC45NWMyLjU1IDAgMy41Mi0yLjA4IDMuNTItMi4wOGwzLjU4LTYuNDlMMjIgNmg0eiIvPjwvc3ZnPg==" alt="Shop"><span>Shop</span></a>
-  <a href="#"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGNUQ2RCI+PHBhdGggZD0iTTEyIDEyYzIuNyAwIDQuOS0yLjIgNC45LTQuOVM0LjcgMi4yIDEyIDIuMiAzLjEgNC40IDMuMSA3LjEgOS4zIDEyIDEyIDEyem0wIDJjLTMuMyAwLTkuOSAxLjctOS45IDV2M2gxOS44di0zYzAtMy4zLTYuNi01LTkuOS01eiIvPjwvc3ZnPg==" alt="Profile"><span>Profile</span></a>
+  <a href="#" onclick="showTab('swipeTab')"><img src="https://img.icons8.com/color/48/000000/swipe-right.png"/><span>Swipe</span></a>
+  <a href="#" onclick="showTab('likeTab')"><img src="https://img.icons8.com/color/48/000000/like--v1.png"/><span>Like</span></a>
+  <a href="#" onclick="showTab('messageTab')"><img src="https://img.icons8.com/color/48/000000/topic.png"/><span>Message</span></a>
+  <a href="#" onclick="showTab('profileTab')"><img src="https://img.icons8.com/color/48/000000/user-male-circle.png"/><span>Profile</span></a>
 </div>
+
+<script>
+// Demo profiles
+const demoProfiles = [
+  {id:1, name:"Alice", age:24, photo:"https://randomuser.me/api/portraits/women/65.jpg", location:"USA", interests:["Music","Travel"]},
+  {id:2, name:"Bob", age:27, photo:"https://randomuser.me/api/portraits/men/12.jpg", location:"UK", interests:["Sports","Movies"]},
+  {id:3, name:"Clara", age:22, photo:"https://randomuser.me/api/portraits/women/43.jpg", location:"Canada", interests:["Reading","Cooking"]},
+];
+let likedProfiles = [];
+let chatMessages = [];
+
+// Render swipe cards
+function renderCards(){
+  const container = document.getElementById("cards");
+  container.innerHTML="";
+  demoProfiles.forEach(p=>{
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <img src="${p.photo}" alt="${p.name}">
+      <h3>${p.name}, ${p.age}</h3>
+      <p>${p.location}</p>
+      <div class="card-actions">
+        <button class="like-btn" onclick="likeProfile(${p.id})">Like</button>
+        <button class="message-btn" onclick="messageProfile(${p.id})">Message</button>
+        <button class="ignore-btn" onclick="ignoreProfile(${p.id})">Ignore</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Swipe actions
+function likeProfile(id){
+  const profile = demoProfiles.find(p=>p.id===id);
+  if(!likedProfiles.includes(profile)) likedProfiles.push(profile);
+  alert(`You liked ${profile.name}`);
+  renderLiked();
+}
+function messageProfile(id){
+  const profile = demoProfiles.find(p=>p.id===id);
+  alert(`Open chat with ${profile.name}`);
+}
+function ignoreProfile(id){
+  const index = demoProfiles.findIndex(p=>p.id===id);
+  demoProfiles.splice(index,1);
+  renderCards();
+}
+
+// Render liked tab
+function renderLiked(){
+  const container = document.getElementById("likedList");
+  container.innerHTML="";
+  likedProfiles.forEach(p=>{
+    const div = document.createElement("div");
+    div.className="liked-card";
+    div.innerHTML=`<img src="${p.photo}" alt="${p.name}"><p>${p.name}</p>`;
+    container.appendChild(div);
+  });
+}
+
+// Tabs
+function showTab(tabId){
+  document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+}
+
+// Chat
+function sendMessage(){
+  const msgInput = document.getElementById("chatMessage");
+  if(msgInput.value.trim()==="") return;
+  chatMessages.push({from:"You", text: msgInput.value});
+  renderChat();
+  msgInput.value="";
+}
+function renderChat(){
+  const box = document.getElementById("chatBox");
+  box.innerHTML="";
+  chatMessages.forEach(m=>{
+    const div = document.createElement("div");
+    div.textContent=`${m.from}: ${m.text}`;
+    box.appendChild(div);
+  });
+}
+
+// Profile
+const locations = ["USA","UK","Canada","Germany","France","Italy","Spain","Australia","India","Japan"]; // add 152+
+const interests = ["Music","Sports","Travel","Reading","Cooking","Movies","Gaming","Art"];
+
+const locationSelect = document.getElementById("location");
+locations.forEach(loc=>{
+  const opt=document.createElement("option"); opt.value=loc; opt.textContent=loc; locationSelect.appendChild(opt);
+});
+
+const interestSelect = document.getElementById("interests");
+interests.forEach(i=>{
+  const opt=document.createElement("option"); opt.value=i; opt.textContent=i; interestSelect.appendChild(opt);
+});
+
+function saveProfile(e){
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const age = document.getElementById("age").value;
+  const location = document.getElementById("location").value;
+  const interests = Array.from(document.getElementById("interests").selectedOptions).map(o=>o.value);
+  alert(`Profile Saved:\nName: ${username}\nAge: ${age}\nLocation: ${location}\nInterests: ${interests.join(", ")}`);
+}
+
+renderCards();
+renderLiked();
+</script>
 
 </body>
 </html>
