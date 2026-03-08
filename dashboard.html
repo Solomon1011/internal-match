@@ -5,51 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Internal Match - Dashboard</title>
 <style>
-  body { font-family: Arial,sans-serif; margin:0; background:#fff0f6; }
-  h2 { color:#ff4d6d; text-align:center; margin-top:20px; }
+body { font-family: Arial, sans-serif; margin:0; padding-bottom:60px; background:#fff0f6; text-align:center;}
+h2 { color:#ff4d6d; }
+.tab-buttons { display:flex; justify-content:space-around; background:#fff; border-bottom:1px solid #ccc; position:fixed; top:0; width:100%; z-index:100; }
+.tab-buttons button { flex:1; padding:10px; border:none; background:#fff; color:#333; font-size:14px; cursor:pointer; }
+.tab-buttons button.active { color:#ff4d6d; border-bottom:2px solid #ff4d6d; }
+.tab-content { display:none; padding-top:60px; min-height:80vh; }
+.tab-content.active { display:block; }
 
-  /* Tabs */
-  .bottom-tabs { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background:#fff; display:flex; justify-content:space-around; align-items:center; border-top:1px solid #ccc; }
-  .bottom-tabs a { text-decoration:none; color:#333; font-size:12px; display:flex; flex-direction:column; align-items:center; }
-  .bottom-tabs a:hover { color:#ff2a5c; }
-  .bottom-tabs img { width: 30px; height:30px; margin-bottom:3px; }
+/* Swipe Cards */
+.card-container { position:relative; width:90%; max-width:350px; margin:20px auto; height:400px; }
+.card { position:absolute; width:100%; height:100%; background:#fff; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition:transform 0.3s ease; overflow:hidden; }
+.card img { width:100%; height:60%; object-fit:cover; border-top-left-radius:12px; border-top-right-radius:12px; }
+.card h3 { margin:10px 0 5px; }
+.card p { margin:0 0 10px; color:#666; }
+.card-actions { display:flex; justify-content:space-around; margin-top:auto; padding:10px; }
+.card-actions button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; color:#fff; }
+.like-btn { background:#28a745; }
+.message-btn { background:#17a2b8; }
+.ignore-btn { background:#dc3545; }
 
-  /* Card */
-  .card-container { display:flex; justify-content:center; align-items:center; flex-direction:column; margin-top:20px; }
-  .card { width:300px; height:400px; background:#fff; border-radius:12px; box-shadow:0 5px 10px rgba(0,0,0,0.2); margin-bottom:20px; padding:15px; position:relative; }
-  .card img { width:100%; height:60%; border-radius:12px; object-fit:cover; }
-  .card h3 { margin:10px 0 5px 0; }
-  .card p { font-size:14px; color:#555; }
-  .card-actions { display:flex; justify-content:space-around; margin-top:10px; }
-  .card-actions button { padding:8px 12px; border:none; border-radius:8px; cursor:pointer; }
-  .like-btn { background:#ff4d6d; color:#fff; }
-  .ignore-btn { background:#ccc; }
-  .message-btn { background:#ffa500; color:#fff; }
+/* Liked Tab */
+#likedList .liked-card { display:flex; align-items:center; margin:10px; padding:5px; border:1px solid #ccc; border-radius:8px; background:#fff; }
+#likedList .liked-card img { width:50px; height:50px; border-radius:50%; margin-right:10px; }
 
-  /* Tabs content */
-  .tab-content { display:none; padding: 20px; margin-bottom:60px; }
-  .active { display:block; }
+/* Message Tab */
+#messagesList .message-card { background:#fff; margin:5px; padding:10px; border-radius:8px; text-align:left; }
+#messagesList .message-card.you { background:#ffdee0; }
 
-  /* Like tab */
-  .liked-list { display:flex; flex-wrap:wrap; justify-content:center; }
-  .liked-card { width:120px; margin:10px; text-align:center; }
-  .liked-card img { width:100%; height:100px; border-radius:12px; object-fit:cover; }
-
-  /* Message tab */
-  .chat-box { border:1px solid #ccc; height:300px; overflow-y:auto; padding:10px; margin-bottom:10px; }
-  .chat-input { display:flex; }
-  .chat-input input { flex:1; padding:8px; border-radius:8px; border:1px solid #ccc; }
-  .chat-input button { padding:8px 12px; background:#ff4d6d; color:#fff; border:none; border-radius:8px; cursor:pointer; }
-
-  /* Profile tab */
-  .profile-form input, .profile-form select, .profile-form textarea { width:100%; padding:8px; margin:5px 0; border-radius:8px; border:1px solid #ccc; }
-  .profile-form button { background:#ff4d6d; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-top:10px; }
-
+/* Profile Tab */
+.profile-form input, .profile-form select { width:80%; padding:8px; margin:8px 0; border-radius:6px; border:1px solid #ccc; }
+.profile-form button { background:#ff4d6d; color:#fff; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <h2>💘 Internal Match Dashboard</h2>
+
+<!-- Tab Buttons -->
+<div class="tab-buttons">
+  <button class="tab-btn active" data-tab="swipeTab">Swipe</button>
+  <button class="tab-btn" data-tab="likeTab">Like</button>
+  <button class="tab-btn" data-tab="messageTab">Message</button>
+  <button class="tab-btn" data-tab="profileTab">Profile</button>
+  <button class="tab-btn" data-tab="coinsTab">Coins</button>
+</div>
 
 <!-- Swipe Tab -->
 <div id="swipeTab" class="tab-content active">
@@ -58,58 +58,81 @@
 
 <!-- Like Tab -->
 <div id="likeTab" class="tab-content">
-  <h3>People Who Like You</h3>
-  <div class="liked-list" id="likedList"></div>
+  <h3>People who liked you</h3>
+  <div id="likedList"></div>
 </div>
 
 <!-- Message Tab -->
 <div id="messageTab" class="tab-content">
-  <div class="chat-box" id="chatBox"></div>
-  <div class="chat-input">
-    <input type="text" id="chatMessage" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-  </div>
+  <h3>Messages</h3>
+  <div id="messagesList"></div>
+  <input type="text" id="messageInput" placeholder="Type message">
+  <button onclick="sendMessage()">Send</button>
 </div>
 
 <!-- Profile Tab -->
 <div id="profileTab" class="tab-content">
   <h3>Edit Profile</h3>
   <form class="profile-form" onsubmit="saveProfile(event)">
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="number" id="age" placeholder="Age" required>
-    <input type="file" id="profilePhoto" accept="image/*">
-    <select id="location" required></select>
-    <select id="interests" multiple size="5"></select>
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="number" id="age" placeholder="Age" min="13"><br>
+    <input type="file" id="photo" accept="image/*"><br>
+    <select id="country">
+      <option value="">Select Country</option>
+      <option value="USA">USA</option>
+      <option value="UK">UK</option>
+      <option value="Canada">Canada</option>
+      <option value="France">France</option>
+      <option value="Germany">Germany</option>
+      <!-- add more countries up to 152+ -->
+    </select><br>
+    <select id="interest" multiple>
+      <option value="Music">Music</option>
+      <option value="Travel">Travel</option>
+      <option value="Sports">Sports</option>
+      <option value="Movies">Movies</option>
+      <option value="Reading">Reading</option>
+      <option value="Cooking">Cooking</option>
+    </select><br>
     <button type="submit">Save Profile</button>
   </form>
 </div>
 
-<!-- Bottom Tabs -->
-<div class="bottom-tabs">
-  <a href="#" onclick="showTab('swipeTab')"><img src="https://img.icons8.com/color/48/000000/swipe-right.png"/><span>Swipe</span></a>
-  <a href="#" onclick="showTab('likeTab')"><img src="https://img.icons8.com/color/48/000000/like--v1.png"/><span>Like</span></a>
-  <a href="#" onclick="showTab('messageTab')"><img src="https://img.icons8.com/color/48/000000/topic.png"/><span>Message</span></a>
-  <a href="#" onclick="showTab('profileTab')"><img src="https://img.icons8.com/color/48/000000/user-male-circle.png"/><span>Profile</span></a>
+<!-- Coins Tab -->
+<div id="coinsTab" class="tab-content">
+  <h3>Your Coins</h3>
+  <p>You have <span id="coinCount">100</span> coins.</p>
 </div>
 
 <script>
-// Demo profiles
+// Tab switch
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// Demo swipe profiles
 const demoProfiles = [
   {id:1, name:"Alice", age:24, photo:"https://randomuser.me/api/portraits/women/65.jpg", location:"USA", interests:["Music","Travel"]},
   {id:2, name:"Bob", age:27, photo:"https://randomuser.me/api/portraits/men/12.jpg", location:"UK", interests:["Sports","Movies"]},
   {id:3, name:"Clara", age:22, photo:"https://randomuser.me/api/portraits/women/43.jpg", location:"Canada", interests:["Reading","Cooking"]},
 ];
 let likedProfiles = [];
-let chatMessages = [];
+let messages = [];
 
 // Render swipe cards
 function renderCards(){
   const container = document.getElementById("cards");
   container.innerHTML="";
-  demoProfiles.forEach(p=>{
+  demoProfiles.slice().reverse().forEach(p=>{
     const card = document.createElement("div");
     card.className="card";
-    card.innerHTML=`
+    card.style.zIndex = demoProfiles.length - p.id;
+    card.innerHTML = `
       <img src="${p.photo}" alt="${p.name}">
       <h3>${p.name}, ${p.age}</h3>
       <p>${p.location}</p>
@@ -119,89 +142,71 @@ function renderCards(){
         <button class="ignore-btn" onclick="ignoreProfile(${p.id})">Ignore</button>
       </div>
     `;
+
+    let startX=0, startY=0, isDragging=false;
+    card.addEventListener("touchstart",e=>{ startX=e.touches[0].clientX; startY=e.touches[0].clientY; isDragging=true; });
+    card.addEventListener("touchmove",e=>{
+      if(!isDragging) return;
+      const dx=e.touches[0].clientX-startX;
+      const dy=e.touches[0].clientY-startY;
+      card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/10}deg)`;
+    });
+    card.addEventListener("touchend",e=>{
+      isDragging=false;
+      const dx=e.changedTouches[0].clientX-startX;
+      if(dx>100){ likeProfile(p.id); }
+      else if(dx<-100){ ignoreProfile(p.id); }
+      else{ card.style.transform="translate(0,0) rotate(0)"; }
+    });
     container.appendChild(card);
   });
 }
 
-// Swipe actions
+// Like, Ignore, Message
 function likeProfile(id){
-  const profile = demoProfiles.find(p=>p.id===id);
-  if(!likedProfiles.includes(profile)) likedProfiles.push(profile);
-  alert(`You liked ${profile.name}`);
-  renderLiked();
-}
-function messageProfile(id){
-  const profile = demoProfiles.find(p=>p.id===id);
-  alert(`Open chat with ${profile.name}`);
-}
-function ignoreProfile(id){
-  const index = demoProfiles.findIndex(p=>p.id===id);
+  const index=demoProfiles.findIndex(p=>p.id===id);
+  likedProfiles.push(demoProfiles[index]);
   demoProfiles.splice(index,1);
   renderCards();
+  renderLiked();
 }
+function ignoreProfile(id){ const index=demoProfiles.findIndex(p=>p.id===id); demoProfiles.splice(index,1); renderCards();}
+function messageProfile(id){ alert(`Open chat with ${demoProfiles.find(p=>p.id===id).name}`);}
+function renderLiked(){ const container=document.getElementById("likedList"); container.innerHTML=""; likedProfiles.forEach(p=>{ const div=document.createElement("div"); div.className="liked-card"; div.innerHTML=`<img src="${p.photo}" alt="${p.name}"><p>${p.name}</p>`; container.appendChild(div);});}
 
-// Render liked tab
-function renderLiked(){
-  const container = document.getElementById("likedList");
+// Messages
+function sendMessage(){ 
+  const input=document.getElementById("messageInput"); 
+  if(input.value.trim()==="") return;
+  messages.push({text:input.value, you:true}); 
+  renderMessages(); 
+  input.value=""; 
+}
+function renderMessages(){
+  const container=document.getElementById("messagesList");
   container.innerHTML="";
-  likedProfiles.forEach(p=>{
-    const div = document.createElement("div");
-    div.className="liked-card";
-    div.innerHTML=`<img src="${p.photo}" alt="${p.name}"><p>${p.name}</p>`;
+  messages.forEach(m=>{ 
+    const div=document.createElement("div"); 
+    div.className="message-card"+(m.you?" you":""); 
+    div.textContent=m.text; 
     container.appendChild(div);
   });
 }
 
-// Tabs
-function showTab(tabId){
-  document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
-  document.getElementById(tabId).classList.add("active");
-}
-
-// Chat
-function sendMessage(){
-  const msgInput = document.getElementById("chatMessage");
-  if(msgInput.value.trim()==="") return;
-  chatMessages.push({from:"You", text: msgInput.value});
-  renderChat();
-  msgInput.value="";
-}
-function renderChat(){
-  const box = document.getElementById("chatBox");
-  box.innerHTML="";
-  chatMessages.forEach(m=>{
-    const div = document.createElement("div");
-    div.textContent=`${m.from}: ${m.text}`;
-    box.appendChild(div);
-  });
-}
-
-// Profile
-const locations = ["USA","UK","Canada","Germany","France","Italy","Spain","Australia","India","Japan"]; // add 152+
-const interests = ["Music","Sports","Travel","Reading","Cooking","Movies","Gaming","Art"];
-
-const locationSelect = document.getElementById("location");
-locations.forEach(loc=>{
-  const opt=document.createElement("option"); opt.value=loc; opt.textContent=loc; locationSelect.appendChild(opt);
-});
-
-const interestSelect = document.getElementById("interests");
-interests.forEach(i=>{
-  const opt=document.createElement("option"); opt.value=i; opt.textContent=i; interestSelect.appendChild(opt);
-});
-
-function saveProfile(e){
+// Profile Save
+function saveProfile(e){ 
   e.preventDefault();
-  const username = document.getElementById("username").value;
-  const age = document.getElementById("age").value;
-  const location = document.getElementById("location").value;
-  const interests = Array.from(document.getElementById("interests").selectedOptions).map(o=>o.value);
-  alert(`Profile Saved:\nName: ${username}\nAge: ${age}\nLocation: ${location}\nInterests: ${interests.join(", ")}`);
+  const username=document.getElementById("username").value;
+  const age=document.getElementById("age").value;
+  const country=document.getElementById("country").value;
+  const interest=Array.from(document.getElementById("interest").selectedOptions).map(o=>o.value);
+  alert(`Profile saved!\nName: ${username}\nAge: ${age}\nCountry: ${country}\nInterests: ${interest.join(", ")}`);
 }
 
+// Initialize
 renderCards();
 renderLiked();
+renderMessages();
 </script>
-
 </body>
 </html>
