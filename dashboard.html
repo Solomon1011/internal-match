@@ -165,7 +165,7 @@ function ignoreProfile(i){nextProfile();}
 function nextProfile(){currentIndex++;showProfileCard(currentIndex);}
 showProfileCard(currentIndex);
 
-// --- User Login/Signup ---
+// --- Login/Signup ---
 let currentUser=null;
 function showSignup(){document.getElementById("login-form").style.display="none"; document.getElementById("signup-form").style.display="flex";}
 function showLogin(){document.getElementById("signup-form").style.display="none"; document.getElementById("login-form").style.display="flex";}
@@ -194,13 +194,12 @@ function openUserProfile(user){
   swipeContainer.style.display="none";
 
   if(user===currentUser){
-    // My profile editable
     document.getElementById("editable-profile").style.display="block";
     document.getElementById("save-profile").style.display="block";
     document.getElementById("photo1").style.display="block";
     ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>document.getElementById(id).disabled=false);
   } else {
-    // Viewing other profiles - readonly exactly as requested
+    // Viewing other profiles - only show exactly requested info
     document.getElementById("editable-profile").style.display="block";
     document.getElementById("save-profile").style.display="none";
     document.getElementById("photo1").style.display="none";
