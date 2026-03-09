@@ -174,7 +174,7 @@ function login(){
   const password=document.getElementById("login-password").value;
   if(email && password){
     alert("Login successful!");
-    currentUser=demoProfiles[0]; // my demo profile
+    currentUser=demoProfiles[0];
     showProfileTab();
   } else alert("Enter email and password");
 }
@@ -199,20 +199,20 @@ function openUserProfile(user){
     document.getElementById("photo1").style.display="block";
     ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>document.getElementById(id).disabled=false);
   } else {
-    // Viewing other profiles - only show exactly requested info
-    document.getElementById("editable-profile").style.display="block";
-    document.getElementById("save-profile").style.display="none";
-    document.getElementById("photo1").style.display="none";
-
-    document.getElementById("profile-pic").src = user.photo;
-    document.getElementById("profile-name").value = user.name;
-    document.getElementById("profile-age").value = user.age;
-    document.getElementById("profile-country").value = user.location;
-    document.getElementById("profile-interest").value = user.interest;
-
-    ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>{
-      document.getElementById(id).disabled = true;
-    });
+    // Viewing other people - show only plain text
+    const container=document.getElementById("editable-profile");
+    container.innerHTML=`
+      <div style="position:relative; margin-bottom:15px;">
+        <img src="${user.photo}" style="width:120px;height:120px;border-radius:50%;object-fit:cover">
+        <div class="online-dot" style="background:${user.online?'lime':'gray'}"></div>
+      </div>
+      <div style="text-align:left; font-size:16px; line-height:1.6;">
+        <div><b>Name:</b> ${user.name}</div>
+        <div><b>Age:</b> ${user.age}</div>
+        <div><b>Country:</b> ${user.location}</div>
+        <div><b>Interest:</b> ${user.interest}</div>
+      </div>
+    `;
   }
   refreshOnlineDots();
 }
