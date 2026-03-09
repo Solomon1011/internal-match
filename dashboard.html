@@ -58,7 +58,7 @@ input,select{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:none;b
     <p style="text-align:center;">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
   </div>
 
-  <!-- Editable Profile -->
+  <!-- Editable/Readonly Profile -->
   <div class="profile-container" id="editable-profile" style="display:none;">
     <div style="position:relative">
       <img id="profile-pic" src="" alt="Profile">
@@ -188,25 +188,41 @@ function signup(){
   } else alert("Enter email and password");
 }
 
-function showProfileTab(){
-  document.getElementById("login-form").style.display="none";
-  document.getElementById("signup-form").style.display="none";
-  document.getElementById("editable-profile").style.display="block";
-  openUserProfile(currentUser,true);
-}
-
-// --- Profile Editing ---
+// --- Profile Editing & Viewing ---
 function openUserProfile(user,isEditable=false){
   document.getElementById("profile").style.display="flex";
   swipeContainer.style.display="none";
-  document.getElementById("profile-pic").src=user.photo;
-  document.getElementById("profile-name").value=user.name;
-  document.getElementById("profile-age").value=user.age;
-  document.getElementById("profile-country").value=user.location;
-  document.getElementById("profile-interest").value=user.interest;
-  document.getElementById("profile-online").style.background=user.online?'lime':'gray';
-  document.getElementById("save-profile").style.display = (user===currentUser) ? "block":"none";
-  document.getElementById("photo1").style.display = (user===currentUser) ? "block":"none";
+
+  if(user===currentUser){
+    // Editable profile
+    document.getElementById("editable-profile").style.display="block";
+    document.getElementById("login-form").style.display="none";
+    document.getElementById("signup-form").style.display="none";
+
+    document.getElementById("profile-pic").src=user.photo;
+    document.getElementById("profile-name").value=user.name;
+    document.getElementById("profile-age").value=user.age;
+    document.getElementById("profile-country").value=user.location;
+    document.getElementById("profile-interest").value=user.interest;
+    document.getElementById("profile-online").style.background=user.online?'lime':'gray';
+    document.getElementById("save-profile").style.display = "block";
+    document.getElementById("photo1").style.display = "block";
+    ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>document.getElementById(id).disabled=false);
+  } else {
+    // Viewing other people's profile - readonly
+    document.getElementById("editable-profile").style.display="block";
+    document.getElementById("save-profile").style.display="none";
+    document.getElementById("photo1").style.display="none";
+
+    document.getElementById("profile-pic").src=user.photo;
+    document.getElementById("profile-name").value=user.name;
+    document.getElementById("profile-age").value=user.age;
+    document.getElementById("profile-country").value=user.location;
+    document.getElementById("profile-interest").value=user.interest;
+
+    ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>document.getElementById(id).disabled=true);
+  }
+  refreshOnlineDots();
 }
 
 // Save profile
@@ -314,7 +330,7 @@ setInterval(()=>{
   demoProfiles.forEach(p=>p.online=Math.random()>0.3);
   refreshOnlineDots();
 },5000);
-
 </script>
+
 </body>
 </html>
