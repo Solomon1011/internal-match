@@ -144,7 +144,7 @@ function showProfileCard(i){
   const p=demoProfiles[i];
   const card=document.createElement("div");
   card.className="card";
-  card.addEventListener("click",()=>openUserProfile(p,false));
+  card.addEventListener("click",()=>openUserProfile(p));
   card.innerHTML=`
     <div class="online-dot-small" style="background:${p.online?'lime':'gray'}"></div>
     <img src="${p.photo}">
@@ -189,38 +189,31 @@ function signup(){
 }
 
 // --- Profile Editing & Viewing ---
-function openUserProfile(user,isEditable=false){
+function openUserProfile(user){
   document.getElementById("profile").style.display="flex";
   swipeContainer.style.display="none";
 
   if(user===currentUser){
-    // Editable profile
+    // My profile editable
     document.getElementById("editable-profile").style.display="block";
-    document.getElementById("login-form").style.display="none";
-    document.getElementById("signup-form").style.display="none";
-
-    document.getElementById("profile-pic").src=user.photo;
-    document.getElementById("profile-name").value=user.name;
-    document.getElementById("profile-age").value=user.age;
-    document.getElementById("profile-country").value=user.location;
-    document.getElementById("profile-interest").value=user.interest;
-    document.getElementById("profile-online").style.background=user.online?'lime':'gray';
-    document.getElementById("save-profile").style.display = "block";
-    document.getElementById("photo1").style.display = "block";
+    document.getElementById("save-profile").style.display="block";
+    document.getElementById("photo1").style.display="block";
     ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>document.getElementById(id).disabled=false);
   } else {
-    // Viewing other people's profile - readonly
+    // Viewing other profiles - readonly exactly as requested
     document.getElementById("editable-profile").style.display="block";
     document.getElementById("save-profile").style.display="none";
     document.getElementById("photo1").style.display="none";
 
-    document.getElementById("profile-pic").src=user.photo;
-    document.getElementById("profile-name").value=user.name;
-    document.getElementById("profile-age").value=user.age;
-    document.getElementById("profile-country").value=user.location;
-    document.getElementById("profile-interest").value=user.interest;
+    document.getElementById("profile-pic").src = user.photo;
+    document.getElementById("profile-name").value = user.name;
+    document.getElementById("profile-age").value = user.age;
+    document.getElementById("profile-country").value = user.location;
+    document.getElementById("profile-interest").value = user.interest;
 
-    ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>document.getElementById(id).disabled=true);
+    ["profile-name","profile-age","profile-country","profile-interest"].forEach(id=>{
+      document.getElementById(id).disabled = true;
+    });
   }
   refreshOnlineDots();
 }
@@ -285,7 +278,7 @@ function showTab(tab,event){
   if(tab==='swipe') swipeContainer.style.display="flex";
   if(tab==='messages') document.getElementById("chat-box").style.display="flex";
   if(tab==='profile-tab') {
-    if(currentUser) showProfileTab(); 
+    if(currentUser) openUserProfile(currentUser); 
     else document.getElementById("login-form").style.display="flex";
   }
   if(tab==='likes'){
